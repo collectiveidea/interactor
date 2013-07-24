@@ -20,4 +20,24 @@ describe Interactor do
       expect(interactor.perform).to eq(instance)
     end
   end
+
+  describe ".new" do
+    let(:context) { double(:context) }
+
+    it "initializes a context" do
+      expect(Interactor::Context).to receive(:build).with(foo: "bar") { context }
+
+      instance = interactor.new(foo: "bar")
+
+      expect(instance.context).to eq(context)
+    end
+
+    it "initializes a blank context if none is given" do
+      expect(Interactor::Context).to receive(:build).with({}) { context }
+
+      instance = interactor.new
+
+      expect(instance.context).to eq(context)
+    end
+  end
 end
