@@ -64,4 +64,20 @@ describe Interactor do
       }.from([]).to([String, Integer])
     end
   end
+
+  describe "#perform" do
+    it "performs each interactor with the context" do
+      interactor2, interactor3 = double(:interactor2), double(:interactor3)
+      interactor.stub(:interactors) { [interactor2, interactor3] }
+
+      instance = interactor.new
+      context = double(:context)
+      instance.stub(:context) { context }
+
+      expect(interactor2).to receive(:perform).once.with(context).ordered
+      expect(interactor3).to receive(:perform).once.with(context).ordered
+
+      instance.perform
+    end
+  end
 end

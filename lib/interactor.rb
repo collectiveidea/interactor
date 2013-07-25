@@ -28,5 +28,11 @@ module Interactor
     def initialize(context = {})
       @context = Context.build(context)
     end
+
+    def perform
+      self.class.interactors.each do |interactor|
+        interactor.perform(context)
+      end
+    end
   end
 end
