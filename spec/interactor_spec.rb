@@ -183,4 +183,44 @@ describe Interactor do
       expect(instance.performed).to eq([])
     end
   end
+
+  describe "#success?" do
+    let(:instance) { interactor.new }
+    let(:context) { instance.context }
+
+    it "defers to the context" do
+      context.stub(success?: true)
+      expect(instance.success?).to eq(true)
+      context.stub(success?: false)
+      expect(instance.success?).to eq(false)
+    end
+  end
+
+  describe "#failure?" do
+    let(:instance) { interactor.new }
+    let(:context) { instance.context }
+
+    it "defers to the context" do
+      context.stub(failure?: true)
+      expect(instance.failure?).to eq(true)
+      context.stub(failure?: false)
+      expect(instance.failure?).to eq(false)
+    end
+  end
+
+  describe "context deferral" do
+    let(:instance) { interactor.new(foo: "bar") }
+
+    it "defers to keys that exist in the context" do
+      expect(instance).to respond_to(:foo)
+      expect(instance.foo).to eq("bar")
+      expect { instance.method(:foo) }.not_to raise_error
+    end
+
+    it "bombs if the key does not exist in the context" do
+      expect(instance).not_to respond_to(:baz)
+      expect { instance.baz }.to raise_error(NoMethodError)
+      expect { instance.method(:baz) }.to raise_error(NameError)
+    end
+  end
 end

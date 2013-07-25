@@ -54,5 +54,21 @@ module Interactor
     def performed
       @performed ||= []
     end
+
+    def success?
+      context.success?
+    end
+
+    def failure?
+      context.failure?
+    end
+
+    def method_missing(method, *)
+      context.fetch(method) { super }
+    end
+
+    def respond_to_missing?(method, *)
+      context.key?(method) || super
+    end
   end
 end
