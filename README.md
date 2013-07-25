@@ -42,7 +42,7 @@ While business logic may be more at home in a controller, controllers are typica
 
 So what if we encapsulated all of our business logic in dead-simple Ruby. One glance at a directory like `app/interactors` could go a long way in answering the question, "What does this app do?".
 
-```ruby
+```
 ▸ app/
   ▾ interactors/
     add_product_to_cart.rb
