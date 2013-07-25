@@ -14,6 +14,14 @@ module Interactor
     def perform(context = {})
       new(context).tap(&:perform)
     end
+
+    def interactors
+      @interactors ||= []
+    end
+
+    def organize(*interactors)
+      @interactors = interactors.flatten
+    end
   end
 
   module InstanceMethods

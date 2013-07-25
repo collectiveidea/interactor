@@ -40,4 +40,28 @@ describe Interactor do
       expect(instance.context).to eq(context)
     end
   end
+
+  describe ".interactors" do
+    it "is empty by default" do
+      expect(interactor.interactors).to eq([])
+    end
+  end
+
+  describe ".organize" do
+    it "sets interactors given class arguments" do
+      expect {
+        interactor.organize(String, Integer)
+      }.to change {
+        interactor.interactors
+      }.from([]).to([String, Integer])
+    end
+
+    it "sets interactors given an array of classes" do
+      expect {
+        interactor.organize([String, Integer])
+      }.to change {
+        interactor.interactors
+      }.from([]).to([String, Integer])
+    end
+  end
 end
