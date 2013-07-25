@@ -1,4 +1,4 @@
-Copyright (c) 2013 Steve Richert
+Copyright (c) 2013 Collective Idea
 
 MIT License
 
