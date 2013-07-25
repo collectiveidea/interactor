@@ -119,7 +119,7 @@ Breaking your interactors into bite-sized pieces also gives you the benefit or r
 
 ## Examples
 
-### 🚧  Under Contruction
+### 🚧  Under Construction
 
 ## Conventions
 
