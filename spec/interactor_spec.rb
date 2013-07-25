@@ -80,4 +80,13 @@ describe Interactor do
       instance.perform
     end
   end
+
+  describe "#rollback" do
+    it "exists" do
+      instance = interactor.new
+
+      expect(instance).to respond_to(:rollback)
+      expect { instance.rollback }.not_to raise_error
+    end
+  end
 end

@@ -34,5 +34,8 @@ module Interactor
         interactor.perform(context)
       end
     end
+
+    def rollback
+    end
   end
 end
