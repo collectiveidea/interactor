@@ -29,5 +29,54 @@ module Interactor
         }.from(nil).to("bar")
       end
     end
+
+    describe "#success?" do
+      it "is true by default" do
+        context = Context.build
+
+        expect(context.success?).to eq(true)
+      end
+    end
+
+    describe "#failure?" do
+      it "is false by default" do
+        context = Context.build
+
+        expect(context.failure?).to eq(false)
+      end
+    end
+
+    describe "#fail!" do
+      it "sets success to false" do
+        context = Context.build
+
+        expect {
+          context.fail!
+        }.to change {
+          context.success?
+        }.from(true).to(false)
+      end
+
+      it "sets failure to true" do
+        context = Context.build
+
+        expect {
+          context.fail!
+        }.to change {
+          context.failure?
+        }.from(false).to(true)
+      end
+
+      it "preserves failure" do
+        context = Context.build
+        context.fail!
+
+        expect {
+          context.fail!
+        }.not_to change {
+          context.failure?
+        }
+      end
+    end
   end
 end
