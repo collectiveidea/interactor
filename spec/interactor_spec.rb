@@ -41,6 +41,18 @@ describe Interactor do
       expect(instance).to be_a(Interactor)
       expect(instance.context).to eq(context)
     end
+
+    it "calls setup" do
+      interactor.class_eval do
+        def setup
+          context[:foo] = bar
+        end
+      end
+
+      instance = interactor.new(bar: "baz")
+
+      expect(instance.context[:foo]).to eq("baz")
+    end
   end
 
   describe ".interactors" do

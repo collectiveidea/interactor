@@ -31,6 +31,10 @@ module Interactor
   module InstanceMethods
     def initialize(context = {})
       @context = Context.build(context)
+      setup
+    end
+
+    def setup
     end
 
     def interactors
