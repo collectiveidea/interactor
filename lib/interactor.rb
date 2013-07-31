@@ -67,8 +67,8 @@ module Interactor
       context.failure?
     end
 
-    def fail!
-      context.fail!
+    def fail!(*args)
+      context.fail!(*args)
     end
 
     def method_missing(method, *)

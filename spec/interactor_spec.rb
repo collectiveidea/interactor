@@ -237,9 +237,15 @@ describe Interactor do
     let(:context) { instance.context }
 
     it "defers to the context" do
-      expect(context).to receive(:fail!)
+      expect(context).to receive(:fail!).with(no_args)
 
       instance.fail!
+    end
+
+    it "passes updates to the context" do
+      expect(context).to receive(:fail!).with(foo: "bar")
+
+      instance.fail!(foo: "bar")
     end
   end
 
