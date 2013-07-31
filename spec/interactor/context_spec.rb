@@ -18,38 +18,38 @@ module Interactor
       end
 
       it "preserves an already built context" do
-        context1 = Context.build
+        context1 = Context.build(foo: "bar")
         context2 = Context.build(context1)
 
         expect(context2).to be_a(Context)
         expect {
-          context2[:foo] = "bar"
+          context2[:foo] = "baz"
         }.to change {
           context1[:foo]
-        }.from(nil).to("bar")
+        }.from("bar").to("baz")
       end
     end
 
     describe "#success?" do
-      it "is true by default" do
-        context = Context.build
+      let(:context) { Context.build }
 
+      it "is true by default" do
         expect(context.success?).to eq(true)
       end
     end
 
     describe "#failure?" do
-      it "is false by default" do
-        context = Context.build
+      let(:context) { Context.build }
 
+      it "is false by default" do
         expect(context.failure?).to eq(false)
       end
     end
 
     describe "#fail!" do
-      it "sets success to false" do
-        context = Context.build
+      let(:context) { Context.build }
 
+      it "sets success to false" do
         expect {
           context.fail!
         }.to change {
@@ -58,8 +58,6 @@ module Interactor
       end
 
       it "sets failure to true" do
-        context = Context.build
-
         expect {
           context.fail!
         }.to change {
@@ -68,7 +66,6 @@ module Interactor
       end
 
       it "preserves failure" do
-        context = Context.build
         context.fail!
 
         expect {
