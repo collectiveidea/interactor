@@ -67,6 +67,10 @@ module Interactor
       context.failure?
     end
 
+    def fail!
+      context.fail!
+    end
+
     def method_missing(method, *)
       context.fetch(method) { super }
     end

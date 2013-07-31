@@ -213,6 +213,7 @@ describe Interactor do
     it "defers to the context" do
       context.stub(success?: true)
       expect(instance.success?).to eq(true)
+
       context.stub(success?: false)
       expect(instance.success?).to eq(false)
     end
@@ -225,8 +226,20 @@ describe Interactor do
     it "defers to the context" do
       context.stub(failure?: true)
       expect(instance.failure?).to eq(true)
+
       context.stub(failure?: false)
       expect(instance.failure?).to eq(false)
+    end
+  end
+
+  describe "#fail!" do
+    let(:instance) { interactor.new }
+    let(:context) { instance.context }
+
+    it "defers to the context" do
+      expect(context).to receive(:fail!)
+
+      instance.fail!
     end
   end
 
