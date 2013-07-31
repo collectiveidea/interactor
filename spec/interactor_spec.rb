@@ -21,40 +21,6 @@ describe Interactor do
     end
   end
 
-  describe ".new" do
-    let(:context) { double(:context) }
-
-    it "initializes a context" do
-      expect(Interactor::Context).to receive(:build).with(foo: "bar") { context }
-
-      instance = interactor.new(foo: "bar")
-
-      expect(instance).to be_a(Interactor)
-      expect(instance.context).to eq(context)
-    end
-
-    it "initializes a blank context if none is given" do
-      expect(Interactor::Context).to receive(:build).with({}) { context }
-
-      instance = interactor.new
-
-      expect(instance).to be_a(Interactor)
-      expect(instance.context).to eq(context)
-    end
-
-    it "calls setup" do
-      interactor.class_eval do
-        def setup
-          context[:foo] = bar
-        end
-      end
-
-      instance = interactor.new(bar: "baz")
-
-      expect(instance.context[:foo]).to eq("baz")
-    end
-  end
-
   describe ".interactors" do
     it "is empty by default" do
       expect(interactor.interactors).to eq([])
@@ -97,6 +63,40 @@ describe Interactor do
       expect(instance).to receive(:rollback).once.with(no_args)
 
       expect(interactor.rollback).to eq(instance)
+    end
+  end
+
+  describe ".new" do
+    let(:context) { double(:context) }
+
+    it "initializes a context" do
+      expect(Interactor::Context).to receive(:build).with(foo: "bar") { context }
+
+      instance = interactor.new(foo: "bar")
+
+      expect(instance).to be_a(Interactor)
+      expect(instance.context).to eq(context)
+    end
+
+    it "initializes a blank context if none is given" do
+      expect(Interactor::Context).to receive(:build).with({}) { context }
+
+      instance = interactor.new
+
+      expect(instance).to be_a(Interactor)
+      expect(instance.context).to eq(context)
+    end
+
+    it "calls setup" do
+      interactor.class_eval do
+        def setup
+          context[:foo] = bar
+        end
+      end
+
+      instance = interactor.new(bar: "baz")
+
+      expect(instance.context[:foo]).to eq("baz")
     end
   end
 
