@@ -100,6 +100,16 @@ describe Interactor do
     end
   end
 
+  describe "#setup" do
+    let(:instance) { interactor.new }
+
+    it "exists" do
+      expect(instance).to respond_to(:setup)
+      expect { instance.setup }.not_to raise_error
+      expect { instance.method(:setup) }.not_to raise_error
+    end
+  end
+
   describe "#interactors" do
     let(:interactors) { double(:interactors) }
     let(:instance) { interactor.new }
