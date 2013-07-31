@@ -47,7 +47,7 @@ module Interactor
     end
 
     describe "#fail!" do
-      let(:context) { Context.build }
+      let(:context) { Context.build(foo: "bar") }
 
       it "sets success to false" do
         expect {
@@ -73,6 +73,22 @@ module Interactor
         }.not_to change {
           context.failure?
         }
+      end
+
+      it "preserves the context" do
+        expect {
+          context.fail!
+        }.not_to change {
+          context[:foo]
+        }
+      end
+
+      it "updates the context" do
+        expect {
+          context.fail!(foo: "baz")
+        }.to change {
+          context[:foo]
+        }.from("bar").to("baz")
       end
     end
   end
