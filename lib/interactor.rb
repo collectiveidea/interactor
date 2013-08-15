@@ -16,14 +16,6 @@ module Interactor
       new(context).tap(&:perform)
     end
 
-    def interactors
-      @interactors ||= []
-    end
-
-    def organize(*interactors)
-      @interactors = interactors.flatten
-    end
-
     def rollback(context = {})
       new(context).tap(&:rollback)
     end
@@ -38,26 +30,10 @@ module Interactor
     def setup
     end
 
-    def interactors
-      self.class.interactors
-    end
-
     def perform
-      interactors.each do |interactor|
-        performed << interactor
-        interactor.perform(context)
-        rollback && break if context.failure?
-      end
     end
 
     def rollback
-      performed.reverse_each do |interactor|
-        interactor.rollback(context)
-      end
-    end
-
-    def performed
-      @performed ||= []
     end
 
     def success?

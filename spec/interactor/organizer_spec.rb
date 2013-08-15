@@ -2,7 +2,9 @@ require "spec_helper"
 
 module Interactor
   describe Organizer do
-    let(:interactor) { Class.new { include Organizer } }
+    include_examples :lint
+
+    let(:interactor) { Class.new.send(:include, Organizer) }
 
     describe ".interactors" do
       it "is empty by default" do
