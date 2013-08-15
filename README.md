@@ -107,7 +107,7 @@ Each of these actions can (and should) have its own interactor and one organizer
 
 ```ruby
 class PlaceOrder
-  include Interactor
+  include Interactor::Organizer
 
   organize [
     CheckInventory,
