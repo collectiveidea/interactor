@@ -1,4 +1,5 @@
 require "interactor/context"
+require "interactor/organizer"
 
 module Interactor
   def self.included(base)
