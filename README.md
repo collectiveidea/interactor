@@ -125,7 +125,124 @@ Breaking your interactors into bite-sized pieces also gives you the benefit or r
 
 ## Examples
 
-### 🚧  Under Construction
+### Interactors
+
+Take the simple case of authenticating a user.
+
+Using an interactor, the controller stays very clean, making it very readable and easily testable.
+
+```ruby
+class SessionsController < ApplicationController
+  def create
+    result = AuthenticateUser.perform(session_params)
+
+    if result.success?
+      redirect_to result.user
+    else
+      render :new
+    end
+  end
+
+  private
+
+  def session_params
+    params.require(:session).permit(:email, :password)
+  end
+end
+```
+
+The `result` above is an instance of the `AuthenticateUser` interactor that has been performed. The magic happens in the interactor, after receiving a *context* from the controller. A context is just a glorified hash that the interactor manipulates.
+
+```ruby
+class AuthenticateUser
+  include Interactor
+
+  def perform
+    if user = User.authenticate(context[:email], context[:password])
+      context[:user] = user
+    else
+      context.fail!
+    end
+  end
+end
+```
+
+The interactor also has convenience methods for dealing with its context. Anything added to the context is available via getter method on the interactor instance. The following is equivalent:
+
+```ruby
+class AuthenticateUser
+  include Interactor
+
+  def perform
+    if user = User.authenticate(email, password)
+      context[:user] = user
+    else
+      fail!
+    end
+  end
+end
+```
+
+An interactor can fail with an optional hash that is merged into the context.
+
+```ruby
+fail!(message: "Uh oh!")
+```
+
+Interactors are successful until explicitly failed. Instances respond to `success?` and `failure?`.
+
+### Organizers
+
+In the example above, one could argue that the interactor is simple enough that it could be excluded altogether. While that's probably true, in [our](http://collectiveidea.com) experience, these interactions don't stay simple for long. When they get more complex, the `AuthenticateUser` interactor can be converted to an organizer.
+
+```ruby
+class AuthenticateUser
+  include Interactor::Organizer
+
+  organize FindUserByEmailAndPassword, SendWelcomeEmail
+end
+```
+
+And your controller doesn't change a bit!
+
+The `AuthenticateUser` organizer receives its context from the controller and passes it to the interactors, which each manipulate it in turn.
+
+```ruby
+class FindUserByEmailAndPassword
+  include Interactor
+
+  def perform
+    if user = User.authenticate(email, password)
+      context[:user] = user
+    else
+      fail!
+    end
+  end
+end
+```
+
+```ruby
+class SendWelcomeEmail
+  include Interactor
+
+  def perform
+    if user.newly_created?
+      Notifier.welcome(user).deliver
+      context[:new_user] = true
+    end
+  end
+end
+```
+
+#### Inception
+
+Because interactors and organizers adhere to the same interface, it's trivial for an organizer to organize… organizers!
+
+#### Rollback
+
+If an organizer has three interactors and the second one fails, the third one is never called.
+
+In addition to halting the chain, an organizer will also *rollback* through the interactors that it has performed so that each interactor has the opportunity to undo itself. Just define a `rollback` method. It has all the same access to the context as `perform` does.
 
 ## Conventions
 
@@ -136,6 +253,8 @@ We love Rails, and we use Interactor with Rails. We put our interactors in `app/
 * `PlaceOrder`
 * `RegisterUser`
 * `RemoveProductFromCart`
+
+See [Interactor Rails](https://github.com/collectiveidea/interactor-rails)
 
 ## Contributions
 
