@@ -246,6 +246,27 @@ In addition to halting the chain, an organizer will also *rollback* through the 
 
 ## Conventions
 
+### Good Practice
+
+To allow rollbacks to work without fuss in organizers, interactors should only *add* to the context. They should not transform any values already in the context. For example, the following is a bad idea:
+
+```ruby
+class FindUser
+  include Interactor
+
+  def perform
+    context[:user] = User.find(context[:user])
+    # Now, context[:user] contains a User object.
+    # Before, context[:user] held a user ID.
+    # This is bad.
+  end
+end
+```
+
+If an organizer rolls back, any interactor before `FindUser` will now see a `User` object during the rollback when they were probably expecting a simple ID. This could cause problems.
+
+### Rails
+
 We love Rails, and we use Interactor with Rails. We put our interactors in `app/interactors` and we name them as verbs:
 
 * `AddProductToCart`
