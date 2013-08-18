@@ -242,7 +242,7 @@ Because interactors and organizers adhere to the same interface, it's trivial fo
 
 If an organizer has three interactors and the second one fails, the third one is never called.
 
-In addition to halting the chain, an organizer will also *rollback* through the interactors that it has performed so that each interactor has the opportunity to undo itself. Just define a `rollback` method. It has all the same access to the context as `perform` does.
+In addition to halting the chain, an organizer will also *rollback*, giving the performed interactors (including the failed interactor) the opportunity to undo themselves, in reverse order. Just define a `rollback` method. It has all the same access to the context as `perform` does.
 
 ## Conventions
 
