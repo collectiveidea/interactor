@@ -15,10 +15,6 @@ module Interactor
     def perform(context = {})
       new(context).tap(&:perform)
     end
-
-    def rollback(context = {})
-      new(context).tap(&:rollback)
-    end
   end
 
   module InstanceMethods

@@ -19,24 +19,6 @@ shared_examples :lint do
     end
   end
 
-  describe ".rollback" do
-    let(:instance) { double(:instance) }
-
-    it "rolls back an instance with the given context" do
-      expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
-      expect(instance).to receive(:rollback).once.with(no_args)
-
-      expect(interactor.rollback(foo: "bar")).to eq(instance)
-    end
-
-    it "provides a blank context if none is given" do
-      expect(interactor).to receive(:new).once.with({}) { instance }
-      expect(instance).to receive(:rollback).once.with(no_args)
-
-      expect(interactor.rollback).to eq(instance)
-    end
-  end
-
   describe ".new" do
     let(:context) { double(:context) }
 
