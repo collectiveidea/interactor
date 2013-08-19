@@ -69,15 +69,15 @@ module Interactor
 
       it "builds up the performed interactors" do
         interactor2.stub(:perform) do
-          expect(instance.performed).to eq([interactor2])
+          expect(instance.performed).to eq([])
         end
 
         interactor3.stub(:perform) do
-          expect(instance.performed).to eq([interactor2, interactor3])
+          expect(instance.performed).to eq([interactor2])
         end
 
         interactor4.stub(:perform) do
-          expect(instance.performed).to eq([interactor2, interactor3, interactor4])
+          expect(instance.performed).to eq([interactor2, interactor3])
         end
 
         expect {
@@ -93,7 +93,7 @@ module Interactor
         expect(interactor4).not_to receive(:perform)
 
         expect(instance).to receive(:rollback).once.ordered do
-          expect(instance.performed).to eq([interactor2, interactor3])
+          expect(instance.performed).to eq([interactor2])
         end
 
         instance.perform

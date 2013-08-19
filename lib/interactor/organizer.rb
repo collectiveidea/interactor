@@ -26,9 +26,9 @@ module Interactor
 
       def perform
         interactors.each do |interactor|
-          performed << interactor
           interactor.perform(context)
-          rollback && break if context.failure?
+          rollback && break if failure?
+          performed << interactor
         end
       end
 
