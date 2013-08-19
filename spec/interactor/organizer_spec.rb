@@ -162,6 +162,7 @@ module Interactor
       let(:instance2c) { double(:instance2c) }
       let(:instance3) { double(:instance3) }
       let(:instance4a) { double(:instance4a) }
+      let(:instance4b) { double(:instance4b) }
 
       before do
         organizer.stub(:interactors) { [organizer2, interactor3, organizer4, interactor5] }
@@ -175,10 +176,14 @@ module Interactor
         expect(interactor2c).to receive(:perform).once.with(context).ordered { instance2c }
         expect(interactor3).to receive(:perform).once.with(context).ordered { instance3 }
         expect(interactor4a).to receive(:perform).once.with(context).ordered { instance4a }
-        expect(interactor4b).to receive(:perform).once.with(context).ordered { context.fail! }
+        expect(interactor4b).to receive(:perform).once.with(context).ordered do
+          context.fail!
+          instance4b
+        end
         expect(interactor4c).not_to receive(:perform)
         expect(interactor5).not_to receive(:perform)
 
+        expect(instance4b).not_to receive(:rollback)
         expect(instance4a).to receive(:rollback).once.with(no_args).ordered
         expect(instance3).to receive(:rollback).once.with(no_args).ordered
         expect(instance2c).to receive(:rollback).once.with(no_args).ordered
