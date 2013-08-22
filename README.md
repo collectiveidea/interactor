@@ -121,7 +121,7 @@ class PlaceOrder
 end
 ```
 
-Breaking your interactors into bite-sized pieces also gives you the benefit or reusability. In our example above, there may be several scenarios where you may want to check inventory. Encapsulating that logic in one interactor enables you to reuse that interactor, reducing duplication.
+Breaking your interactors into bite-sized pieces also gives you the benefit of reusability. In our example above, there may be several scenarios where you may want to check inventory. Encapsulating that logic in one interactor enables you to reuse that interactor, reducing duplication.
 
 ## Examples
 
