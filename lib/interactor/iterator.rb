@@ -25,15 +25,18 @@ module Interactor
       end
 
       def perform
-        collection.each do |(*element)|
-          perform_each(*element)
+        collection.each_with_index do |(*element), index|
+          element << index
+          send_with_index(:perform_each, *element)
           rollback && break if failure?
           performed << element
         end
       end
 
       def rollback
-        performed.reverse_each { |e| rollback_each(*e) }
+        performed.reverse_each do |element|
+          send_with_index(:rollback_each, *element)
+        end
       end
 
       def performed
@@ -44,6 +47,14 @@ module Interactor
       end
 
       def rollback_each(*)
+      end
+
+      private
+
+      def send_with_index(method_name, *args)
+        method = self.method(method_name)
+        args.pop if (0...args.size).cover?(method.arity)
+        method.call(*args)
       end
     end
   end
