@@ -1,4 +1,5 @@
 require "interactor/context"
+require "interactor/iterator"
 require "interactor/organizer"
 
 module Interactor
