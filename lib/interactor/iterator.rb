@@ -25,15 +25,15 @@ module Interactor
       end
 
       def perform
-        collection.each do |element|
-          perform_each(element)
+        collection.each do |(*element)|
+          perform_each(*element)
           rollback && break if failure?
           performed << element
         end
       end
 
       def rollback
-        performed.reverse_each { |e| rollback_each(e) }
+        performed.reverse_each { |e| rollback_each(*e) }
       end
 
       def performed
