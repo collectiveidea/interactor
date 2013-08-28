@@ -117,6 +117,16 @@ module Interactor
 
         expect { instance.perform }.to raise_error(error)
       end
+
+      it "skips all interactors if failed prior to performance" do
+        instance.fail!
+
+        expect(interactor2).not_to receive(:perform)
+        expect(interactor3).not_to receive(:perform)
+        expect(interactor4).not_to receive(:perform)
+
+        instance.perform
+      end
     end
 
     describe "#rollback" do
