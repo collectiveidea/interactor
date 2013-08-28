@@ -86,6 +86,16 @@ module Interactor
           instance.perform
         end
 
+        it "skips all elements if failed prior to performance" do
+          instance.fail!
+
+          expect(instance).not_to receive(:perform_each).with(1, 0)
+          expect(instance).not_to receive(:perform_each).with(2, 1)
+          expect(instance).not_to receive(:perform_each).with(3, 2)
+
+          instance.perform
+        end
+
         context "with perform_each accepting one argument" do
           before do
             instance.context[:args] = []
@@ -160,6 +170,16 @@ module Interactor
           expect(instance).to receive(:rollback).once.ordered do
             expect(instance.performed).to eq([[:one, 1, 0]])
           end
+
+          instance.perform
+        end
+
+        it "skips all key/value pairs if failed prior to performance" do
+          instance.fail!
+
+          expect(instance).not_to receive(:perform_each).with(:one, 1, 0)
+          expect(instance).not_to receive(:perform_each).with(:two, 2, 1)
+          expect(instance).not_to receive(:perform_each).with(:three, 3, 2)
 
           instance.perform
         end

@@ -25,6 +25,8 @@ module Interactor
       end
 
       def perform
+        return collection if failure?
+
         collection.each_with_index do |(*element), index|
           element << index
           send_with_index(:perform_each, *element)
