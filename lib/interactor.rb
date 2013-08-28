@@ -47,6 +47,6 @@ module Interactor
   end
 
   def respond_to_missing?(method, *)
-    context.key?(method) || super
+    (context && context.key?(method)) || super
   end
 end
