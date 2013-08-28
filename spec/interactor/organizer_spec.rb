@@ -6,12 +6,6 @@ module Interactor
 
     let(:organizer) { Class.new.send(:include, Organizer) }
 
-    describe ".interactors" do
-      it "is empty by default" do
-        expect(organizer.interactors).to eq([])
-      end
-    end
-
     describe ".organize" do
       let(:interactor2) { double(:interactor2) }
       let(:interactor3) { double(:interactor3) }
@@ -33,16 +27,9 @@ module Interactor
       end
     end
 
-    describe "#interactors" do
-      let(:interactors) { double(:interactors) }
-      let(:instance) { organizer.new }
-
-      before do
-        organizer.stub(:interactors) { interactors }
-      end
-
-      it "defers to the class" do
-        expect(instance.interactors).to eq(interactors)
+    describe ".interactors" do
+      it "is empty by default" do
+        expect(organizer.interactors).to eq([])
       end
     end
 
@@ -72,24 +59,24 @@ module Interactor
 
       it "builds up the performed interactors" do
         interactor2.stub(:perform) do
-          expect(instance.performed).to eq([])
+          expect(instance.send(:_performed)).to eq([])
           instance2
         end
 
         interactor3.stub(:perform) do
-          expect(instance.performed).to eq([instance2])
+          expect(instance.send(:_performed)).to eq([instance2])
           instance3
         end
 
         interactor4.stub(:perform) do
-          expect(instance.performed).to eq([instance2, instance3])
+          expect(instance.send(:_performed)).to eq([instance2, instance3])
           instance4
         end
 
         expect {
           instance.perform
         }.to change {
-          instance.performed
+          instance.send(:_performed)
         }.from([]).to([instance2, instance3, instance4])
       end
 
@@ -99,7 +86,7 @@ module Interactor
         expect(interactor4).not_to receive(:perform)
 
         expect(instance).to receive(:rollback).once.ordered do
-          expect(instance.performed).to eq([instance2])
+          expect(instance.send(:_performed)).to eq([instance2])
         end
 
         instance.perform
@@ -112,7 +99,7 @@ module Interactor
         expect(interactor4).not_to receive(:perform)
 
         expect(instance).to receive(:rollback).once.ordered do
-          expect(instance.performed).to eq([instance2])
+          expect(instance.send(:_performed)).to eq([instance2])
         end
 
         expect { instance.perform }.to raise_error(error)
@@ -135,7 +122,7 @@ module Interactor
       let(:instance3) { double(:instance3) }
 
       before do
-        instance.stub(:performed) { [instance2, instance3] }
+        instance.stub(:_performed) { [instance2, instance3] }
       end
 
       it "rolls back each performed interactor in reverse" do
@@ -146,11 +133,24 @@ module Interactor
       end
     end
 
-    describe "#performed" do
+    describe "#_interactors" do
+      let(:interactors) { double(:interactors) }
+      let(:instance) { organizer.new }
+
+      before do
+        organizer.stub(:interactors) { interactors }
+      end
+
+      it "defers to the class" do
+        expect(instance.send(:_interactors)).to eq(interactors)
+      end
+    end
+
+    describe "#_performed" do
       let(:instance) { organizer.new }
 
       it "is empty by default" do
-        expect(instance.performed).to eq([])
+        expect(instance.send(:_performed)).to eq([])
       end
     end
 

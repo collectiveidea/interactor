@@ -10,24 +10,20 @@ module Interactor
     end
 
     module ClassMethods
-      def interactors
-        @interactors ||= []
-      end
-
       def organize(*interactors)
         @interactors = interactors.flatten
+      end
+
+      def interactors
+        @interactors ||= []
       end
     end
 
     module InstanceMethods
-      def interactors
-        self.class.interactors
-      end
-
       def perform
-        return interactors if failure?
+        return _interactors if failure?
 
-        interactors.each do |interactor|
+        _interactors.each do |interactor|
           begin
             instance = interactor.perform(context)
           rescue
@@ -36,15 +32,21 @@ module Interactor
           end
 
           rollback && break if failure?
-          performed << instance
+          _performed << instance
         end
       end
 
       def rollback
-        performed.reverse_each(&:rollback)
+        _performed.reverse_each(&:rollback)
       end
 
-      def performed
+      private
+
+      def _interactors
+        self.class.interactors
+      end
+
+      def _performed
         @performed ||= []
       end
     end

@@ -10,39 +10,31 @@ module Interactor
     end
 
     module ClassMethods
-      def collection
-        @collection
+      def collect(key)
+        @collection_key = key
       end
 
-      def collect(key)
-        @collection = key
+      def collection_key
+        @collection_key
       end
     end
 
     module InstanceMethods
-      def collection
-        context.fetch(self.class.collection, [])
-      end
-
       def perform
-        return collection if failure?
+        return _collection if failure?
 
-        collection.each_with_index do |(*element), index|
+        _collection.each_with_index do |(*element), index|
           element << index
-          send_with_index(:perform_each, *element)
+          _send_with_index(:perform_each, *element)
           rollback && break if failure?
-          performed << element
+          _performed << element
         end
       end
 
       def rollback
-        performed.reverse_each do |element|
-          send_with_index(:rollback_each, *element)
+        _performed.reverse_each do |element|
+          _send_with_index(:rollback_each, *element)
         end
-      end
-
-      def performed
-        @performed ||= []
       end
 
       def perform_each(*)
@@ -53,7 +45,15 @@ module Interactor
 
       private
 
-      def send_with_index(method_name, *args)
+      def _collection
+        context.fetch(self.class.collection_key, [])
+      end
+
+      def _performed
+        @performed ||= []
+      end
+
+      def _send_with_index(method_name, *args)
         method = self.method(method_name)
         args.pop if (0...args.size).cover?(method.arity)
         method.call(*args)

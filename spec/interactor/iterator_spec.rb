@@ -6,33 +6,19 @@ module Interactor
 
     let(:iterator) { Class.new.send(:include, Iterator) }
 
-    describe ".collection" do
-      it "is nil by default" do
-        expect(iterator.collection).to be_nil
-      end
-    end
-
     describe ".collect" do
-      it "sets collection" do
+      it "sets the collection key" do
         expect {
           iterator.collect(:elements)
         }.to change {
-          iterator.collection
+          iterator.collection_key
         }.from(nil).to(:elements)
       end
     end
 
-    describe "#collection" do
-      let(:instance) { iterator.new(elements: [1, 2, 3]) }
-
-      it "is empty by default" do
-        expect(instance.collection).to eq([])
-      end
-
-      it "returns the collection from the context" do
-        iterator.stub(collection: :elements)
-
-        expect(instance.collection).to eq([1, 2, 3])
+    describe ".collection_key" do
+      it "is nil by default" do
+        expect(iterator.collection_key).to be_nil
       end
     end
 
@@ -41,7 +27,7 @@ module Interactor
         let(:instance) { iterator.new(elements: [1, 2, 3]) }
 
         before do
-          iterator.stub(collection: :elements)
+          iterator.stub(collection_key: :elements)
         end
 
         it "performs each element in order with its index" do
@@ -56,21 +42,21 @@ module Interactor
 
         it "builds up the performed elements" do
           instance.stub(:perform_each).with(1, 0) do
-            expect(instance.performed).to eq([])
+            expect(instance.send(:_performed)).to eq([])
           end
 
           instance.stub(:perform_each).with(2, 1) do
-            expect(instance.performed).to eq([[1, 0]])
+            expect(instance.send(:_performed)).to eq([[1, 0]])
           end
 
           instance.stub(:perform_each).with(3, 2) do
-            expect(instance.performed).to eq([[1, 0], [2, 1]])
+            expect(instance.send(:_performed)).to eq([[1, 0], [2, 1]])
           end
 
           expect {
             instance.perform
           }.to change {
-            instance.performed
+            instance.send(:_performed)
           }.from([]).to([[1, 0], [2, 1], [3, 2]])
         end
 
@@ -80,7 +66,7 @@ module Interactor
           expect(instance).not_to receive(:perform_each).with(3, 2)
 
           expect(instance).to receive(:rollback).once.ordered do
-            expect(instance.performed).to eq([[1, 0]])
+            expect(instance.send(:_performed)).to eq([[1, 0]])
           end
 
           instance.perform
@@ -119,7 +105,7 @@ module Interactor
             expect {
               instance.perform
             }.to change {
-              instance.performed
+              instance.send(:_performed)
             }.from([]).to([[1, 0], [2, 1], [3, 2]])
           end
         end
@@ -129,7 +115,7 @@ module Interactor
         let(:instance) { iterator.new(pairs: {one: 1, two: 2, three: 3}) }
 
         before do
-          iterator.stub(collection: :pairs)
+          iterator.stub(collection_key: :pairs)
         end
 
         it "performs each key/value pair in order" do
@@ -144,21 +130,21 @@ module Interactor
 
         it "builds up the performed elements" do
           instance.stub(:perform_each).with(:one, 1, 0) do
-            expect(instance.performed).to eq([])
+            expect(instance.send(:_performed)).to eq([])
           end
 
           instance.stub(:perform_each).with(:two, 2, 1) do
-            expect(instance.performed).to eq([[:one, 1, 0]])
+            expect(instance.send(:_performed)).to eq([[:one, 1, 0]])
           end
 
           instance.stub(:perform_each).with(:three, 3, 2) do
-            expect(instance.performed).to eq([[:one, 1, 0], [:two, 2, 1]])
+            expect(instance.send(:_performed)).to eq([[:one, 1, 0], [:two, 2, 1]])
           end
 
           expect {
             instance.perform
           }.to change {
-            instance.performed
+            instance.send(:_performed)
           }.from([]).to([[:one, 1, 0], [:two, 2, 1], [:three, 3, 2]])
         end
 
@@ -168,7 +154,7 @@ module Interactor
           expect(instance).not_to receive(:perform_each).with(:three, 3, 2)
 
           expect(instance).to receive(:rollback).once.ordered do
-            expect(instance.performed).to eq([[:one, 1, 0]])
+            expect(instance.send(:_performed)).to eq([[:one, 1, 0]])
           end
 
           instance.perform
@@ -207,7 +193,7 @@ module Interactor
             expect {
               instance.perform
             }.to change {
-              instance.performed
+              instance.send(:_performed)
             }.from([]).to([[:one, 1, 0], [:two, 2, 1], [:three, 3, 2]])
           end
         end
@@ -219,7 +205,7 @@ module Interactor
 
       context "with an array collection" do
         before do
-          instance.stub(:performed) { [[1, 0], [2, 1]] }
+          instance.stub(:_performed) { [[1, 0], [2, 1]] }
         end
 
         it "rolls back each performed element in reverse" do
@@ -252,7 +238,7 @@ module Interactor
 
       context "with a hash collection" do
         before do
-          instance.stub(:performed) { [[:one, 1, 0], [:two, 2, 1]] }
+          instance.stub(:_performed) { [[:one, 1, 0], [:two, 2, 1]] }
         end
 
         it "rolls back each performed element in reverse" do
@@ -284,14 +270,6 @@ module Interactor
       end
     end
 
-    describe "#performed" do
-      let(:instance) { iterator.new }
-
-      it "is empty by default" do
-        expect(instance.performed).to eq([])
-      end
-    end
-
     describe "#perform_each" do
       let(:instance) { iterator.new }
 
@@ -309,6 +287,28 @@ module Interactor
         expect(instance).to respond_to(:rollback_each)
         expect { instance.rollback_each }.not_to raise_error
         expect { instance.method(:rollback_each) }.not_to raise_error
+      end
+    end
+
+    describe "#_collection" do
+      let(:instance) { iterator.new(elements: [1, 2, 3]) }
+
+      it "is empty by default" do
+        expect(instance.send(:_collection)).to eq([])
+      end
+
+      it "returns the collection from the context" do
+        iterator.stub(collection_key: :elements)
+
+        expect(instance.send(:_collection)).to eq([1, 2, 3])
+      end
+    end
+
+    describe "#_performed" do
+      let(:instance) { iterator.new }
+
+      it "is empty by default" do
+        expect(instance.send(:_performed)).to eq([])
       end
     end
   end
