@@ -46,7 +46,7 @@ module Interactor
       private
 
       def _collection
-        context.fetch(self.class.collection_key) { [] }
+        Array(context[self.class.collection_key])
       end
 
       def _performed

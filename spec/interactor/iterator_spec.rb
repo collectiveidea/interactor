@@ -291,7 +291,7 @@ module Interactor
     end
 
     describe "#_collection" do
-      let(:instance) { iterator.new(elements: [1, 2, 3]) }
+      let(:instance) { iterator.new(elements: [1, 2, 3], element: 4) }
 
       it "is empty by default" do
         expect(instance.send(:_collection)).to eq([])
@@ -301,6 +301,12 @@ module Interactor
         iterator.stub(collection_key: :elements)
 
         expect(instance.send(:_collection)).to eq([1, 2, 3])
+      end
+
+      it "wraps single elements in an array" do
+        iterator.stub(collection_key: :element)
+
+        expect(instance.send(:_collection)).to eq([4])
       end
     end
 
