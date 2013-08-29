@@ -68,7 +68,16 @@ shared_examples :lint do
 
     it "exists" do
       expect(instance).to respond_to(:perform)
-      expect { instance.perform }.not_to raise_error
+
+      expect {
+        begin
+          instance.perform
+        rescue => error
+          raise if error.is_a?(NoMethodError)
+        end
+      }.not_to raise_error
+
+
       expect { instance.method(:perform) }.not_to raise_error
     end
   end

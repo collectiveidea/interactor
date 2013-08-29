@@ -290,11 +290,29 @@ module Interactor
       end
     end
 
-    describe "#_collection" do
-      let(:instance) { iterator.new(elements: [1, 2, 3], element: 4) }
+    describe "#missing_collection!" do
+      let(:instance) { iterator.new }
 
-      it "is empty by default" do
-        expect(instance.send(:_collection)).to eq([])
+      it "raises an error by default" do
+        expect {
+          instance.missing_collection!
+        }.to raise_error(Iterator::MissingCollection)
+      end
+    end
+
+    describe "#_collection" do
+      let(:instance) { iterator.new(elements: [1, 2, 3], element: 4, foo: nil) }
+
+      it "reacts to a missing collection key" do
+        expect(instance).to receive(:missing_collection!).once { [5, 6, 7] }
+
+        expect(instance.send(:_collection)).to eq([5, 6, 7])
+      end
+
+      it "reacts to a missing collection" do
+        expect(instance).to receive(:missing_collection!).once { [5, 6, 7] }
+
+        expect(instance.send(:_collection)).to eq([5, 6, 7])
       end
 
       it "returns the collection from the context" do
@@ -307,6 +325,12 @@ module Interactor
         iterator.stub(collection_key: :element)
 
         expect(instance.send(:_collection)).to eq([4])
+      end
+
+      it "converts nil into an empty array" do
+        iterator.stub(collection_key: :foo)
+
+        expect(instance.send(:_collection)).to eq([])
       end
     end
 

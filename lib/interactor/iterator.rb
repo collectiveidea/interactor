@@ -1,5 +1,8 @@
 module Interactor
   module Iterator
+    class MissingCollection < ::StandardError
+    end
+
     def self.included(base)
       base.class_eval do
         include Interactor
@@ -43,10 +46,14 @@ module Interactor
       def rollback_each(*)
       end
 
+      def missing_collection!
+        raise MissingCollection
+      end
+
       private
 
       def _collection
-        Array(context[self.class.collection_key])
+        Array(context.fetch(self.class.collection_key) { missing_collection! })
       end
 
       def _performed
