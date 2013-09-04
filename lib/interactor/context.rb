@@ -3,7 +3,7 @@ require "delegate"
 module Interactor
   class Context < SimpleDelegator
     def self.build(context = {})
-      self === context ? context : new(context)
+      self === context ? context : new(context.dup)
     end
 
     def initialize(context = {})
