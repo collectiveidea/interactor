@@ -30,6 +30,17 @@ module Interactor
       end
     end
 
+    describe "#[]" do
+      it "maintains indifferent access" do
+        require "active_support/hash_with_indifferent_access"
+
+        context = Context.build(HashWithIndifferentAccess.new(foo: "bar"))
+
+        expect(context[:foo]).to eq("bar")
+        expect(context["foo"]).to eq("bar")
+      end
+    end
+
     describe "#success?" do
       let(:context) { Context.build }
 
