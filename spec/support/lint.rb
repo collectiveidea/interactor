@@ -128,12 +128,18 @@ shared_examples :lint do
 
   describe "context deferral" do
     context "initialized" do
-      let(:instance) { interactor.new(foo: "bar") }
+      let(:instance) { interactor.new(foo: "bar", "hello" => "world") }
 
       it "defers to keys that exist in the context" do
         expect(instance).to respond_to(:foo)
         expect(instance.foo).to eq("bar")
         expect { instance.method(:foo) }.not_to raise_error
+      end
+
+      it "defers to string keys that exist in the context" do
+        expect(instance).to respond_to(:hello)
+        expect(instance.hello).to eq("world")
+        expect { instance.method(:hello) }.not_to raise_error
       end
 
       it "bombs if the key does not exist in the context" do
