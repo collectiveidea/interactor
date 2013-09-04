@@ -6,6 +6,10 @@ module Interactor
       self === context ? context : new(context)
     end
 
+    def initialize(context = {})
+      super(context)
+    end
+
     def success?
       !failure?
     end

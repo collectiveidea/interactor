@@ -30,6 +30,14 @@ module Interactor
       end
     end
 
+    describe "#initialize" do
+      it "defaults to empty" do
+        expect {
+          expect(Context.new).to eq({})
+        }.not_to raise_error
+      end
+    end
+
     describe "#[]" do
       it "maintains indifferent access" do
         require "active_support/hash_with_indifferent_access"
