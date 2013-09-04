@@ -26,7 +26,13 @@ module Interactor
 
       def perform
         interactors.each do |interactor|
-          instance = interactor.perform(context)
+          begin
+            instance = interactor.perform(context)
+          rescue
+            rollback
+            raise
+          end
+
           rollback && break if failure?
           performed << instance
         end
