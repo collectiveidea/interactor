@@ -17,6 +17,18 @@ module Interactor
         expect(context).to eq({})
       end
 
+      it "doesn't affect the original hash" do
+        hash = { foo: "bar" }
+        context = Context.build(hash)
+
+        expect(context).to be_a(Context)
+        expect {
+          context[:foo] = "baz"
+        }.not_to change {
+          hash[:foo]
+        }
+      end
+
       it "preserves an already built context" do
         context1 = Context.build(foo: "bar")
         context2 = Context.build(context1)
@@ -27,6 +39,25 @@ module Interactor
         }.to change {
           context1[:foo]
         }.from("bar").to("baz")
+      end
+    end
+
+    describe "#initialize" do
+      it "defaults to empty" do
+        expect {
+          expect(Context.new).to eq({})
+        }.not_to raise_error
+      end
+    end
+
+    describe "#[]" do
+      it "maintains indifferent access" do
+        require "active_support/hash_with_indifferent_access"
+
+        context = Context.build(HashWithIndifferentAccess.new(foo: "bar"))
+
+        expect(context[:foo]).to eq("bar")
+        expect(context["foo"]).to eq("bar")
       end
     end
 
