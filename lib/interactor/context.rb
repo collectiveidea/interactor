@@ -1,7 +1,13 @@
+require "delegate"
+
 module Interactor
-  class Context < ::Hash
+  class Context < SimpleDelegator
     def self.build(context = {})
-      self === context ? context : new.replace(context)
+      self === context ? context : new(context.dup)
+    end
+
+    def initialize(context = {})
+      super(context)
     end
 
     def success?
