@@ -104,6 +104,19 @@ module Interactor
 
         instance.perform
       end
+
+      it "aborts and rolls back on error" do
+        error = StandardError.new("foo")
+        expect(interactor2).to receive(:perform).once.with(context).ordered { instance2 }
+        expect(interactor3).to receive(:perform).once.with(context).ordered { raise error }
+        expect(interactor4).not_to receive(:perform)
+
+        expect(instance).to receive(:rollback).once.ordered do
+          expect(instance.performed).to eq([instance2])
+        end
+
+        expect { instance.perform }.to raise_error(error)
+      end
     end
 
     describe "#rollback" do
