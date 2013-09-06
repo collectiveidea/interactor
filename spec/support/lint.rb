@@ -157,4 +157,26 @@ shared_examples :lint do
       end
     end
   end
+
+  describe "YAML serialization" do
+    require "yaml"
+
+    let(:instance) { interactor.new(foo: "bar") }
+
+    before do
+      # Give the interactor class a name for proper YAML deserialization
+      Object.send(:remove_const, :LintInteractor) if Object.const_defined?(:LintInteractor)
+      Object.const_set(:LintInteractor, interactor)
+    end
+
+    it "is serializable and deserializable" do
+      expect { YAML.load(YAML.dump(instance)) }.not_to raise_error
+    end
+
+    it "preserves its context" do
+      instance2 = YAML.load(YAML.dump(instance))
+
+      expect(instance2.context).to eq(instance.context)
+    end
+  end
 end
