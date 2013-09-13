@@ -34,6 +34,7 @@ module Interactor
           end
 
           rollback && break if failure?
+          break if halted?
           performed << instance
         end
       end
