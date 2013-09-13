@@ -189,7 +189,13 @@ An interactor can fail with an optional hash that is merged into the context.
 fail!(message: "Uh oh!")
 ```
 
-Interactors are successful until explicitly failed. Instances respond to `success?` and `failure?`.
+An interactor can halt with an optional hash that is merged into the context.  `halt!` differs from `fail!` in that `halt!` stops execution but does not cause previoius interactors to rollback and is a success case.
+
+```ruby
+halt!(message: "Police!")
+```
+
+Interactors are successful until explicitly failed. Instances respond to `success?`, `failure?`, and `halted?`.
 
 ### Organizers
 
