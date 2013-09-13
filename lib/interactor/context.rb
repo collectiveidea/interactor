@@ -18,9 +18,18 @@ module Interactor
       @failure || false
     end
 
+    def halted?
+      @halt || false
+    end
+
     def fail!(context = {})
       update(context)
       @failure = true
+    end
+
+    def halt!(context = {})
+      update(context)
+      @halt = true
     end
   end
 end

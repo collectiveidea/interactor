@@ -122,5 +122,28 @@ module Interactor
         }.from("bar").to("baz")
       end
     end
+
+    describe "#halt!" do
+      let(:context) { Context.build(foo: "bar") }
+
+      it "does not set failure" do
+        context.halt!
+        expect(context).not_to be_a_failure
+      end
+
+      it "sets halt to true" do
+        context.halt!
+        expect(context).to be_halted
+      end
+
+      it "preserves the context" do
+        expect { context.halt! }.not_to change { context[:foo] }
+      end
+
+      it "updates the context" do
+        context.halt!(bada: "bing")
+        expect(context[:bada]).to eq("bing")
+      end
+    end
   end
 end
