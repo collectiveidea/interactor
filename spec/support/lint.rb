@@ -126,6 +126,36 @@ shared_examples :lint do
     end
   end
 
+  describe "#halted?" do
+    let(:instance) { interactor.new }
+    let(:context) { instance.context }
+
+    it "defers to the context" do
+      context.stub(halted?: true)
+      expect(instance.halted?).to eq(true)
+
+      context.stub(halted?: false)
+      expect(instance.halted?).to eq(false)
+    end
+
+    it "passes updates to the context" do
+      expect(context).to receive(:halt!).once.with(bada: "boom")
+
+      instance.halt!(bada: "boom")
+    end
+  end
+
+  describe "#halt!" do
+    let(:instance) { interactor.new }
+    let(:context) { instance.context }
+
+    it "defers to the context" do
+      expect(context).to receive(:halt!).once.with(no_args)
+
+      instance.halt!
+    end
+  end
+
   describe "context deferral" do
     context "initialized" do
       let(:instance) { interactor.new(foo: "bar", "hello" => "world") }

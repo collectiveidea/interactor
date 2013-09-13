@@ -42,6 +42,14 @@ module Interactor
     context.fail!(*args)
   end
 
+  def halted?
+    context.halted?
+  end
+
+  def halt!(*args)
+    context.halt!(*args)
+  end
+
   def method_missing(method, *)
     context.fetch(method) { context.fetch(method.to_s) { super } }
   end
