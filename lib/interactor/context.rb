@@ -22,5 +22,10 @@ module Interactor
       update(context)
       @failure = true
     end
+
+    def success!(context = {})
+      update(context)
+      @failure = false
+    end
   end
 end
