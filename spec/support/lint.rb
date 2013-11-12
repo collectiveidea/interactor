@@ -4,16 +4,16 @@ shared_examples :lint do
   describe ".perform" do
     let(:instance) { double(:instance) }
 
-    it "performs an instance with the given context" do
+    it "runs an instance with the given context" do
       expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
-      expect(instance).to receive(:perform).once.with(no_args)
+      expect(instance).to receive(:run).once.with(no_args)
 
       expect(interactor.perform(foo: "bar")).to eq(instance)
     end
 
     it "provides a blank context if none is given" do
       expect(interactor).to receive(:new).once.with({}) { instance }
-      expect(instance).to receive(:perform).once.with(no_args)
+      expect(instance).to receive(:run).once.with(no_args)
 
       expect(interactor.perform).to eq(instance)
     end
@@ -39,17 +39,39 @@ shared_examples :lint do
       expect(instance).to be_a(interactor)
       expect(instance.context).to eq(context)
     end
+  end
 
-    it "calls setup" do
-      interactor.class_eval do
-        def setup
-          context[:foo] = bar
-        end
-      end
+  describe "#run" do
+    let(:instance) { interactor.new }
 
-      instance = interactor.new(bar: "baz")
+    it "sets up and performs" do
+      expect(instance).to receive(:setup).once.with(no_args).ordered
+      expect(instance).to receive(:perform).once.with(no_args).ordered
 
-      expect(instance.context[:foo]).to eq("baz")
+      instance.run
+    end
+
+    it "rescues setup failure" do
+      expect(instance).to receive(:setup).and_raise(Interactor::Failure)
+      expect(instance).not_to receive(:perform)
+
+      expect { instance.run }.not_to raise_error
+    end
+
+    it "rescues performance failure" do
+      expect(instance).to receive(:setup)
+      expect(instance).to receive(:perform).and_raise(Interactor::Failure)
+
+      expect { instance.run }.not_to raise_error
+    end
+
+    it "doesn't rescue other errors" do
+      error = StandardError.new
+
+      expect(instance).to receive(:setup)
+      expect(instance).to receive(:perform).and_raise(error)
+
+      expect { instance.run }.to raise_error(error)
     end
   end
 
@@ -115,6 +137,20 @@ shared_examples :lint do
 
     it "raises a failure" do
       expect { instance.fail! }.to raise_error(Interactor::Failure)
+    end
+
+    it "interrupts execution" do
+      interactor.class_eval do
+        def setup
+          context[:foo] = "bar"
+          fail!
+          context[:foo] = "baz"
+        end
+      end
+
+      instance.setup rescue nil
+
+      expect(context[:foo]).to eq("bar")
     end
 
     it "defers to the context" do

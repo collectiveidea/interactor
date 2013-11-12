@@ -13,13 +13,18 @@ module Interactor
 
   module ClassMethods
     def perform(context = {})
-      new(context).tap(&:perform)
+      new(context).tap(&:run)
     end
   end
 
   def initialize(context = {})
     @context = Context.build(context)
+  end
+
+  def run
     setup
+    perform
+  rescue Failure
   end
 
   def setup
