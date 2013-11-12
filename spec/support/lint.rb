@@ -113,16 +113,20 @@ shared_examples :lint do
     let(:instance) { interactor.new }
     let(:context) { instance.context }
 
+    it "raises a failure" do
+      expect { instance.fail! }.to raise_error(Interactor::Failure)
+    end
+
     it "defers to the context" do
       expect(context).to receive(:fail!).once.with(no_args)
 
-      instance.fail!
+      instance.fail! rescue nil
     end
 
     it "passes updates to the context" do
       expect(context).to receive(:fail!).once.with(foo: "bar")
 
-      instance.fail!(foo: "bar")
+      instance.fail!(foo: "bar") rescue nil
     end
   end
 

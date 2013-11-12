@@ -1,4 +1,5 @@
 require "interactor/context"
+require "interactor/error"
 require "interactor/organizer"
 
 module Interactor
@@ -40,6 +41,7 @@ module Interactor
 
   def fail!(*args)
     context.fail!(*args)
+    raise Failure
   end
 
   def method_missing(method, *)
