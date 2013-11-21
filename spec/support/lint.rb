@@ -84,7 +84,7 @@ shared_examples :lint do
     end
   end
 
-  describe "#perform" do
+  describe "#perform!" do
     let(:instance) { interactor.new }
 
     it "sets up and runs" do
@@ -94,6 +94,13 @@ shared_examples :lint do
       instance.perform!
     end
 
+    it "rescues setup success" do
+      expect(instance).to receive(:setup).and_raise(Interactor::Success)
+      expect(instance).not_to receive(:run)
+
+      expect { instance.perform! }.not_to raise_error
+    end
+
     it "doesn't rescue setup failure" do
       error = Interactor::Failure.new
 
@@ -101,6 +108,13 @@ shared_examples :lint do
       expect(instance).not_to receive(:run)
 
       expect { instance.perform! }.to raise_error(error)
+    end
+
+    it "rescues run success" do
+      expect(instance).to receive(:setup)
+      expect(instance).to receive(:run).and_raise(Interactor::Success)
+
+      expect { instance.perform! }.not_to raise_error
     end
 
     it "doesn't rescue run failure" do

@@ -33,6 +33,7 @@ module Interactor
   def perform!
     setup
     run
+  rescue Success
   end
 
   def setup
