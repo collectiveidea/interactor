@@ -13,7 +13,7 @@ module Interactor
 
   module ClassMethods
     def perform(context = {})
-      new(context).tap(&:run)
+      new(context).tap(&:perform)
     end
   end
 
@@ -21,16 +21,16 @@ module Interactor
     @context = Context.build(context)
   end
 
-  def run
+  def perform
     setup
-    perform
+    run
   rescue Failure
   end
 
   def setup
   end
 
-  def perform
+  def run
   end
 
   def rollback

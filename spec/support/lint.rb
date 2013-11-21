@@ -4,16 +4,16 @@ shared_examples :lint do
   describe ".perform" do
     let(:instance) { double(:instance) }
 
-    it "runs an instance with the given context" do
+    it "performs an instance with the given context" do
       expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
-      expect(instance).to receive(:run).once.with(no_args)
+      expect(instance).to receive(:perform).once.with(no_args)
 
       expect(interactor.perform(foo: "bar")).to eq(instance)
     end
 
     it "provides a blank context if none is given" do
       expect(interactor).to receive(:new).once.with({}) { instance }
-      expect(instance).to receive(:run).once.with(no_args)
+      expect(instance).to receive(:perform).once.with(no_args)
 
       expect(interactor.perform).to eq(instance)
     end
@@ -41,37 +41,37 @@ shared_examples :lint do
     end
   end
 
-  describe "#run" do
+  describe "#perform" do
     let(:instance) { interactor.new }
 
-    it "sets up and performs" do
+    it "sets up and runs" do
       expect(instance).to receive(:setup).once.with(no_args).ordered
-      expect(instance).to receive(:perform).once.with(no_args).ordered
+      expect(instance).to receive(:run).once.with(no_args).ordered
 
-      instance.run
+      instance.perform
     end
 
     it "rescues setup failure" do
       expect(instance).to receive(:setup).and_raise(Interactor::Failure)
-      expect(instance).not_to receive(:perform)
+      expect(instance).not_to receive(:run)
 
-      expect { instance.run }.not_to raise_error
+      expect { instance.perform }.not_to raise_error
     end
 
-    it "rescues performance failure" do
+    it "rescues run failure" do
       expect(instance).to receive(:setup)
-      expect(instance).to receive(:perform).and_raise(Interactor::Failure)
+      expect(instance).to receive(:run).and_raise(Interactor::Failure)
 
-      expect { instance.run }.not_to raise_error
+      expect { instance.perform }.not_to raise_error
     end
 
     it "doesn't rescue other errors" do
       error = StandardError.new
 
       expect(instance).to receive(:setup)
-      expect(instance).to receive(:perform).and_raise(error)
+      expect(instance).to receive(:run).and_raise(error)
 
-      expect { instance.run }.to raise_error(error)
+      expect { instance.perform }.to raise_error(error)
     end
   end
 
@@ -85,13 +85,13 @@ shared_examples :lint do
     end
   end
 
-  describe "#perform" do
+  describe "#run" do
     let(:instance) { interactor.new }
 
     it "exists" do
-      expect(instance).to respond_to(:perform)
-      expect { instance.perform }.not_to raise_error
-      expect { instance.method(:perform) }.not_to raise_error
+      expect(instance).to respond_to(:run)
+      expect { instance.run }.not_to raise_error
+      expect { instance.method(:run) }.not_to raise_error
     end
   end
 
