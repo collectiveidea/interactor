@@ -77,6 +77,54 @@ module Interactor
       end
     end
 
+    describe "#succeed!" do
+      let(:context) { Context.build(foo: "bar") }
+
+      it "sets success to true" do
+        context.fail!
+
+        expect {
+          context.succeed!
+        }.to change {
+          context.success?
+        }.from(false).to(true)
+      end
+
+      it "sets failure to true" do
+        context.fail!
+
+        expect {
+          context.succeed!
+        }.to change {
+          context.failure?
+        }.from(true).to(false)
+      end
+
+      it "preserves success" do
+        expect {
+          context.succeed!
+        }.not_to change {
+          context.success?
+        }
+      end
+
+      it "preserves the context" do
+        expect {
+          context.succeed!
+        }.not_to change {
+          context[:foo]
+        }
+      end
+
+      it "updates the context" do
+        expect {
+          context.succeed!(foo: "baz")
+        }.to change {
+          context[:foo]
+        }.from("bar").to("baz")
+      end
+    end
+
     describe "#fail!" do
       let(:context) { Context.build(foo: "bar") }
 

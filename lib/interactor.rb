@@ -52,6 +52,11 @@ module Interactor
     context.failure?
   end
 
+  def succeed!(*args)
+    context.succeed!(*args)
+    raise Success
+  end
+
   def fail!(*args)
     context.fail!(*args)
     raise Failure

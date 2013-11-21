@@ -213,6 +213,41 @@ shared_examples :lint do
     end
   end
 
+  describe "#succeed!" do
+    let(:instance) { interactor.new }
+    let(:context) { instance.context }
+
+    it "raises a success" do
+      expect { instance.succeed! }.to raise_error(Interactor::Success)
+    end
+
+    it "interrupts execution" do
+      interactor.class_eval do
+        def setup
+          context[:foo] = "bar"
+          succeed!
+          context[:foo] = "baz"
+        end
+      end
+
+      instance.setup rescue nil
+
+      expect(context[:foo]).to eq("bar")
+    end
+
+    it "defers to the context" do
+      expect(context).to receive(:succeed!).once.with(no_args)
+
+      instance.succeed! rescue nil
+    end
+
+    it "passes updates to the context" do
+      expect(context).to receive(:succeed!).once.with(foo: "bar")
+
+      instance.succeed!(foo: "bar") rescue nil
+    end
+  end
+
   describe "context deferral" do
     context "initialized" do
       let(:instance) { interactor.new(foo: "bar", "hello" => "world") }
