@@ -123,6 +123,10 @@ module Interactor
           context[:foo]
         }.from("bar").to("baz")
       end
+
+      it "returns the context" do
+        expect(context.succeed!).to eq(context)
+      end
     end
 
     describe "#fail!" do
@@ -168,6 +172,10 @@ module Interactor
         }.to change {
           context[:foo]
         }.from("bar").to("baz")
+      end
+
+      it "returns the context" do
+        expect(context.fail!).to eq(context)
       end
     end
   end

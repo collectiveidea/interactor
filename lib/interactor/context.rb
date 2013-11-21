@@ -19,13 +19,13 @@ module Interactor
     end
 
     def succeed!(context = {})
-      update(context)
       @failure = false
+      update(context)
     end
 
     def fail!(context = {})
-      update(context)
       @failure = true
+      update(context)
     end
   end
 end
