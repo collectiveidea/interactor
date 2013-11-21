@@ -15,6 +15,10 @@ module Interactor
     def perform(context = {})
       new(context).tap(&:perform)
     end
+
+    def perform!(context = {})
+      new(context).tap(&:perform!)
+    end
   end
 
   def initialize(context = {})
@@ -22,9 +26,13 @@ module Interactor
   end
 
   def perform
+    perform!
+  rescue Failure
+  end
+
+  def perform!
     setup
     run
-  rescue Failure
   end
 
   def setup

@@ -19,6 +19,24 @@ shared_examples :lint do
     end
   end
 
+  describe ".perform!" do
+    let(:instance) { double(:instance) }
+
+    it "performs an instance with the given context!" do
+      expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
+      expect(instance).to receive(:perform!).once.with(no_args)
+
+      expect(interactor.perform!(foo: "bar")).to eq(instance)
+    end
+
+    it "provides a blank context if none is given" do
+      expect(interactor).to receive(:new).once.with({}) { instance }
+      expect(instance).to receive(:perform!).once.with(no_args)
+
+      expect(interactor.perform!).to eq(instance)
+    end
+  end
+
   describe ".new" do
     let(:context) { double(:context) }
 
@@ -44,23 +62,14 @@ shared_examples :lint do
   describe "#perform" do
     let(:instance) { interactor.new }
 
-    it "sets up and runs" do
-      expect(instance).to receive(:setup).once.with(no_args).ordered
-      expect(instance).to receive(:run).once.with(no_args).ordered
+    it "performs!" do
+      expect(instance).to receive(:perform!).once.with(no_args)
 
       instance.perform
     end
 
-    it "rescues setup failure" do
-      expect(instance).to receive(:setup).and_raise(Interactor::Failure)
-      expect(instance).not_to receive(:run)
-
-      expect { instance.perform }.not_to raise_error
-    end
-
-    it "rescues run failure" do
-      expect(instance).to receive(:setup)
-      expect(instance).to receive(:run).and_raise(Interactor::Failure)
+    it "rescues failure" do
+      expect(instance).to receive(:perform!).and_raise(Interactor::Failure)
 
       expect { instance.perform }.not_to raise_error
     end
@@ -72,6 +81,44 @@ shared_examples :lint do
       expect(instance).to receive(:run).and_raise(error)
 
       expect { instance.perform }.to raise_error(error)
+    end
+  end
+
+  describe "#perform" do
+    let(:instance) { interactor.new }
+
+    it "sets up and runs" do
+      expect(instance).to receive(:setup).once.with(no_args).ordered
+      expect(instance).to receive(:run).once.with(no_args).ordered
+
+      instance.perform!
+    end
+
+    it "doesn't rescue setup failure" do
+      error = Interactor::Failure.new
+
+      expect(instance).to receive(:setup).and_raise(error)
+      expect(instance).not_to receive(:run)
+
+      expect { instance.perform! }.to raise_error(error)
+    end
+
+    it "doesn't rescue run failure" do
+      error = Interactor::Failure.new
+
+      expect(instance).to receive(:setup)
+      expect(instance).to receive(:run).and_raise(error)
+
+      expect { instance.perform! }.to raise_error(error)
+    end
+
+    it "doesn't rescue other errors" do
+      error = StandardError.new
+
+      expect(instance).to receive(:setup)
+      expect(instance).to receive(:run).and_raise(error)
+
+      expect { instance.perform! }.to raise_error(error)
     end
   end
 
