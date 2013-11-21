@@ -33,6 +33,7 @@ module Interactor
   def perform!
     before
     run
+    after
   rescue Success
   end
 
@@ -40,6 +41,9 @@ module Interactor
   end
 
   def run
+  end
+
+  def after
   end
 
   def rollback

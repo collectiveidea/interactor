@@ -89,51 +89,73 @@ shared_examples :lint do
     let(:failure) { Interactor::Failure.new }
     let(:error) { StandardError.new }
 
-    it "runs with before" do
+    it "runs with before and after" do
       expect(instance).to receive(:before).once.with(no_args).ordered
       expect(instance).to receive(:run).once.with(no_args).ordered
+      expect(instance).to receive(:after).once.with(no_args).ordered
 
       instance.perform!
     end
 
     it "rescues hard success during before" do
-      expect(instance).to receive(:before).and_raise(Interactor::Success)
+      instance.stub(:before).and_raise(Interactor::Success)
       expect(instance).not_to receive(:run)
+      expect(instance).not_to receive(:after)
+
+      expect { instance.perform! }.not_to raise_error
+    end
+
+    it "rescues hard success during run" do
+      instance.stub(:run).and_raise(Interactor::Success)
+      expect(instance).not_to receive(:after)
+
+      expect { instance.perform! }.not_to raise_error
+    end
+
+    it "rescues hard success during after" do
+      instance.stub(:after).and_raise(Interactor::Success)
 
       expect { instance.perform! }.not_to raise_error
     end
 
     it "doesn't rescue failure during before" do
-      expect(instance).to receive(:before).and_raise(failure)
+      instance.stub(:before).and_raise(failure)
       expect(instance).not_to receive(:run)
+      expect(instance).not_to receive(:after)
 
       expect { instance.perform! }.to raise_error(failure)
     end
 
-    it "rescues hard success during run" do
-      expect(instance).to receive(:before)
-      expect(instance).to receive(:run).and_raise(Interactor::Success)
+    it "doesn't rescue failure during run" do
+      instance.stub(:run).and_raise(failure)
+      expect(instance).not_to receive(:after)
 
-      expect { instance.perform! }.not_to raise_error
+      expect { instance.perform! }.to raise_error(failure)
     end
 
-    it "doesn't rescue failure during run" do
-      expect(instance).to receive(:before)
-      expect(instance).to receive(:run).and_raise(failure)
+    it "doesn't rescue failure during after" do
+      instance.stub(:after).and_raise(failure)
 
       expect { instance.perform! }.to raise_error(failure)
     end
 
     it "doesn't rescue other errors during before" do
-      expect(instance).to receive(:before).and_raise(error)
+      instance.stub(:before).and_raise(error)
       expect(instance).not_to receive(:run)
+      expect(instance).not_to receive(:after)
 
       expect { instance.perform! }.to raise_error(error)
     end
 
     it "doesn't rescue other errors during run" do
-      expect(instance).to receive(:before)
-      expect(instance).to receive(:run).and_raise(error)
+      instance.stub(:run).and_raise(error)
+      expect(instance).not_to receive(:after)
+
+      expect { instance.perform! }.to raise_error(error)
+    end
+
+    it "doesn't rescue other errors during after" do
+      instance.stub(:after).and_raise(error)
 
       expect { instance.perform! }.to raise_error(error)
     end
@@ -156,6 +178,16 @@ shared_examples :lint do
       expect(instance).to respond_to(:run)
       expect { instance.run }.not_to raise_error
       expect { instance.method(:run) }.not_to raise_error
+    end
+  end
+
+  describe "#after" do
+    let(:instance) { interactor.new }
+
+    it "exists" do
+      expect(instance).to respond_to(:after)
+      expect { instance.after }.not_to raise_error
+      expect { instance.method(:after) }.not_to raise_error
     end
   end
 
