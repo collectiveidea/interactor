@@ -33,7 +33,14 @@ module Interactor
   def perform!
     before
     run
-    after
+
+    begin
+      after
+    rescue Success
+    rescue
+      rollback
+      raise
+    end
   rescue Success
   end
 

@@ -86,8 +86,6 @@ shared_examples :lint do
 
   describe "#perform!" do
     let(:instance) { interactor.new }
-    let(:failure) { Interactor::Failure.new }
-    let(:error) { StandardError.new }
 
     it "runs with before and after" do
       expect(instance).to receive(:before).once.with(no_args).ordered
@@ -97,67 +95,171 @@ shared_examples :lint do
       instance.perform!
     end
 
-    it "rescues hard success during before" do
-      instance.stub(:before).and_raise(Interactor::Success)
-      expect(instance).not_to receive(:run)
-      expect(instance).not_to receive(:after)
+    context "with hard success" do
+      let(:error) { Interactor::Success.new }
 
-      expect { instance.perform! }.not_to raise_error
+      context "before run" do
+        before do
+          instance.stub(:before).and_raise(error)
+          expect(instance).not_to receive(:run)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "rescues" do
+          expect { instance.perform! }.not_to raise_error
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform!
+        end
+      end
+
+      context "during run" do
+        before do
+          instance.stub(:run).and_raise(error)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "rescues" do
+          expect { instance.perform! }.not_to raise_error
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform!
+        end
+      end
+
+      context "after run" do
+        before do
+          instance.stub(:after).and_raise(error)
+        end
+
+        it "rescues" do
+          expect { instance.perform! }.not_to raise_error
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform!
+        end
+      end
     end
 
-    it "rescues hard success during run" do
-      instance.stub(:run).and_raise(Interactor::Success)
-      expect(instance).not_to receive(:after)
+    context "with failure" do
+      let(:error) { Interactor::Failure.new }
 
-      expect { instance.perform! }.not_to raise_error
+      context "before run" do
+        before do
+          instance.stub(:before).and_raise(error)
+          expect(instance).not_to receive(:run)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform! rescue nil
+        end
+      end
+
+      context "during run" do
+        before do
+          instance.stub(:run).and_raise(error)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform! rescue nil
+        end
+      end
+
+      context "after run" do
+        before do
+          instance.stub(:after).and_raise(error)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "rolls back" do
+          expect(instance).to receive(:after).and_raise(error).ordered
+          expect(instance).to receive(:rollback).once.with(no_args).ordered
+
+          instance.perform! rescue nil
+        end
+      end
     end
 
-    it "rescues hard success during after" do
-      instance.stub(:after).and_raise(Interactor::Success)
+    context "with some other error" do
+      let(:error) { StandardError.new }
 
-      expect { instance.perform! }.not_to raise_error
-    end
+      context "before run" do
+        before do
+          instance.stub(:before).and_raise(error)
+          expect(instance).not_to receive(:run)
+          expect(instance).not_to receive(:after)
+        end
 
-    it "doesn't rescue failure during before" do
-      instance.stub(:before).and_raise(failure)
-      expect(instance).not_to receive(:run)
-      expect(instance).not_to receive(:after)
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
 
-      expect { instance.perform! }.to raise_error(failure)
-    end
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
 
-    it "doesn't rescue failure during run" do
-      instance.stub(:run).and_raise(failure)
-      expect(instance).not_to receive(:after)
+          instance.perform! rescue nil
+        end
+      end
 
-      expect { instance.perform! }.to raise_error(failure)
-    end
+      context "during run" do
+        before do
+          instance.stub(:run).and_raise(error)
+          expect(instance).not_to receive(:after)
+        end
 
-    it "doesn't rescue failure during after" do
-      instance.stub(:after).and_raise(failure)
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
 
-      expect { instance.perform! }.to raise_error(failure)
-    end
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
 
-    it "doesn't rescue other errors during before" do
-      instance.stub(:before).and_raise(error)
-      expect(instance).not_to receive(:run)
-      expect(instance).not_to receive(:after)
+          instance.perform! rescue nil
+        end
+      end
 
-      expect { instance.perform! }.to raise_error(error)
-    end
+      context "after run" do
+        before do
+          instance.stub(:after).and_raise(error)
+        end
 
-    it "doesn't rescue other errors during run" do
-      instance.stub(:run).and_raise(error)
-      expect(instance).not_to receive(:after)
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
 
-      expect { instance.perform! }.to raise_error(error)
-    end
+        it "rolls back" do
+          expect(instance).to receive(:after).and_raise(error).ordered
+          expect(instance).to receive(:rollback).once.with(no_args).ordered
 
-    it "doesn't rescue other errors during after" do
-      instance.stub(:after).and_raise(error)
-
-      expect { instance.perform! }.to raise_error(error)
+          instance.perform! rescue nil
+        end
+      end
     end
   end
 
