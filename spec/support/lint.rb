@@ -77,7 +77,7 @@ shared_examples :lint do
     it "doesn't rescue other errors" do
       error = StandardError.new
 
-      expect(instance).to receive(:setup)
+      expect(instance).to receive(:before)
       expect(instance).to receive(:run).and_raise(error)
 
       expect { instance.perform }.to raise_error(error)
@@ -86,63 +86,66 @@ shared_examples :lint do
 
   describe "#perform!" do
     let(:instance) { interactor.new }
+    let(:failure) { Interactor::Failure.new }
+    let(:error) { StandardError.new }
 
-    it "sets up and runs" do
-      expect(instance).to receive(:setup).once.with(no_args).ordered
+    it "runs with before" do
+      expect(instance).to receive(:before).once.with(no_args).ordered
       expect(instance).to receive(:run).once.with(no_args).ordered
 
       instance.perform!
     end
 
-    it "rescues setup success" do
-      expect(instance).to receive(:setup).and_raise(Interactor::Success)
+    it "rescues hard success during before" do
+      expect(instance).to receive(:before).and_raise(Interactor::Success)
       expect(instance).not_to receive(:run)
 
       expect { instance.perform! }.not_to raise_error
     end
 
-    it "doesn't rescue setup failure" do
-      error = Interactor::Failure.new
-
-      expect(instance).to receive(:setup).and_raise(error)
+    it "doesn't rescue failure during before" do
+      expect(instance).to receive(:before).and_raise(failure)
       expect(instance).not_to receive(:run)
 
-      expect { instance.perform! }.to raise_error(error)
+      expect { instance.perform! }.to raise_error(failure)
     end
 
-    it "rescues run success" do
-      expect(instance).to receive(:setup)
+    it "rescues hard success during run" do
+      expect(instance).to receive(:before)
       expect(instance).to receive(:run).and_raise(Interactor::Success)
 
       expect { instance.perform! }.not_to raise_error
     end
 
-    it "doesn't rescue run failure" do
-      error = Interactor::Failure.new
+    it "doesn't rescue failure during run" do
+      expect(instance).to receive(:before)
+      expect(instance).to receive(:run).and_raise(failure)
 
-      expect(instance).to receive(:setup)
-      expect(instance).to receive(:run).and_raise(error)
+      expect { instance.perform! }.to raise_error(failure)
+    end
+
+    it "doesn't rescue other errors during before" do
+      expect(instance).to receive(:before).and_raise(error)
+      expect(instance).not_to receive(:run)
 
       expect { instance.perform! }.to raise_error(error)
     end
 
-    it "doesn't rescue other errors" do
-      error = StandardError.new
-
-      expect(instance).to receive(:setup)
+    it "doesn't rescue other errors during run" do
+      expect(instance).to receive(:before)
       expect(instance).to receive(:run).and_raise(error)
 
       expect { instance.perform! }.to raise_error(error)
     end
   end
 
-  describe "#setup" do
+  describe "#before" do
     let(:instance) { interactor.new }
 
     it "exists" do
-      expect(instance).to respond_to(:setup)
-      expect { instance.setup }.not_to raise_error
-      expect { instance.method(:setup) }.not_to raise_error
+      expect(instance).to respond_to(:before)
+      expect { instance.before }.not_to raise_error
+      expect { instance.method(:before) }.not_to raise_error
     end
   end
 
@@ -202,14 +205,14 @@ shared_examples :lint do
 
     it "interrupts execution" do
       interactor.class_eval do
-        def setup
+        def run
           context[:foo] = "bar"
           fail!
           context[:foo] = "baz"
         end
       end
 
-      instance.setup rescue nil
+      instance.run rescue nil
 
       expect(context[:foo]).to eq("bar")
     end
@@ -237,14 +240,14 @@ shared_examples :lint do
 
     it "interrupts execution" do
       interactor.class_eval do
-        def setup
+        def run
           context[:foo] = "bar"
           succeed!
           context[:foo] = "baz"
         end
       end
 
-      instance.setup rescue nil
+      instance.run rescue nil
 
       expect(context[:foo]).to eq("bar")
     end

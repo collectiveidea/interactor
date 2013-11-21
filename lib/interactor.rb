@@ -31,12 +31,12 @@ module Interactor
   end
 
   def perform!
-    setup
+    before
     run
   rescue Success
   end
 
-  def setup
+  def before
   end
 
   def run
