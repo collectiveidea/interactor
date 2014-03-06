@@ -1,5 +1,6 @@
 require "interactor/context"
 require "interactor/organizer"
+require "interactor/registry"
 
 module Interactor
   def self.included(base)
@@ -8,6 +9,10 @@ module Interactor
 
       attr_reader :context
     end
+  end
+
+  def self.registry
+    Registry.new
   end
 
   module ClassMethods
