@@ -90,6 +90,28 @@ It's feasible that a collection of small interactors such as these could encapsu
 
 Interactors free up your controllers to simply accept requests and build responses. They free up your models to acts as the gatekeepers to your data.
 
+### Pre-perform operation
+In the above example if you want to add some checking or small operations before the main operation,
+you can just define `setup` and it will be called before `perform`.
+
+```ruby
+class AuthenticateUser
+  include Interactor
+  
+  def setup
+    context.fail! unless context[:email].present? && context[:password].present?
+  end
+
+  def perform
+    if user = User.authenticate(context[:email], context[:password])
+      context[:user] = user
+    else
+      context.fail!
+    end
+  end
+end
+```
+
 ## Organizers
 
 An organizer is just an interactor that's in charge of other interactors. When an organizer is asked to perform, it just asks its interactors to perform, in order.
