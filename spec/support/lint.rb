@@ -62,10 +62,10 @@ shared_examples :lint do
   describe "#perform" do
     let(:instance) { interactor.new }
 
-    it "runs with #before_run and #after_run" do
-      expect(instance).to receive(:before_run).once.with(no_args).ordered
+    it "runs with #before and #after" do
+      expect(instance).to receive(:before).once.with(no_args).ordered
       expect(instance).to receive(:run).once.with(no_args).ordered
-      expect(instance).to receive(:after_run).once.with(no_args).ordered
+      expect(instance).to receive(:after).once.with(no_args).ordered
 
       instance.perform
     end
@@ -93,11 +93,11 @@ shared_examples :lint do
       end
 
       it "halts further execution" do
+        def instance.before; succeed!; foobar; end
         def instance.foobar; raise "shouldn't get here!"; end
-        def instance.before_run; succeed!; foobar; end
         expect(instance).not_to receive(:run)
         expect(instance).not_to receive(:foobar)
-        expect(instance).not_to receive(:after_run)
+        expect(instance).not_to receive(:after)
 
         instance.perform
       end
@@ -119,11 +119,11 @@ shared_examples :lint do
       end
 
       it "halts further execution" do
+        def instance.before; fail!; foobar; end
         def instance.foobar; raise "shouldn't get here!"; end
-        def instance.before_run; fail!; foobar; end
         expect(instance).not_to receive(:run)
         expect(instance).not_to receive(:foobar)
-        expect(instance).not_to receive(:after_run)
+        expect(instance).not_to receive(:after)
 
         instance.perform
       end
@@ -135,9 +135,9 @@ shared_examples :lint do
         instance.perform
       end
 
-      context "during #after_run" do
+      context "during #after" do
         it "rolls back" do
-          def instance.after_run; fail!; end
+          def instance.after; fail!; end
           expect(instance).to receive(:rollback)
 
           instance.perform

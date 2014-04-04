@@ -27,10 +27,10 @@ module Interactor
 
   def perform
     catch(:halt!) do
-      before_run
+      before
       run
 
-      if catch(:halt!) { after_run } == :failure!
+      if catch(:halt!) { after } == :failure!
         rollback
         throw :halt!, :failure!
       end
@@ -42,13 +42,13 @@ module Interactor
     raise Failure if failure?
   end
 
-  def before_run
+  def before
   end
 
   def run
   end
 
-  def after_run
+  def after
   end
 
   def rollback
