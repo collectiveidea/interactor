@@ -86,15 +86,15 @@ shared_examples :lint do
 
     context "with #succeed!" do
       it "is a success" do
-        instance.extend(Module.new { def run; succeed!; end })
+        def instance.run; succeed!; end
         instance.perform
 
         expect(instance.success?).to be_true
       end
 
       it "halts further execution" do
-        instance.extend(Module.new { def foobar; raise "can't be here!"; end })
-        instance.extend(Module.new { def before_run; succeed!; foobar; end })
+        def instance.foobar; raise "shouldn't get here!"; end
+        def instance.before_run; succeed!; foobar; end
         expect(instance).not_to receive(:run)
         expect(instance).not_to receive(:foobar)
         expect(instance).not_to receive(:after_run)
@@ -103,7 +103,7 @@ shared_examples :lint do
       end
 
       it "doesn't roll back" do
-        instance.extend(Module.new { def run; succeed!; end })
+        def instance.run; succeed!; end
         expect(instance).not_to receive(:rollback)
 
         instance.perform
@@ -112,15 +112,15 @@ shared_examples :lint do
 
     context "with #fail!" do
       it "is a failure" do
-        instance.extend(Module.new { def run; fail!; end })
+        def instance.run; fail!; end
         instance.perform
 
         expect(instance.failure?).to be_true
       end
 
       it "halts further execution" do
-        instance.extend(Module.new { def foobar; raise "can't be here!"; end })
-        instance.extend(Module.new { def before_run; fail!; foobar; end })
+        def instance.foobar; raise "shouldn't get here!"; end
+        def instance.before_run; fail!; foobar; end
         expect(instance).not_to receive(:run)
         expect(instance).not_to receive(:foobar)
         expect(instance).not_to receive(:after_run)
@@ -129,7 +129,7 @@ shared_examples :lint do
       end
 
       it "doesn't roll back" do
-        instance.extend(Module.new { def run; fail!; end })
+        def instance.run; fail!; end
         expect(instance).not_to receive(:rollback)
 
         instance.perform
@@ -137,7 +137,7 @@ shared_examples :lint do
 
       context "during #after_run" do
         it "rolls back" do
-          instance.extend(Module.new { def after_run; fail!; end })
+          def instance.after_run; fail!; end
           expect(instance).to receive(:rollback)
 
           instance.perform
@@ -157,7 +157,7 @@ shared_examples :lint do
 
     context "with #fail!" do
       it "raises Interactor::Failure" do
-        instance.extend(Module.new { def run; fail!; end })
+        def instance.run; fail!; end
 
         expect { instance.perform! }.to raise_error(Interactor::Failure)
       end
