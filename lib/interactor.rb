@@ -50,3 +50,10 @@ module Interactor
     (context && (context.key?(method) || context.key?(method.to_s))) || super
   end
 end
+
+def Interactor(&block)
+  Class.new.tap do |interactor|
+    interactor.send :include, Interactor
+    interactor.send :define_method, :perform, &block
+  end
+end
