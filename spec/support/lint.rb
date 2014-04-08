@@ -2,7 +2,7 @@ shared_examples :lint do
   let(:interactor) { Class.new.send(:include, described_class) }
 
   describe ".perform" do
-    let(:instance) { double(:instance) }
+    let(:instance) { double(:instance, failure?: false) }
 
     it "performs an instance with the given context" do
       expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
@@ -14,6 +14,15 @@ shared_examples :lint do
     it "provides a blank context if none is given" do
       expect(interactor).to receive(:new).once.with({}) { instance }
       expect(instance).to receive(:perform).once.with(no_args)
+
+      expect(interactor.perform).to eq(instance)
+    end
+
+    it "does not run perform if the context is a failure after setup" do
+      expect(interactor).to receive(:new).once { instance }
+      instance.stub(failure?: true)
+
+      expect(instance).not_to receive(:perform)
 
       expect(interactor.perform).to eq(instance)
     end

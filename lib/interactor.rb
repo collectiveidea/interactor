@@ -12,7 +12,9 @@ module Interactor
 
   module ClassMethods
     def perform(context = {})
-      new(context).tap(&:perform)
+      new(context).tap do |instance|
+        instance.perform unless instance.failure?
+      end
     end
   end
 
