@@ -31,17 +31,17 @@ module Interactor
   end
 
   def perform!
-    before
-    run
+    catch(:halt) do
+      before
+      run
 
-    begin
-      after
-    rescue Success
-    rescue
-      rollback
-      raise
+      begin
+        after
+      rescue Failure
+        rollback
+        raise
+      end
     end
-  rescue Success
   end
 
   def before
@@ -66,12 +66,12 @@ module Interactor
 
   def succeed!(*args)
     context.succeed!(*args)
-    raise Success
+    throw :halt
   end
 
   def fail!(*args)
     context.fail!(*args)
-    raise Failure
+    raise Failure, "fail!: called in #{self.class}##{caller[0][/`([^']*)'/, 1]}"
   end
 
   def method_missing(method, *)
