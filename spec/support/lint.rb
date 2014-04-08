@@ -70,6 +70,12 @@ shared_examples :lint do
       instance.perform
     end
 
+    it "performs!" do
+      expect(instance).to receive(:perform!).once.with(no_args)
+
+      instance.perform
+    end
+
     context "with neither #succeed! nor #fail!" do
       it "is a success" do
         instance.perform
@@ -148,12 +154,6 @@ shared_examples :lint do
 
   describe "#perform!" do
     let(:instance) { interactor.new }
-
-    it "performs" do
-      expect(instance).to receive(:perform).once.with(no_args)
-
-      instance.perform!
-    end
 
     context "with #fail!" do
       it "raises Interactor::Failure" do
