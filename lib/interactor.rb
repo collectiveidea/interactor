@@ -26,13 +26,13 @@ module Interactor
   end
 
   def perform
-    catch(:halt!) do
+    catch(:halt) do
       before
       run
 
-      if catch(:halt!) { after } == :failure!
+      if catch(:halt) { after } == :failure
         rollback
-        throw :halt!, :failure!
+        throw :halt, :failure
       end
     end
   end
@@ -64,12 +64,12 @@ module Interactor
 
   def succeed!(*args)
     context.succeed!(*args)
-    throw :halt!, :success!
+    throw :halt, :success
   end
 
   def fail!(*args)
     context.fail!(*args)
-    throw :halt!, :failure!
+    throw :halt, :failure
   end
 
   def method_missing(method, *)
