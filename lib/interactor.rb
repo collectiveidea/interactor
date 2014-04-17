@@ -1,4 +1,6 @@
 require "interactor/context"
+require "interactor/success"
+require "interactor/failure"
 require "interactor/organizer"
 
 module Interactor
@@ -14,6 +16,7 @@ module Interactor
     def perform(context = {})
       new(context).tap do |instance|
         instance.perform unless instance.failure?
+        yield Success.new(instance), Failure.new(instance) if block_given?
       end
     end
   end

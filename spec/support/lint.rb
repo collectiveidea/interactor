@@ -26,6 +26,41 @@ shared_examples :lint do
 
       expect(interactor.perform).to eq(instance)
     end
+
+    it "yields control when a block is given" do
+      expect { |block|
+        interactor.perform &block
+      }.to yield_control
+    end
+
+    it "performs a failure if the context is a failure after setup and a block is given" do
+      expect(interactor).to receive(:new).once { instance }
+      instance.stub(failure?: true, success?: false)
+
+      result = nil
+      interactor.perform do |success, failure|
+        failure.perform do
+          result = :failure
+        end
+      end
+      expect(result).to eq(:failure)
+    end
+
+    it "performs a success if the context is a success after setup and a block is given" do
+      expect(interactor).to receive(:new).once { instance }
+      instance.stub(perform: true, failure?: false, success?: true)
+
+      result = nil
+      interactor.perform do |success, failure|
+        success.perform do
+          result = :success
+        end
+      end
+      expect(result).to eq(:success)
+    end
+
+
+
   end
 
   describe ".new" do
