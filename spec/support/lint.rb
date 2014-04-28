@@ -28,6 +28,24 @@ shared_examples :lint do
     end
   end
 
+  describe ".perform!" do
+    let(:instance) { double(:instance) }
+
+    it "performs an instance with the given context!" do
+      expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
+      expect(instance).to receive(:perform!).once.with(no_args)
+
+      expect(interactor.perform!(foo: "bar")).to eq(instance)
+    end
+
+    it "provides a blank context if none is given" do
+      expect(interactor).to receive(:new).once.with({}) { instance }
+      expect(instance).to receive(:perform!).once.with(no_args)
+
+      expect(interactor.perform!).to eq(instance)
+    end
+  end
+
   describe ".new" do
     let(:context) { double(:context) }
 
@@ -48,37 +66,239 @@ shared_examples :lint do
       expect(instance).to be_a(interactor)
       expect(instance.context).to eq(context)
     end
-
-    it "calls setup" do
-      interactor.class_eval do
-        def setup
-          context[:foo] = bar
-        end
-      end
-
-      instance = interactor.new(bar: "baz")
-
-      expect(instance.context[:foo]).to eq("baz")
-    end
-  end
-
-  describe "#setup" do
-    let(:instance) { interactor.new }
-
-    it "exists" do
-      expect(instance).to respond_to(:setup)
-      expect { instance.setup }.not_to raise_error
-      expect { instance.method(:setup) }.not_to raise_error
-    end
   end
 
   describe "#perform" do
     let(:instance) { interactor.new }
 
-    it "exists" do
-      expect(instance).to respond_to(:perform)
+    it "performs!" do
+      expect(instance).to receive(:perform!).once.with(no_args)
+
+      instance.perform
+    end
+
+    it "rescues failure" do
+      expect(instance).to receive(:perform!).and_raise(Interactor::Failure)
+
       expect { instance.perform }.not_to raise_error
-      expect { instance.method(:perform) }.not_to raise_error
+    end
+
+    it "doesn't rescue other errors" do
+      error = StandardError.new
+
+      expect(instance).to receive(:before)
+      expect(instance).to receive(:run).and_raise(error)
+
+      expect { instance.perform }.to raise_error(error)
+    end
+  end
+
+  describe "#perform!" do
+    let(:instance) { interactor.new }
+
+    it "runs with before and after" do
+      expect(instance).to receive(:before).once.with(no_args).ordered
+      expect(instance).to receive(:run).once.with(no_args).ordered
+      expect(instance).to receive(:after).once.with(no_args).ordered
+
+      instance.perform!
+    end
+
+    context "with hard success" do
+      let(:error) { Interactor::Success.new }
+
+      context "before run" do
+        before do
+          instance.stub(:before).and_raise(error)
+          expect(instance).not_to receive(:run)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "rescues" do
+          expect { instance.perform! }.not_to raise_error
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform!
+        end
+      end
+
+      context "during run" do
+        before do
+          instance.stub(:run).and_raise(error)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "rescues" do
+          expect { instance.perform! }.not_to raise_error
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform!
+        end
+      end
+
+      context "after run" do
+        before do
+          instance.stub(:after).and_raise(error)
+        end
+
+        it "rescues" do
+          expect { instance.perform! }.not_to raise_error
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform!
+        end
+      end
+    end
+
+    context "with failure" do
+      let(:error) { Interactor::Failure.new }
+
+      context "before run" do
+        before do
+          instance.stub(:before).and_raise(error)
+          expect(instance).not_to receive(:run)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform! rescue nil
+        end
+      end
+
+      context "during run" do
+        before do
+          instance.stub(:run).and_raise(error)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform! rescue nil
+        end
+      end
+
+      context "after run" do
+        before do
+          instance.stub(:after).and_raise(error)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "rolls back" do
+          expect(instance).to receive(:after).and_raise(error).ordered
+          expect(instance).to receive(:rollback).once.with(no_args).ordered
+
+          instance.perform! rescue nil
+        end
+      end
+    end
+
+    context "with some other error" do
+      let(:error) { StandardError.new }
+
+      context "before run" do
+        before do
+          instance.stub(:before).and_raise(error)
+          expect(instance).not_to receive(:run)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform! rescue nil
+        end
+      end
+
+      context "during run" do
+        before do
+          instance.stub(:run).and_raise(error)
+          expect(instance).not_to receive(:after)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "doesn't roll back" do
+          expect(instance).not_to receive(:rollback)
+
+          instance.perform! rescue nil
+        end
+      end
+
+      context "after run" do
+        before do
+          instance.stub(:after).and_raise(error)
+        end
+
+        it "doesn't rescue" do
+          expect { instance.perform! }.to raise_error(error)
+        end
+
+        it "rolls back" do
+          expect(instance).to receive(:after).and_raise(error).ordered
+          expect(instance).to receive(:rollback).once.with(no_args).ordered
+
+          instance.perform! rescue nil
+        end
+      end
+    end
+  end
+
+  describe "#before" do
+    let(:instance) { interactor.new }
+
+    it "exists" do
+      expect(instance).to respond_to(:before)
+      expect { instance.before }.not_to raise_error
+      expect { instance.method(:before) }.not_to raise_error
+    end
+  end
+
+  describe "#run" do
+    let(:instance) { interactor.new }
+
+    it "exists" do
+      expect(instance).to respond_to(:run)
+      expect { instance.run }.not_to raise_error
+      expect { instance.method(:run) }.not_to raise_error
+    end
+  end
+
+  describe "#after" do
+    let(:instance) { interactor.new }
+
+    it "exists" do
+      expect(instance).to respond_to(:after)
+      expect { instance.after }.not_to raise_error
+      expect { instance.method(:after) }.not_to raise_error
     end
   end
 
@@ -122,16 +342,69 @@ shared_examples :lint do
     let(:instance) { interactor.new }
     let(:context) { instance.context }
 
+    it "raises a failure" do
+      expect { instance.fail! }.to raise_error(Interactor::Failure)
+    end
+
+    it "interrupts execution" do
+      interactor.class_eval do
+        def run
+          context[:foo] = "bar"
+          fail!
+          context[:foo] = "baz"
+        end
+      end
+
+      instance.run rescue nil
+
+      expect(context[:foo]).to eq("bar")
+    end
+
     it "defers to the context" do
       expect(context).to receive(:fail!).once.with(no_args)
 
-      instance.fail!
+      instance.fail! rescue nil
     end
 
     it "passes updates to the context" do
       expect(context).to receive(:fail!).once.with(foo: "bar")
 
-      instance.fail!(foo: "bar")
+      instance.fail!(foo: "bar") rescue nil
+    end
+  end
+
+  describe "#succeed!" do
+    let(:instance) { interactor.new }
+    let(:context) { instance.context }
+
+    it "raises a success" do
+      expect { instance.succeed! }.to raise_error(Interactor::Success)
+    end
+
+    it "interrupts execution" do
+      interactor.class_eval do
+        def run
+          context[:foo] = "bar"
+          succeed!
+          context[:foo] = "baz"
+        end
+      end
+
+      instance.run rescue nil
+
+      expect(context[:foo]).to eq("bar")
+    end
+
+    it "defers to the context" do
+      expect(context).to receive(:succeed!).once.with(no_args)
+
+      instance.succeed! rescue nil
+    end
+
+    it "passes updates to the context" do
+      expect(context).to receive(:succeed!).once.with(foo: "bar")
+
+      instance.succeed!(foo: "bar") rescue nil
     end
   end
 

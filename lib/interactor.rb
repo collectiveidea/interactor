@@ -1,4 +1,5 @@
 require "interactor/context"
+require "interactor/error"
 require "interactor/organizer"
 
 module Interactor
@@ -16,17 +17,42 @@ module Interactor
         instance.perform unless instance.failure?
       end
     end
+
+    def perform!(context = {})
+      new(context).tap(&:perform!)
+    end
   end
 
   def initialize(context = {})
     @context = Context.build(context)
-    setup
-  end
-
-  def setup
   end
 
   def perform
+    perform!
+  rescue Failure
+  end
+
+  def perform!
+    before
+    run
+
+    begin
+      after
+    rescue Success
+    rescue
+      rollback
+      raise
+    end
+  rescue Success
+  end
+
+  def before
+  end
+
+  def run
+  end
+
+  def after
   end
 
   def rollback
@@ -40,8 +66,14 @@ module Interactor
     context.failure?
   end
 
+  def succeed!(*args)
+    context.succeed!(*args)
+    raise Success
+  end
+
   def fail!(*args)
     context.fail!(*args)
+    raise Failure
   end
 
   def method_missing(method, *)

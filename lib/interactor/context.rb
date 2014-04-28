@@ -18,9 +18,14 @@ module Interactor
       @failure || false
     end
 
-    def fail!(context = {})
+    def succeed!(context = {})
+      @failure = false
       update(context)
+    end
+
+    def fail!(context = {})
       @failure = true
+      update(context)
     end
   end
 end

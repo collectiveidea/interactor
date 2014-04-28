@@ -24,7 +24,7 @@ module Interactor
         self.class.interactors
       end
 
-      def perform
+      def run
         interactors.each do |interactor|
           begin
             instance = interactor.perform(context)

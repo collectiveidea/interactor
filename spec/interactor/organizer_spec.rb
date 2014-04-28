@@ -46,7 +46,7 @@ module Interactor
       end
     end
 
-    describe "#perform" do
+    describe "#run" do
       let(:instance) { organizer.new }
       let(:context) { instance.context }
       let(:interactor2) { double(:interactor2) }
@@ -67,7 +67,7 @@ module Interactor
 
         expect(instance).not_to receive(:rollback)
 
-        instance.perform
+        instance.run
       end
 
       it "builds up the performed interactors" do
@@ -87,7 +87,7 @@ module Interactor
         end
 
         expect {
-          instance.perform
+          instance.run
         }.to change {
           instance.performed
         }.from([]).to([instance2, instance3, instance4])
@@ -102,7 +102,7 @@ module Interactor
           expect(instance.performed).to eq([instance2])
         end
 
-        instance.perform
+        instance.run
       end
 
       it "aborts and rolls back on error" do
@@ -115,7 +115,7 @@ module Interactor
           expect(instance.performed).to eq([instance2])
         end
 
-        expect { instance.perform }.to raise_error(error)
+        expect { instance.run }.to raise_error(error)
       end
     end
 
@@ -203,7 +203,7 @@ module Interactor
         expect(instance2b).to receive(:rollback).once.with(no_args).ordered
         expect(instance2a).to receive(:rollback).once.with(no_args).ordered
 
-        instance.perform
+        instance.run
       end
     end
   end
