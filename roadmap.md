@@ -31,7 +31,11 @@ personal preference. There are two problems with that suggestion:
 ### Proposed Solution
 
 On both the class level and the instance level, interactors will use the `call`
-method rather than `perform`.
+method rather than `perform`, because… Ruby. The `call` method is a common Ruby
+convention for method objects. It also has nice symmetry with Ruby's procs and
+lambdas.
+
+Fun argument [here](https://github.com/collectiveidea/interactor/issues/27).
 
 ```ruby
 class SessionsController < ApplicationController
