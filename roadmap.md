@@ -254,7 +254,7 @@ end
 
 ### Proposed Solution
 
-The `Interactor.perform` method will return the mutated context resulting from
+The `Interactor.call` method will return the mutated context resulting from
 performance of the interactor instance. The instance itself is a throwaway. If
 the interactor wishes to make data available outside of its own performance,
 that data should be added to the context.
