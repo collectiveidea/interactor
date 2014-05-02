@@ -52,7 +52,7 @@ shared_examples :lint do
     it "calls setup" do
       interactor.class_eval do
         def setup
-          context[:foo] = bar
+          context[:foo] = context[:bar]
         end
       end
 
@@ -132,38 +132,6 @@ shared_examples :lint do
       expect(context).to receive(:fail!).once.with(foo: "bar")
 
       instance.fail!(foo: "bar")
-    end
-  end
-
-  describe "context deferral" do
-    context "initialized" do
-      let(:instance) { interactor.new(foo: "bar", "hello" => "world") }
-
-      it "defers to keys that exist in the context" do
-        expect(instance).to respond_to(:foo)
-        expect(instance.foo).to eq("bar")
-        expect { instance.method(:foo) }.not_to raise_error
-      end
-
-      it "defers to string keys that exist in the context" do
-        expect(instance).to respond_to(:hello)
-        expect(instance.hello).to eq("world")
-        expect { instance.method(:hello) }.not_to raise_error
-      end
-
-      it "bombs if the key does not exist in the context" do
-        expect(instance).not_to respond_to(:baz)
-        expect { instance.baz }.to raise_error(NoMethodError)
-        expect { instance.method(:baz) }.to raise_error(NameError)
-      end
-    end
-
-    context "allocated" do
-      let(:instance) { interactor.allocate }
-
-      it "doesn't respond to context keys before the context is set" do
-        expect(instance).not_to respond_to(:foo)
-      end
     end
   end
 end
