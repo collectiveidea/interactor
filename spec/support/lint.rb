@@ -52,13 +52,13 @@ shared_examples :lint do
     it "calls setup" do
       interactor.class_eval do
         def setup
-          context[:foo] = context[:bar]
+          context.foo = context.bar
         end
       end
 
       instance = interactor.new(bar: "baz")
 
-      expect(instance.context[:foo]).to eq("baz")
+      expect(instance.context.foo).to eq("baz")
     end
   end
 
