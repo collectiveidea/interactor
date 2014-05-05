@@ -11,9 +11,9 @@ module Interactor
   end
 
   module ClassMethods
-    def perform(context = {})
+    def call(context = {})
       new(context).tap do |instance|
-        instance.perform unless instance.failure?
+        instance.call unless instance.failure?
       end
     end
   end
@@ -26,7 +26,7 @@ module Interactor
   def setup
   end
 
-  def perform
+  def call
   end
 
   def rollback
