@@ -24,26 +24,26 @@ module Interactor
         self.class.interactors
       end
 
-      def perform
+      def call
         interactors.each do |interactor|
           begin
-            instance = interactor.perform(context)
+            instance = interactor.call(context)
           rescue
             rollback
             raise
           end
 
           rollback && break if failure?
-          performed << instance
+          called << instance
         end
       end
 
       def rollback
-        performed.reverse_each(&:rollback)
+        called.reverse_each(&:rollback)
       end
 
-      def performed
-        @performed ||= []
+      def called
+        @called ||= []
       end
     end
   end
