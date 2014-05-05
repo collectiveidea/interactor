@@ -1,6 +1,7 @@
 branches:
   only:
     - master
+    - v3-new
 language: ruby
 rvm:
   - 1.9.3
