@@ -13,7 +13,7 @@ module Interactor
   module ClassMethods
     def call(context = {})
       new(context).tap do |instance|
-        instance.call unless instance.failure?
+        instance.call unless instance.context.failure?
       end
     end
   end
@@ -30,17 +30,5 @@ module Interactor
   end
 
   def rollback
-  end
-
-  def success?
-    context.success?
-  end
-
-  def failure?
-    context.failure?
-  end
-
-  def fail!(*args)
-    context.fail!(*args)
   end
 end
