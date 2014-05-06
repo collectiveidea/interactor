@@ -41,9 +41,7 @@ module Interactor
   end
 
   def call_with_hooks
-    call_before_hooks
-    call
-    call_after_hooks
+    with_hooks { call }
   end
 
   def call
@@ -53,6 +51,12 @@ module Interactor
   end
 
   private
+
+  def with_hooks
+    call_before_hooks
+    yield
+    call_after_hooks
+  end
 
   def call_before_hooks
     call_hooks(self.class.before_hooks)
