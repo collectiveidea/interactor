@@ -52,18 +52,15 @@ module Interactor
       let(:interactor2) { double(:interactor2) }
       let(:interactor3) { double(:interactor3) }
       let(:interactor4) { double(:interactor4) }
-      let(:instance2) { double(:instance2) }
-      let(:instance3) { double(:instance3) }
-      let(:instance4) { double(:instance4) }
 
       before do
         organizer.stub(:interactors) { [interactor2, interactor3, interactor4] }
       end
 
       it "calls each interactor in order with the context" do
-        expect(interactor2).to receive(:call).once.with(context).ordered { instance2 }
-        expect(interactor3).to receive(:call).once.with(context).ordered { instance3 }
-        expect(interactor4).to receive(:call).once.with(context).ordered { instance4 }
+        expect(interactor2).to receive(:call).once.with(context).ordered
+        expect(interactor3).to receive(:call).once.with(context).ordered
+        expect(interactor4).to receive(:call).once.with(context).ordered
 
         expect(instance).not_to receive(:rollback)
 
@@ -73,33 +70,35 @@ module Interactor
       it "builds up the called interactors" do
         interactor2.stub(:call) do
           expect(instance.called).to eq([])
-          instance2
+          interactor2
         end
 
         interactor3.stub(:call) do
-          expect(instance.called).to eq([instance2])
-          instance3
+          expect(instance.called).to eq([interactor2])
+          interactor3
         end
 
         interactor4.stub(:call) do
-          expect(instance.called).to eq([instance2, instance3])
-          instance4
+          expect(instance.called).to eq([interactor2, interactor3])
+          interactor4
         end
 
         expect {
           instance.call
         }.to change {
           instance.called
-        }.from([]).to([instance2, instance3, instance4])
+        }.from([]).to([interactor2, interactor3, interactor4])
       end
 
       it "aborts and rolls back on failure" do
-        expect(interactor2).to receive(:call).once.with(context).ordered { instance2 }
-        expect(interactor3).to receive(:call).once.with(context).ordered { context.fail! }
+        expect(interactor2).to receive(:call).once.with(context).ordered
+        expect(interactor3).to receive(:call).once.with(context).ordered do
+          context.fail!
+        end
         expect(interactor4).not_to receive(:call)
 
-        expect(instance).to receive(:rollback).once.ordered do
-          expect(instance.called).to eq([instance2])
+        expect(instance).to receive(:rollback_called).once.ordered do
+          expect(instance.called).to eq([interactor2])
         end
 
         instance.call
@@ -107,12 +106,14 @@ module Interactor
 
       it "aborts and rolls back on error" do
         error = StandardError.new("foo")
-        expect(interactor2).to receive(:call).once.with(context).ordered { instance2 }
-        expect(interactor3).to receive(:call).once.with(context).ordered { raise error }
+        expect(interactor2).to receive(:call).once.with(context).ordered
+        expect(interactor3).to receive(:call).once.with(context).ordered do
+          raise error
+        end
         expect(interactor4).not_to receive(:call)
 
-        expect(instance).to receive(:rollback).once.ordered do
-          expect(instance.called).to eq([instance2])
+        expect(instance).to receive(:rollback_called).once.ordered do
+          expect(instance.called).to eq([interactor2])
         end
 
         expect { instance.call }.to raise_error(error)
@@ -121,18 +122,35 @@ module Interactor
 
     describe "#rollback" do
       let(:instance) { organizer.new }
-      let(:instance2) { double(:instance2) }
-      let(:instance3) { double(:instance3) }
+      let(:interactor2) { double(:interactor2) }
+      let(:interactor3) { double(:interactor3) }
 
       before do
-        instance.stub(:called) { [instance2, instance3] }
+        instance.stub(:interactors) { [interactor2, interactor3] }
+      end
+
+      it "rolls back each organized interactor in reverse" do
+        expect(interactor3).to receive(:rollback).once.ordered
+        expect(interactor2).to receive(:rollback).once.ordered
+
+        instance.rollback
+      end
+    end
+
+    describe "#rollback_called" do
+      let(:instance) { organizer.new }
+      let(:interactor2) { double(:interactor2) }
+      let(:interactor3) { double(:interactor3) }
+
+      before do
+        instance.stub(:called) { [interactor2, interactor3] }
       end
 
       it "rolls back each called interactor in reverse" do
-        expect(instance3).to receive(:rollback).once.ordered
-        expect(instance2).to receive(:rollback).once.ordered
+        expect(interactor3).to receive(:rollback).once.ordered
+        expect(interactor2).to receive(:rollback).once.ordered
 
-        instance.rollback
+        instance.rollback_called
       end
     end
 
@@ -170,13 +188,6 @@ module Interactor
       let(:interactor4c) { double(:interactor4c) }
       let(:interactor5) { double(:interactor5) }
 
-      let(:instance2a) { double(:instance2a) }
-      let(:instance2b) { double(:instance2b) }
-      let(:instance2c) { double(:instance2c) }
-      let(:instance3) { double(:instance3) }
-      let(:instance4a) { double(:instance4a) }
-      let(:instance4b) { double(:instance4b) }
-
       before do
         organizer.stub(:interactors) { [organizer2, interactor3, organizer4, interactor5] }
         organizer2.stub(:interactors) { [interactor2a, interactor2b, interactor2c] }
@@ -184,24 +195,25 @@ module Interactor
       end
 
       it "calls and rolls back properly" do
-        expect(interactor2a).to receive(:call).once.with(context).ordered { instance2a }
-        expect(interactor2b).to receive(:call).once.with(context).ordered { instance2b }
-        expect(interactor2c).to receive(:call).once.with(context).ordered { instance2c }
-        expect(interactor3).to receive(:call).once.with(context).ordered { instance3 }
-        expect(interactor4a).to receive(:call).once.with(context).ordered { instance4a }
+        expect(interactor2a).to receive(:call).once.with(context).ordered
+        expect(interactor2b).to receive(:call).once.with(context).ordered
+        expect(interactor2c).to receive(:call).once.with(context).ordered
+        expect(interactor3).to receive(:call).once.with(context).ordered
+        expect(interactor4a).to receive(:call).once.with(context).ordered
         expect(interactor4b).to receive(:call).once.with(context).ordered do
           context.fail!
-          instance4b
         end
         expect(interactor4c).not_to receive(:call)
         expect(interactor5).not_to receive(:call)
 
-        expect(instance4b).not_to receive(:rollback)
-        expect(instance4a).to receive(:rollback).once.with(no_args).ordered
-        expect(instance3).to receive(:rollback).once.with(no_args).ordered
-        expect(instance2c).to receive(:rollback).once.with(no_args).ordered
-        expect(instance2b).to receive(:rollback).once.with(no_args).ordered
-        expect(instance2a).to receive(:rollback).once.with(no_args).ordered
+        expect(interactor5).not_to receive(:rollback)
+        expect(interactor4c).not_to receive(:rollback)
+        expect(interactor4b).not_to receive(:rollback)
+        expect(interactor4a).to receive(:rollback).once.with(context).ordered
+        expect(interactor3).to receive(:rollback).once.with(context).ordered
+        expect(interactor2c).to receive(:rollback).once.with(context).ordered
+        expect(interactor2b).to receive(:rollback).once.with(context).ordered
+        expect(interactor2a).to receive(:rollback).once.with(context).ordered
 
         instance.call
       end
