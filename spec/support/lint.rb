@@ -1,30 +1,30 @@
 shared_examples :lint do
   let(:interactor) { Class.new.send(:include, described_class) }
 
-  describe ".perform" do
+  describe ".call" do
     let(:instance) { double(:instance, failure?: false) }
 
-    it "performs an instance with the given context" do
+    it "calls an instance with the given context" do
       expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
-      expect(instance).to receive(:perform).once.with(no_args)
+      expect(instance).to receive(:call).once.with(no_args)
 
-      expect(interactor.perform(foo: "bar")).to eq(instance)
+      expect(interactor.call(foo: "bar")).to eq(instance)
     end
 
     it "provides a blank context if none is given" do
       expect(interactor).to receive(:new).once.with({}) { instance }
-      expect(instance).to receive(:perform).once.with(no_args)
+      expect(instance).to receive(:call).once.with(no_args)
 
-      expect(interactor.perform).to eq(instance)
+      expect(interactor.call).to eq(instance)
     end
 
-    it "does not run perform if the context is a failure after setup" do
+    it "does not run call if the context is a failure after setup" do
       expect(interactor).to receive(:new).once { instance }
       instance.stub(failure?: true)
 
-      expect(instance).not_to receive(:perform)
+      expect(instance).not_to receive(:call)
 
-      expect(interactor.perform).to eq(instance)
+      expect(interactor.call).to eq(instance)
     end
   end
 
@@ -72,13 +72,13 @@ shared_examples :lint do
     end
   end
 
-  describe "#perform" do
+  describe "#call" do
     let(:instance) { interactor.new }
 
     it "exists" do
-      expect(instance).to respond_to(:perform)
-      expect { instance.perform }.not_to raise_error
-      expect { instance.method(:perform) }.not_to raise_error
+      expect(instance).to respond_to(:call)
+      expect { instance.call }.not_to raise_error
+      expect { instance.method(:call) }.not_to raise_error
     end
   end
 
