@@ -11,14 +11,14 @@ shared_examples :lint do
         expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
         expect(instance).to receive(:call).once.with(no_args)
 
-        expect(interactor.call(foo: "bar")).to eq(instance)
+        expect(interactor.call(foo: "bar")).to eq(context)
       end
 
       it "provides a blank context if none is given" do
         expect(interactor).to receive(:new).once.with({}) { instance }
         expect(instance).to receive(:call).once.with(no_args)
 
-        expect(interactor.call).to eq(instance)
+        expect(interactor.call).to eq(context)
       end
     end
 
@@ -31,8 +31,27 @@ shared_examples :lint do
 
         expect(instance).not_to receive(:call)
 
-        expect(interactor.call).to eq(instance)
+        expect(interactor.call).to eq(context)
       end
+    end
+  end
+
+  describe ".rollback" do
+    let(:context) { double(:context) }
+    let(:instance) { double(:instance, context: context) }
+
+    it "rolls back an instance with the given context" do
+      expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
+      expect(instance).to receive(:rollback).once.with(no_args)
+
+      expect(interactor.rollback(foo: "bar")).to eq(context)
+    end
+
+    it "provides a blank context if none is given" do
+      expect(interactor).to receive(:new).once.with({}) { instance }
+      expect(instance).to receive(:rollback).once.with(no_args)
+
+      expect(interactor.rollback).to eq(context)
     end
   end
 
