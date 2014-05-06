@@ -33,7 +33,7 @@ module Interactor
             raise
           end
 
-          rollback && break if failure?
+          rollback && break if context.failure?
           called << instance
         end
       end
