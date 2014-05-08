@@ -1,10 +1,12 @@
 require "interactor/context"
+require "interactor/hooks"
 require "interactor/organizer"
 
 module Interactor
   def self.included(base)
     base.class_eval do
       extend ClassMethods
+      include Hooks
 
       attr_reader :context
     end
@@ -12,25 +14,20 @@ module Interactor
 
   module ClassMethods
     def call(context = {})
-      instance = new(context)
-      context = instance.context
-      instance.call unless context.failure?
-      context
+      new(context).tap(&:call_with_hooks).context
     end
 
     def rollback(context = {})
-      instance = new(context)
-      instance.rollback
-      instance.context
+      new(context).tap(&:rollback).context
     end
   end
 
   def initialize(context = {})
     @context = Context.build(context)
-    setup
   end
 
-  def setup
+  def call_with_hooks
+    with_hooks { call }
   end
 
   def call
