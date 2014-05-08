@@ -198,8 +198,7 @@ module Interactor
     #  └─ interactor5
     #
     context "organizers within organizers" do
-      let(:instance) { organizer.new }
-      let(:context) { instance.context }
+      let(:context) { Context.build }
       let(:organizer2) { Class.new.send(:include, Organizer) }
       let(:interactor2a) { double(:interactor2a) }
       let(:interactor2b) { double(:interactor2b) }
@@ -238,7 +237,7 @@ module Interactor
         expect(interactor2b).to receive(:rollback).once.with(context).ordered
         expect(interactor2a).to receive(:rollback).once.with(context).ordered
 
-        instance.call
+        organizer.call(context)
       end
     end
   end
