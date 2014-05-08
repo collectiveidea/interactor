@@ -63,7 +63,7 @@ module Interactor
 
       it "sets success to false" do
         expect {
-          context.fail!
+          context.fail! rescue nil
         }.to change {
           context.success?
         }.from(true).to(false)
@@ -71,17 +71,17 @@ module Interactor
 
       it "sets failure to true" do
         expect {
-          context.fail!
+          context.fail! rescue nil
         }.to change {
           context.failure?
         }.from(false).to(true)
       end
 
       it "preserves failure" do
-        context.fail!
+        context.fail! rescue nil
 
         expect {
-          context.fail!
+          context.fail! rescue nil
         }.not_to change {
           context.failure?
         }
@@ -89,7 +89,7 @@ module Interactor
 
       it "preserves the context" do
         expect {
-          context.fail!
+          context.fail! rescue nil
         }.not_to change {
           context.foo
         }
@@ -97,7 +97,7 @@ module Interactor
 
       it "updates the context" do
         expect {
-          context.fail!(foo: "baz")
+          context.fail!(foo: "baz") rescue nil
         }.to change {
           context.foo
         }.from("bar").to("baz")
