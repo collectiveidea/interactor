@@ -132,6 +132,7 @@ shared_examples :lint do
   describe "#call_with_hooks" do
     let(:instance) { interactor.new(hooks: []) }
     let(:before1) { proc { context.hooks << :before1 } }
+    let(:call) { proc { context.hooks << :call } }
     let(:after1) { proc { context.hooks << :after1 } }
 
     before do
@@ -147,19 +148,110 @@ shared_examples :lint do
         end
       end
       interactor.stub(:before_hooks) { [before1, :before2] }
+      instance.stub(:call) { instance.instance_eval(&call) }
       interactor.stub(:after_hooks) { [after1, :after2] }
     end
 
     it "runs before hooks, call, then after hooks" do
-      expect(instance).to receive(:call).once.with(no_args) do
-        expect(instance.context.hooks).to eq([:before1, :before2])
-      end
-
       expect {
         instance.call_with_hooks
       }.to change {
         instance.context.hooks
-      }.from([]).to([:before1, :before2, :after1, :after2])
+      }.from([]).to([:before1, :before2, :call, :after1, :after2])
+    end
+
+    context "when a before hook fails" do
+      let(:before1) { proc { context.fail!; context.hooks << :before1 } }
+
+      it "aborts" do
+        expect {
+          instance.call_with_hooks
+        }.not_to change {
+          instance.context.hooks
+        }
+      end
+    end
+
+    context "when a before hook errors" do
+      let(:before1) { proc { raise "foo"; context.hooks << :before1 } }
+
+      it "aborts" do
+        expect {
+          instance.call_with_hooks rescue nil
+        }.not_to change {
+          instance.context.hooks
+        }
+      end
+
+      it "raises the error" do
+        expect {
+          instance.call_with_hooks
+        }.to raise_error("foo")
+      end
+    end
+
+    context "when call fails" do
+      let!(:call) { proc { context.fail!; context.hooks << :call } }
+
+      it "aborts" do
+        expect {
+          instance.call_with_hooks
+        }.to change {
+          instance.context.hooks
+        }.from([]).to([:before1, :before2])
+      end
+    end
+
+    context "when call errors" do
+      let!(:call) { proc { raise "foo"; context.hooks << :call } }
+
+      it "aborts" do
+        expect {
+          instance.call_with_hooks rescue nil
+        }.to change {
+          instance.context.hooks
+        }.from([]).to([:before1, :before2])
+      end
+
+      it "raises the error" do
+        expect {
+          instance.call_with_hooks
+        }.to raise_error("foo")
+      end
+    end
+
+    context "when an after hook fails" do
+      let(:after1) { proc { context.fail!; context.hooks << :after1 } }
+
+      it "aborts" do
+        expect {
+          instance.call_with_hooks
+        }.to change {
+          instance.context.hooks
+        }.from([]).to([:before1, :before2, :call])
+      end
+
+      it "rolls back"
+    end
+
+    context "when an after hook errors" do
+      let(:after1) { proc { raise "foo"; context.hooks << :after1 } }
+
+      it "aborts" do
+        expect {
+          instance.call_with_hooks rescue nil
+        }.to change {
+          instance.context.hooks
+        }.from([]).to([:before1, :before2, :call])
+      end
+
+      it "rolls back"
+
+      it "raises the error" do
+        expect {
+          instance.call_with_hooks
+        }.to raise_error("foo")
+      end
     end
   end
 

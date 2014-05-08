@@ -17,6 +17,7 @@ module Interactor
     def fail!(context = {})
       modifiable.update(context)
       @failure = true
+      raise Failure
     end
   end
 end

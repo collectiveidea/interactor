@@ -1,4 +1,5 @@
 require "interactor/context"
+require "interactor/error"
 require "interactor/hooks"
 require "interactor/organizer"
 
@@ -28,6 +29,7 @@ module Interactor
 
   def call_with_hooks
     with_hooks { call }
+  rescue Failure
   end
 
   def call
