@@ -2,29 +2,56 @@ shared_examples :lint do
   let(:interactor) { Class.new.send(:include, described_class) }
 
   describe ".call" do
-    let(:instance) { double(:instance, failure?: false) }
+    let(:instance) { double(:instance, context: context) }
 
-    it "calls an instance with the given context" do
+    context "when setup succeeds" do
+      let(:context) { double(:context, success?: true, failure?: false) }
+
+      it "calls an instance with the given context" do
+        expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
+        expect(instance).to receive(:call).once.with(no_args)
+
+        expect(interactor.call(foo: "bar")).to eq(context)
+      end
+
+      it "provides a blank context if none is given" do
+        expect(interactor).to receive(:new).once.with({}) { instance }
+        expect(instance).to receive(:call).once.with(no_args)
+
+        expect(interactor.call).to eq(context)
+      end
+    end
+
+    context "when setup fails" do
+      let(:context) { double(:context, success?: false, failure?: true) }
+
+      it "does not call the instance" do
+        expect(interactor).to receive(:new).once { instance }
+        instance.stub(failure?: true)
+
+        expect(instance).not_to receive(:call)
+
+        expect(interactor.call).to eq(context)
+      end
+    end
+  end
+
+  describe ".rollback" do
+    let(:context) { double(:context) }
+    let(:instance) { double(:instance, context: context) }
+
+    it "rolls back an instance with the given context" do
       expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
-      expect(instance).to receive(:call).once.with(no_args)
+      expect(instance).to receive(:rollback).once.with(no_args)
 
-      expect(interactor.call(foo: "bar")).to eq(instance)
+      expect(interactor.rollback(foo: "bar")).to eq(context)
     end
 
     it "provides a blank context if none is given" do
       expect(interactor).to receive(:new).once.with({}) { instance }
-      expect(instance).to receive(:call).once.with(no_args)
+      expect(instance).to receive(:rollback).once.with(no_args)
 
-      expect(interactor.call).to eq(instance)
-    end
-
-    it "does not run call if the context is a failure after setup" do
-      expect(interactor).to receive(:new).once { instance }
-      instance.stub(failure?: true)
-
-      expect(instance).not_to receive(:call)
-
-      expect(interactor.call).to eq(instance)
+      expect(interactor.rollback).to eq(context)
     end
   end
 
@@ -89,49 +116,6 @@ shared_examples :lint do
       expect(instance).to respond_to(:rollback)
       expect { instance.rollback }.not_to raise_error
       expect { instance.method(:rollback) }.not_to raise_error
-    end
-  end
-
-  describe "#success?" do
-    let(:instance) { interactor.new }
-    let(:context) { instance.context }
-
-    it "defers to the context" do
-      context.stub(success?: true)
-      expect(instance.success?).to eq(true)
-
-      context.stub(success?: false)
-      expect(instance.success?).to eq(false)
-    end
-  end
-
-  describe "#failure?" do
-    let(:instance) { interactor.new }
-    let(:context) { instance.context }
-
-    it "defers to the context" do
-      context.stub(failure?: true)
-      expect(instance.failure?).to eq(true)
-
-      context.stub(failure?: false)
-      expect(instance.failure?).to eq(false)
-    end
-  end
-
-  describe "#fail!" do
-    let(:instance) { interactor.new }
-    let(:context) { instance.context }
-
-    it "defers to the context" do
-      expect(context).to receive(:fail!).once.with(no_args)
-
-      instance.fail!
-    end
-
-    it "passes updates to the context" do
-      expect(context).to receive(:fail!).once.with(foo: "bar")
-
-      instance.fail!(foo: "bar")
     end
   end
 end
