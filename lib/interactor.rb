@@ -28,8 +28,15 @@ module Interactor
   end
 
   def call_with_hooks
-    with_hooks { call }
-  rescue Failure
+    called = false
+
+    with_hooks do
+      call
+      called = true
+    end
+  rescue => error
+    rollback if called
+    raise unless error.is_a?(Failure)
   end
 
   def call
