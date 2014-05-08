@@ -90,33 +90,56 @@ module Interactor
         }.from([]).to([interactor2, interactor3, interactor4])
       end
 
-      it "aborts and rolls back on failure" do
-        expect(interactor2).to receive(:call).once.with(context).ordered
-        expect(interactor3).to receive(:call).once.with(context).ordered do
-          context.fail!
-        end
-        expect(interactor4).not_to receive(:call)
-
-        expect(instance).to receive(:rollback_called).once.ordered do
-          expect(instance.called).to eq([interactor2])
+      context "when an interactor fails" do
+        before do
+          interactor2.stub(:call) { context.fail! }
         end
 
-        instance.call
+        it "aborts" do
+          expect(interactor4).not_to receive(:call)
+
+          instance.call rescue nil
+        end
+
+        it "rolls back" do
+          expect(instance).to receive(:rollback_called).once do
+            expect(instance.called).to eq([interactor2])
+          end
+
+          instance.call rescue nil
+        end
+
+        it "raises failure" do
+          expect {
+            instance.call
+          }.to raise_error(Failure)
+        end
       end
 
-      it "aborts and rolls back on error" do
-        error = StandardError.new("foo")
-        expect(interactor2).to receive(:call).once.with(context).ordered
-        expect(interactor3).to receive(:call).once.with(context).ordered do
-          raise error
-        end
-        expect(interactor4).not_to receive(:call)
-
-        expect(instance).to receive(:rollback_called).once.ordered do
-          expect(instance.called).to eq([interactor2])
+      context "when an interactor errors" do
+        before do
+          interactor2.stub(:call) { raise "foo" }
         end
 
-        expect { instance.call }.to raise_error(error)
+        it "aborts" do
+          expect(interactor4).not_to receive(:call)
+
+          instance.call rescue nil
+        end
+
+        it "rolls back" do
+          expect(instance).to receive(:rollback_called).once do
+            expect(instance.called).to eq([interactor2])
+          end
+
+          instance.call rescue nil
+        end
+
+        it "raises the error" do
+          expect {
+            instance.call
+          }.to raise_error("foo")
+        end
       end
     end
 
