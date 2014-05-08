@@ -57,6 +57,14 @@ shared_examples :lint do
         interactor.before_hooks
       }.from([hook1]).to([hook1, hook2])
     end
+
+    it "accepts method names" do
+      expect {
+        interactor.before(:hook1, :hook2)
+      }.to change {
+        interactor.before_hooks
+      }.from([]).to([:hook1, :hook2])
+    end
   end
 
   describe ".after" do
@@ -76,6 +84,14 @@ shared_examples :lint do
       }.to change {
         interactor.after_hooks
       }.from([hook1]).to([hook2, hook1])
+    end
+
+    it "accepts method names" do
+      expect {
+        interactor.after(:hook1, :hook2)
+      }.to change {
+        interactor.after_hooks
+      }.from([]).to([:hook2, :hook1])
     end
   end
 
@@ -115,26 +131,34 @@ shared_examples :lint do
 
   describe "#call_with_hooks" do
     let(:instance) { interactor.new(hooks: []) }
-    let(:context) { instance.context }
     let(:before1) { proc { context.hooks << :before1 } }
-    let(:before2) { proc { context.hooks << :before2 } }
     let(:after1) { proc { context.hooks << :after1 } }
-    let(:after2) { proc { context.hooks << :after2 } }
 
     before do
-      interactor.stub(:before_hooks) { [before1, before2] }
-      interactor.stub(:after_hooks) { [after1, after2] }
+      interactor.class_eval do
+        private
+
+        def before2
+          context.hooks << :before2
+        end
+
+        def after2
+          context.hooks << :after2
+        end
+      end
+      interactor.stub(:before_hooks) { [before1, :before2] }
+      interactor.stub(:after_hooks) { [after1, :after2] }
     end
 
     it "runs before hooks, call, then after hooks" do
       expect(instance).to receive(:call).once.with(no_args) do
-        expect(context.hooks).to eq([:before1, :before2])
+        expect(instance.context.hooks).to eq([:before1, :before2])
       end
 
       expect {
         instance.call_with_hooks
       }.to change {
-        context.hooks
+        instance.context.hooks
       }.from([]).to([:before1, :before2, :after1, :after2])
     end
   end

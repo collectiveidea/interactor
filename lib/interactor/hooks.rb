@@ -7,12 +7,14 @@ module Interactor
     end
 
     module ClassMethods
-      def before(&hook)
-        before_hooks.push(hook)
+      def before(*hooks, &block)
+        hooks << block if block
+        hooks.each { |hook| before_hooks.push(hook) }
       end
 
-      def after(&hook)
-        after_hooks.unshift(hook)
+      def after(*hooks, &block)
+        hooks << block if block
+        hooks.each { |hook| after_hooks.unshift(hook) }
       end
 
       def before_hooks
@@ -53,7 +55,7 @@ module Interactor
     end
 
     def call_hook(hook)
-      instance_eval(&hook)
+      hook.is_a?(Symbol) ? method(hook).call : instance_eval(&hook)
     end
   end
 end
