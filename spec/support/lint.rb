@@ -170,6 +170,12 @@ shared_examples :lint do
           instance.context.hooks
         }
       end
+
+      it "doesn't roll back" do
+        expect(instance).not_to receive(:rollback)
+
+        instance.call_with_hooks
+      end
     end
 
     context "when a before hook errors" do
@@ -188,6 +194,12 @@ shared_examples :lint do
           instance.call_with_hooks
         }.to raise_error("foo")
       end
+
+      it "doesn't roll back" do
+        expect(instance).not_to receive(:rollback)
+
+        instance.call_with_hooks rescue nil
+      end
     end
 
     context "when call fails" do
@@ -199,6 +211,12 @@ shared_examples :lint do
         }.to change {
           instance.context.hooks
         }.from([]).to([:before1, :before2])
+      end
+
+      it "doesn't roll back" do
+        expect(instance).not_to receive(:rollback)
+
+        instance.call_with_hooks
       end
     end
 
@@ -218,6 +236,12 @@ shared_examples :lint do
           instance.call_with_hooks
         }.to raise_error("foo")
       end
+
+      it "doesn't roll back" do
+        expect(instance).not_to receive(:rollback)
+
+        instance.call_with_hooks rescue nil
+      end
     end
 
     context "when an after hook fails" do
@@ -231,7 +255,11 @@ shared_examples :lint do
         }.from([]).to([:before1, :before2, :call])
       end
 
-      it "rolls back"
+      it "rolls back" do
+        expect(instance).to receive(:rollback).once.with(no_args)
+
+        instance.call_with_hooks
+      end
     end
 
     context "when an after hook errors" do
@@ -245,7 +273,11 @@ shared_examples :lint do
         }.from([]).to([:before1, :before2, :call])
       end
 
-      it "rolls back"
+      it "rolls back" do
+        expect(instance).to receive(:rollback).once.with(no_args)
+
+        instance.call_with_hooks rescue nil
+      end
 
       it "raises the error" do
         expect {
