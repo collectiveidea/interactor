@@ -37,14 +37,12 @@ module Interactor
   end
 
   def run!
-    called = false
-
     with_hooks do
       call
-      called = true
+      context.called!(self.class)
     end
   rescue
-    rollback if called
+    context.rollback!
     raise
   end
 
