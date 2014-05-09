@@ -21,10 +21,6 @@ module Interactor
     def call!(context = {})
       new(context).tap(&:run!).context
     end
-
-    def rollback(context = {})
-      new(context).tap(&:rollback).context
-    end
   end
 
   def initialize(context = {})
