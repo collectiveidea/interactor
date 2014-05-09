@@ -26,32 +26,8 @@ module Interactor
 
       def call
         interactors.each do |interactor|
-          begin
-            interactor.call!(context)
-          rescue
-            rollback_called
-            raise
-          end
-
-          rollback_called && break if context.failure?
-          called << interactor
+          interactor.call!(context)
         end
-      end
-
-      def rollback
-        interactors.reverse_each do |interactor|
-          interactor.rollback(context)
-        end
-      end
-
-      def rollback_called
-        called.reverse_each do |interactor|
-          interactor.rollback(context)
-        end
-      end
-
-      def called
-        @called ||= []
       end
     end
   end
