@@ -39,7 +39,7 @@ module Interactor
   def run!
     with_hooks do
       call
-      context.called!(self.class)
+      context.called!(self)
     end
   rescue
     context.rollback!

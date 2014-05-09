@@ -26,11 +26,7 @@ module Interactor
 
     def rollback!
       return false if @rolled_back
-
-      _called.reverse_each do |interactor|
-        interactor.rollback(self)
-      end
-
+      _called.reverse_each(&:rollback)
       @rolled_back = true
     end
 
