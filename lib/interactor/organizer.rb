@@ -10,22 +10,18 @@ module Interactor
     end
 
     module ClassMethods
-      def interactors
-        @interactors ||= []
+      def organize(*interactors)
+        @organized = interactors.flatten
       end
 
-      def organize(*interactors)
-        @interactors = interactors.flatten
+      def organized
+        @organized ||= []
       end
     end
 
     module InstanceMethods
-      def interactors
-        self.class.interactors
-      end
-
       def call
-        interactors.each do |interactor|
+        self.class.organized.each do |interactor|
           interactor.call!(context)
         end
       end
