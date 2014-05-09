@@ -27,7 +27,7 @@ module Interactor
       def call
         interactors.each do |interactor|
           begin
-            interactor.call(context)
+            interactor.call!(context)
           rescue
             rollback_called
             raise
