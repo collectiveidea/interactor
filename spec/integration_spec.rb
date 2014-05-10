@@ -249,6 +249,154 @@ describe "Integration" do
     end
   end
 
+  context "when a before hook fails" do
+    let(:organizer) {
+      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+        before do
+          context.fail!
+          context.steps << :before
+        end
+
+        after do
+          context.steps << :after
+        end
+      end
+    }
+
+    it "aborts" do
+      expect {
+        organizer.call(context)
+      }.not_to change {
+        context.steps
+      }
+    end
+  end
+
+  context "when a before hook errors" do
+    let(:organizer) {
+      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+        before do
+          raise "foo"
+          context.steps << :before
+        end
+
+        after do
+          context.steps << :after
+        end
+      end
+    }
+
+    it "aborts" do
+      expect {
+        organizer.call(context) rescue nil
+      }.not_to change {
+        context.steps
+      }
+    end
+
+    it "raises the error" do
+      expect {
+        organizer.call(context)
+      }.to raise_error("foo")
+    end
+  end
+
+  context "when an after hook fails" do
+    let(:organizer) {
+      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+        before do
+          context.steps << :before
+        end
+
+        after do
+          context.fail!
+          context.steps << :after
+        end
+      end
+    }
+
+    it "rolls back successfully called interactors" do
+      expect {
+        organizer.call(context)
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :before,
+          :before2,
+            :before2a, :call2a, :after2a,
+            :before2b, :call2b, :after2b,
+            :before2c, :call2c, :after2c,
+          :after2,
+          :before3, :call3, :after3,
+          :before4,
+            :before4a, :call4a, :after4a,
+            :before4b, :call4b, :after4b,
+            :before4c, :call4c, :after4c,
+          :after4,
+          :before5, :call5, :after5,
+        :rollback5,
+        :rollback4c,
+        :rollback4b,
+        :rollback4a,
+        :rollback3,
+        :rollback2c,
+        :rollback2b,
+        :rollback2a
+      ])
+    end
+  end
+
+  context "when an after hook errors" do
+    let(:organizer) {
+      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+        before do
+          context.steps << :before
+        end
+
+        after do
+          raise "foo"
+          context.steps << :after
+        end
+      end
+    }
+
+    it "aborts" do
+      expect {
+        organizer.call(context) rescue nil
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :before,
+          :before2,
+            :before2a, :call2a, :after2a,
+            :before2b, :call2b, :after2b,
+            :before2c, :call2c, :after2c,
+          :after2,
+          :before3, :call3, :after3,
+          :before4,
+            :before4a, :call4a, :after4a,
+            :before4b, :call4b, :after4b,
+            :before4c, :call4c, :after4c,
+          :after4,
+          :before5, :call5, :after5,
+        :rollback5,
+        :rollback4c,
+        :rollback4b,
+        :rollback4a,
+        :rollback3,
+        :rollback2c,
+        :rollback2b,
+        :rollback2a
+      ])
+    end
+
+    it "raises the error" do
+      expect {
+        organizer.call(context)
+      }.to raise_error("foo")
+    end
+  end
+
   context "when a nested before hook fails" do
     let(:interactor3) {
       build_interactor do
