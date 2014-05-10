@@ -249,6 +249,276 @@ describe "Integration" do
     end
   end
 
+  context "when a nested before hook fails" do
+    let(:interactor3) {
+      build_interactor do
+        before do
+          context.fail!
+          context.steps << :before3
+        end
+
+        after do
+          context.steps << :after3
+        end
+
+        def call
+          context.steps << :call3
+        end
+
+        def rollback
+          context.steps << :rollback3
+        end
+      end
+    }
+
+    it "rolls back successfully called interactors" do
+      expect {
+        organizer.call(context)
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :before,
+          :before2,
+            :before2a, :call2a, :after2a,
+            :before2b, :call2b, :after2b,
+            :before2c, :call2c, :after2c,
+          :after2,
+        :rollback2c,
+        :rollback2b,
+        :rollback2a
+      ])
+    end
+  end
+
+  context "when a nested before hook errors" do
+    let(:interactor3) {
+      build_interactor do
+        before do
+          raise "foo"
+          context.steps << :before3
+        end
+
+        after do
+          context.steps << :after3
+        end
+
+        def call
+          context.steps << :call3
+        end
+
+        def rollback
+          context.steps << :rollback3
+        end
+      end
+    }
+
+    it "rolls back successfully called interactors" do
+      expect {
+        organizer.call(context) rescue nil
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :before,
+          :before2,
+            :before2a, :call2a, :after2a,
+            :before2b, :call2b, :after2b,
+            :before2c, :call2c, :after2c,
+          :after2,
+        :rollback2c,
+        :rollback2b,
+        :rollback2a
+      ])
+    end
+
+    it "raises the error" do
+      expect {
+        organizer.call(context)
+      }.to raise_error("foo")
+    end
+  end
+
+  context "when a nested call fails" do
+    let(:interactor3) {
+      build_interactor do
+        before do
+          context.steps << :before3
+        end
+
+        after do
+          context.steps << :after3
+        end
+
+        def call
+          context.fail!
+          context.steps << :call3
+        end
+
+        def rollback
+          context.steps << :rollback3
+        end
+      end
+    }
+
+    it "rolls back successfully called interactors" do
+      expect {
+        organizer.call(context)
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :before,
+          :before2,
+            :before2a, :call2a, :after2a,
+            :before2b, :call2b, :after2b,
+            :before2c, :call2c, :after2c,
+          :after2,
+          :before3,
+        :rollback2c,
+        :rollback2b,
+        :rollback2a
+      ])
+    end
+  end
+
+  context "when a nested call errors" do
+    let(:interactor3) {
+      build_interactor do
+        before do
+          context.steps << :before3
+        end
+
+        after do
+          context.steps << :after3
+        end
+
+        def call
+          raise "foo"
+          context.steps << :call3
+        end
+
+        def rollback
+          context.steps << :rollback3
+        end
+      end
+    }
+
+    it "rolls back successfully called interactors" do
+      expect {
+        organizer.call(context) rescue nil
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :before,
+          :before2,
+            :before2a, :call2a, :after2a,
+            :before2b, :call2b, :after2b,
+            :before2c, :call2c, :after2c,
+          :after2,
+          :before3,
+        :rollback2c,
+        :rollback2b,
+        :rollback2a
+      ])
+    end
+
+    it "raises the error" do
+      expect {
+        organizer.call(context)
+      }.to raise_error("foo")
+    end
+  end
+
+  context "when a nested after hook fails" do
+    let(:interactor3) {
+      build_interactor do
+        before do
+          context.steps << :before3
+        end
+
+        after do
+          context.fail!
+          context.steps << :after3
+        end
+
+        def call
+          context.steps << :call3
+        end
+
+        def rollback
+          context.steps << :rollback3
+        end
+      end
+    }
+
+    it "rolls back successfully called interactors and the failed interactor" do
+      expect {
+        organizer.call(context)
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :before,
+          :before2,
+            :before2a, :call2a, :after2a,
+            :before2b, :call2b, :after2b,
+            :before2c, :call2c, :after2c,
+          :after2,
+          :before3, :call3,
+        :rollback3,
+        :rollback2c,
+        :rollback2b,
+        :rollback2a
+      ])
+    end
+  end
+
+  context "when a nested after hook errors" do
+    let(:interactor3) {
+      build_interactor do
+        before do
+          context.steps << :before3
+        end
+
+        after do
+          raise "foo"
+          context.steps << :after3
+        end
+
+        def call
+          context.steps << :call3
+        end
+
+        def rollback
+          context.steps << :rollback3
+        end
+      end
+    }
+
+    it "rolls back successfully called interactors and the failed interactor" do
+      expect {
+        organizer.call(context) rescue nil
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :before,
+          :before2,
+            :before2a, :call2a, :after2a,
+            :before2b, :call2b, :after2b,
+            :before2c, :call2c, :after2c,
+          :after2,
+          :before3, :call3,
+        :rollback3,
+        :rollback2c,
+        :rollback2b,
+        :rollback2a
+      ])
+    end
+
+    it "raises the error" do
+      expect {
+        organizer.call(context)
+      }.to raise_error("foo")
+    end
+  end
+
   context "when a deeply nested before hook fails" do
     let(:interactor4b) {
       build_interactor do
