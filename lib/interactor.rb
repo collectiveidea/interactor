@@ -1,4 +1,5 @@
 require "interactor/context"
+require "interactor/error"
 require "interactor/hooks"
 require "interactor/organizer"
 
@@ -14,11 +15,11 @@ module Interactor
 
   module ClassMethods
     def call(context = {})
-      new(context).tap(&:call_with_hooks).context
+      new(context).tap(&:run).context
     end
 
-    def rollback(context = {})
-      new(context).tap(&:rollback).context
+    def call!(context = {})
+      new(context).tap(&:run!).context
     end
   end
 
@@ -26,8 +27,19 @@ module Interactor
     @context = Context.build(context)
   end
 
-  def call_with_hooks
-    with_hooks { call }
+  def run
+    run!
+  rescue Failure
+  end
+
+  def run!
+    with_hooks do
+      call
+      context.called!(self)
+    end
+  rescue
+    context.rollback!
+    raise
   end
 
   def call

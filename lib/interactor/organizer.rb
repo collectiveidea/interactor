@@ -10,48 +10,20 @@ module Interactor
     end
 
     module ClassMethods
-      def interactors
-        @interactors ||= []
+      def organize(*interactors)
+        @organized = interactors.flatten
       end
 
-      def organize(*interactors)
-        @interactors = interactors.flatten
+      def organized
+        @organized ||= []
       end
     end
 
     module InstanceMethods
-      def interactors
-        self.class.interactors
-      end
-
       def call
-        interactors.each do |interactor|
-          begin
-            interactor.call(context)
-          rescue
-            rollback_called
-            raise
-          end
-
-          rollback_called && break if context.failure?
-          called << interactor
+        self.class.organized.each do |interactor|
+          interactor.call!(context)
         end
-      end
-
-      def rollback
-        interactors.reverse_each do |interactor|
-          interactor.rollback(context)
-        end
-      end
-
-      def rollback_called
-        called.reverse_each do |interactor|
-          interactor.rollback(context)
-        end
-      end
-
-      def called
-        @called ||= []
       end
     end
   end

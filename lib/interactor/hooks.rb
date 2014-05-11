@@ -28,34 +28,26 @@ module Interactor
 
     private
 
-    def before_hooks
-      self.class.before_hooks
-    end
-
-    def after_hooks
-      self.class.after_hooks
-    end
-
     def with_hooks
-      call_before_hooks
+      run_before_hooks
       yield
-      call_after_hooks
+      run_after_hooks
     end
 
-    def call_before_hooks
-      call_hooks(before_hooks)
+    def run_before_hooks
+      run_hooks(self.class.before_hooks)
     end
 
-    def call_after_hooks
-      call_hooks(after_hooks)
+    def run_after_hooks
+      run_hooks(self.class.after_hooks)
     end
 
-    def call_hooks(hooks)
-      hooks.each { |hook| call_hook(hook) }
+    def run_hooks(hooks)
+      hooks.each { |hook| run_hook(hook) }
     end
 
-    def call_hook(hook)
-      hook.is_a?(Symbol) ? method(hook).call : instance_eval(&hook)
+    def run_hook(hook)
+      hook.is_a?(Symbol) ? send(hook) : instance_eval(&hook)
     end
   end
 end
