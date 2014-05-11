@@ -102,6 +102,20 @@ module Interactor
           context.foo
         }.from("bar").to("baz")
       end
+
+      it "raises failure" do
+        expect {
+          context.fail!
+        }.to raise_error(Failure)
+      end
+
+      it "makes the context available from the failure" do
+        begin
+          context.fail!
+        rescue Failure => error
+          expect(error.context).to eq(context)
+        end
+      end
     end
 
     describe "#called!" do

@@ -1,5 +1,10 @@
 module Interactor
-  class Error < StandardError; end
+  class Failure < StandardError
+    attr_reader :context
 
-  class Failure < Error; end
+    def initialize(context = nil)
+      @context = context
+      super
+    end
+  end
 end
