@@ -103,5 +103,53 @@ module Interactor
         }.from("bar").to("baz")
       end
     end
+
+    describe "#called!" do
+      let(:context) { Context.build }
+      let(:instance1) { double(:instance1) }
+      let(:instance2) { double(:instance2) }
+
+      it "appends to the internal list of called instances" do
+        expect {
+          context.called!(instance1)
+          context.called!(instance2)
+        }.to change {
+          context._called
+        }.from([]).to([instance1, instance2])
+      end
+    end
+
+    describe "#rollback!" do
+      let(:context) { Context.build }
+      let(:instance1) { double(:instance1) }
+      let(:instance2) { double(:instance2) }
+
+      before do
+        context.stub(:_called) { [instance1, instance2] }
+      end
+
+      it "rolls back each instance in reverse order" do
+        expect(instance2).to receive(:rollback).once.with(no_args).ordered
+        expect(instance1).to receive(:rollback).once.with(no_args).ordered
+
+        context.rollback!
+      end
+
+      it "ignores subsequent attempts" do
+        expect(instance2).to receive(:rollback).once
+        expect(instance1).to receive(:rollback).once
+
+        context.rollback!
+        context.rollback!
+      end
+    end
+
+    describe "#_called" do
+      let(:context) { Context.build }
+
+      it "is empty by default" do
+        expect(context._called).to eq([])
+      end
+    end
   end
 end
