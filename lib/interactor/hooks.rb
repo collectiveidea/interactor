@@ -47,7 +47,7 @@ module Interactor
     end
 
     def call_hook(hook)
-      hook.is_a?(Symbol) ? method(hook).call : instance_eval(&hook)
+      hook.is_a?(Symbol) ? send(hook) : instance_eval(&hook)
     end
   end
 end
