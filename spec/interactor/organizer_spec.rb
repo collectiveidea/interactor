@@ -117,6 +117,15 @@ module Interactor
 
         expect { instance.perform }.to raise_error(error)
       end
+
+      it "aborts on halt" do
+        expect(interactor2).to receive(:perform).once.with(context).ordered { instance2 }
+        expect(interactor3).to receive(:perform).once.with(context).ordered { context.halt! }
+        expect(interactor4).not_to receive(:perform)
+        expect(instance).not_to receive(:rollback)
+
+        instance.perform
+      end
     end
 
     describe "#rollback" do
