@@ -25,7 +25,7 @@ When an interactor does its single purpose, it affects its given context.
 
 As an interactor runs it can add information to the context.
 
-```
+```ruby
 context.user = user
 ```
 
@@ -34,25 +34,25 @@ context.user = user
 When something goes wrong in your interactor, you can flag the context as
 failed.
 
-```
+```ruby
 context.fail!
 ```
 
 When given a hash argument, the `fail!` method can also update the context. The
 following are equivalent:
 
-```
+```ruby
 context.error = "Boom!"
 context.fail!
 ```
 
-```
+```ruby
 context.fail!(error: "Boom!")
 ```
 
 You can ask a context if it's a failure:
 
-```
+```ruby
 context.failure? # => false
 context.fail!
 context.failure? # => true
@@ -60,7 +60,7 @@ context.failure? # => true
 
 or if it's a success.
 
-```
+```ruby
 context.success? # => true
 context.fail!
 context.success? # => false
@@ -73,7 +73,7 @@ context.success? # => false
 Sometimes an interactor needs to prepare its context before the interactor is
 even run. This can be done with before hooks on the interactor.
 
-```
+```ruby
 before do
   context.emails_sent = 0
 end
@@ -81,7 +81,7 @@ end
 
 A symbol argument can also be given, rather than a block.
 
-```
+```ruby
 before :zero_emails_sent
 
 def zero_email_sent
@@ -94,7 +94,7 @@ end
 Interactors can also perform teardown operations after the interactor instance
 is run.
 
-```
+```ruby
 after do
   context.user.reload
 end
@@ -107,7 +107,7 @@ hooks to be extracted into interactor concerns.
 
 Your application could use an interactor to authenticate a user.
 
-```
+```ruby
 class AuthenticateUser
   include Interactor
 
@@ -131,7 +131,7 @@ module and give it a `call` instance method. The interactor can access its
 Most of the time, your application will use its interactors from its
 controllers. The following controller:
 
-```
+```ruby
 class SessionsController < ApplicationController
   def create
     if user = User.authenticate(session_params[:email], session_params[:password])
@@ -153,7 +153,7 @@ end
 
 can be refactored to:
 
-```
+```ruby
 class SessionsController < ApplicationController
   def create
     result = AuthenticateUser.call(session_params)
@@ -184,7 +184,7 @@ Finally, the context (along with any changes made to it) is returned.
 
 Given the user authentication example, your controller may look like:
 
-```
+```ruby
 class SessionsController < ApplicationController
   def create
     result = AuthenticateUser.call(session_params)
@@ -264,7 +264,7 @@ interactors and organizers.
 
 A basic interactor is a class that includes `Interactor` and defines `call`.
 
-```
+```ruby
 class AuthenticateUser
   include Interactor
 
@@ -287,7 +287,7 @@ single-purpose units of work.
 An organizer is an important variation on the basic interactor. Its single
 purpose is to run *other* interactors.
 
-```
+```ruby
 class PlaceOrder
   include Interactor::Organizer
 
@@ -298,7 +298,7 @@ end
 In the controller, you can run the `PlaceOrder` organizer just like you would
 any other interactor:
 
-```
+```ruby
 class OrdersController < ApplicationController
   def create
     result = PlaceOrder.call(order_params: order_params)
@@ -332,7 +332,7 @@ In addition, any interactors that had already run are given the chance to undo
 themselves, in reverse order. Simply define the `rollback` method on your
 interactors:
 
-```
+```ruby
 class CreateOrder
   include Interactor
 
@@ -361,7 +361,7 @@ after any failed interactor.
 When written correctly, an interactor is easy to test because it only *does* one
 thing. Take the following interactor:
 
-```
+```ruby
 class AuthenticateUser
   include Interactor
 
@@ -379,7 +379,7 @@ end
 You can test just this interactor's single purpose and how it affects the
 context.
 
-```
+```ruby
 describe AuthenticateUser do
   describe "#call" do
  end
@@ -455,7 +455,7 @@ easy to draw a line between which responsibilities belong to the interactor and
 which to the model. The `User.authenticate` method is a good, clear line.
 Imagine the interactor otherwise:
 
-```
+```ruby
 class AuthenticateUser
   include Interactor
 
@@ -503,7 +503,7 @@ and their tests. Because you're testing your interactors thoroughly in isolation
 as well as in integration tests (right?), you can remove your business logic
 from your controller tests.
 
-```
+```ruby
 class SessionsController < ApplicationController
   def create
     result = AuthenticateUser.call(session_params)
@@ -525,7 +525,7 @@ class SessionsController < ApplicationController
 end
 ```
 
-```
+```ruby
 describe SessionsController do
   describe "#create" do
     before do
