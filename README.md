@@ -574,3 +574,21 @@ end
 
 This controller test will have to change very little during the life of the
 application because all of the magic happens in the interactor.
+
+## Contributions
+
+Interactor is open source and contributions from the community are encouraged!
+No contribution is too small.
+
+See Interactor's
+[contribution guidelines](CONTRIBUTING.md) for more information.
+
+## Thank You
+
+A very special thank you to [Attila Domokos](https://github.com/adomokos) for
+his fantastic work on [LightService](https://github.com/adomokos/light-service).
+Interactor is inspired heavily by the concepts put to code by Attila.
+
+Interactor was born from a desire for a slightly simplified interface. We
+understand that this is a matter of personal preference, so please take a look
+at LightService as well!
