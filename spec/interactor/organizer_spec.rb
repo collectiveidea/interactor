@@ -1,5 +1,3 @@
-require "spec_helper"
-
 module Interactor
   describe Organizer do
     include_examples :lint
@@ -41,8 +39,10 @@ module Interactor
       let(:interactor4) { double(:interactor4) }
 
       before do
-        instance.stub(:context) { context }
-        organizer.stub(:organized) { [interactor2, interactor3, interactor4] }
+        allow(instance).to receive(:context) { context }
+        allow(organizer).to receive(:organized) {
+          [interactor2, interactor3, interactor4]
+        }
       end
 
       it "calls each interactor in order with the context" do

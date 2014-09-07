@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe "Integration" do
   def build_interactor(&block)
     interactor = Class.new.send(:include, Interactor)

@@ -1,5 +1,3 @@
-require "spec_helper"
-
 module Interactor
   describe Context do
     describe ".build" do
@@ -139,7 +137,7 @@ module Interactor
       let(:instance2) { double(:instance2) }
 
       before do
-        context.stub(:_called) { [instance1, instance2] }
+        allow(context).to receive(:_called) { [instance1, instance2] }
       end
 
       it "rolls back each instance in reverse order" do
