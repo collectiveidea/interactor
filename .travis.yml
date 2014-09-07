@@ -1,7 +1,7 @@
 branches:
   only:
     - master
-    - v3-new
+    - v3
 language: ruby
 matrix:
   allow_failures:
