@@ -6,161 +6,116 @@
 [![Test Coverage](http://img.shields.io/codeclimate/coverage/github/collectiveidea/interactor.svg?style=flat-square)](https://codeclimate.com/github/collectiveidea/interactor)
 [![Dependency Status](https://img.shields.io/gemnasium/collectiveidea/interactor.svg?style=flat-square)](https://gemnasium.com/collectiveidea/interactor)
 
-Interactor provides a common interface for performing complex interactions in a single request.
+## What is an Interactor?
 
-## Problems
+An interactor is a simple, single-purpose object.
 
-If you're like us at [Collective Idea](http://collectiveidea.com), you've noticed that there seems to be a layer missing between the Controller and the Model.
+Interactors are used to encapsulate your application's [business logic](http://en.wikipedia.org/wiki/Business_logic). Each interactor represents one thing that your application *does*.
 
-### Fat Models
+### Context
 
-We've been told time after time to keep our controllers "skinny" but this usually comes at the expense of our models becoming pretty flabby. Oftentimes, much of the excess weight doesn't belong on the model. We're sending emails, making calls to external services and more, all from the model. It's not right.
+An interactor is given a *context*. The context contains everything the interactor needs to do its work.
 
-*The purpose of the model layer is to be a gatekeeper to the application's data.*
+When an interactor does its single purpose, it affects its given context.
 
-Consider the following model:
+#### Adding to the Context
 
-```ruby
-class User < ActiveRecord::Base
-  validates :name, :email, presence: true
+As an interactor runs it can add information to the context.
 
-  after_create :send_welcome_email
+```
+context.user = user
+```
 
-  private
+#### Failing the Context
 
-  def send_welcome_email
-    Notifier.welcome(self).deliver
-  end
+When something goes wrong in your interactor, you can flag the context as failed.
+
+```
+context.fail!
+```
+
+When given a hash argument, the `fail!` method can also update the context. The following are equivalent:
+
+```
+context.error = "Boom!"
+context.fail!
+```
+
+```
+context.fail!(error: "Boom!")
+```
+
+You can ask a context if it's a failure:
+
+```
+context.failure? # => false
+context.fail!
+context.failure? # => true
+```
+
+or if it's a success.
+
+```
+context.success? # => true
+context.fail!
+context.success? # => false
+```
+
+### Hooks
+
+#### Before Hooks
+
+Sometimes an interactor needs to prepare its context before the interactor is even run. This can be done with before hooks on the interactor.
+
+```
+before do
+  context.emails_sent = 0
 end
 ```
 
-We see this pattern all too often. The problem is that *any* time we want to add a user to the application, the welcome email will be sent. That includes creating users in development and in your tests. Is that really what we want?
-
-Sending a welcome email is business logic. It has nothing to do with the integrity of the application's data, so it belongs somewhere else.
-
-### Fat Controllers
-
-Usually, the alternative to fat models is fat controllers.
-
-While business logic may be more at home in a controller, controllers are typically intermingled with the concept of a request. HTTP requests are complex and that fact makes testing your business logic more difficult than it should be.
-
-*Your business logic should be unaware of your delivery mechanism.*
-
-So what if we encapsulated all of our business logic in dead-simple Ruby. One glance at a directory like `app/interactors` could go a long way in answering the question, "What does this app do?".
+A symbol argument can also be given, rather than a block.
 
 ```
-▸ app/
-  ▾ interactors/
-    add_product_to_cart.rb
-    authenticate_user.rb
-    place_order.rb
-    register_user.rb
-    remove_product_from_cart.rb
+before :zero_emails_sent
+
+def zero_email_sent
+  context.emails_sent = 0
+end
 ```
 
-## Interactors
+### An Example Interactor
 
-An interactor is an object with a simple interface and a singular purpose.
+Your application could use an interactor to authenticate a user.
 
-Interactors are given a context from the controller and do one thing: perform. When an interactor performs, it may act on models, send emails, make calls to external services and more. The interactor may also modify the given context.
-
-A simple interactor may look like:
-
-```ruby
+```
 class AuthenticateUser
   include Interactor
 
-  def perform
-    if user = User.authenticate(context[:email], context[:password])
-      context[:user] = user
+  def call
+    if user = User.authenticate(context.email, context.password)
+      context.user = user
+      context.token = user.secret_token
     else
-      context.fail!
+      context.fail!(message: "authenticate_user.failure")
     end
   end
 end
 ```
 
-There are a few important things to note about this interactor:
+To define an interactor, simply create a class that includes the `Interactor` module and give it a `call` instance method. The interactor can access its `context` from within `call`.
 
-1. It's simple.
-2. It's just Ruby.
-3. It's easily testable.
+## Interactors in the Controller
 
-It's feasible that a collection of small interactors such as these could encapsulate *all* of your business logic.
+Most of the time, your application will use its interactors from its controllers. The following controller:
 
-Interactors free up your controllers to simply accept requests and build responses. They free up your models to acts as the gatekeepers to your data.
-
-### Pre-perform operation
-In the above example if you want to add some checking or small operations before the main operation,
-you can just define `setup` and it will be called before `perform`.
-
-```ruby
-class AuthenticateUser
-  include Interactor
-  
-  def setup
-    context.fail! unless context[:email].present? && context[:password].present?
-  end
-
-  def perform
-    if user = User.authenticate(context[:email], context[:password])
-      context[:user] = user
-    else
-      context.fail!
-    end
-  end
-end
 ```
-
-## Organizers
-
-An organizer is just an interactor that's in charge of other interactors. When an organizer is asked to perform, it just asks its interactors to perform, in order.
-
-Organizers are great for complex interactions. For example, placing an order might involve:
-
-* checking inventory
-* calculating tax
-* charging a credit card
-* writing an order to the database
-* sending email notifications
-* scheduling a follow-up email
-
-Each of these actions can (and should) have its own interactor and one organizer can perform them all. That organizer may look like:
-
-```ruby
-class PlaceOrder
-  include Interactor::Organizer
-
-  organize [
-    CheckInventory,
-    CalculateTax,
-    ChargeCard,
-    CreateOrder,
-    DeliverThankYou,
-    DeliverOrderNotification,
-    ScheduleFollowUp
-  ]
-end
-```
-
-Breaking your interactors into bite-sized pieces also gives you the benefit of reusability. In our example above, there may be several scenarios where you may want to check inventory. Encapsulating that logic in one interactor enables you to reuse that interactor, reducing duplication.
-
-## Examples
-
-### Interactors
-
-Take the simple case of authenticating a user.
-
-Using an interactor, the controller stays very clean, making it very readable and easily testable.
-
-```ruby
 class SessionsController < ApplicationController
   def create
-    result = AuthenticateUser.perform(session_params)
-
-    if result.success?
-      redirect_to result.user
+    if user = User.authenticate(session_params[:email], session_params[:password])
+      session[:user_token] = user.secret_token
+      redirect_to user
     else
+      flash.now[:message] = "Please try again."
       render :new
     end
   end
@@ -173,153 +128,379 @@ class SessionsController < ApplicationController
 end
 ```
 
-The `result` above is an instance of the `AuthenticateUser` interactor that has been performed. The magic happens in the interactor, after receiving a *context* from the controller. A context is just a glorified hash that the interactor manipulates.
+can be refactored to:
 
-```ruby
+```
+class SessionsController < ApplicationController
+  def create
+    result = AuthenticateUser.call(session_params)
+
+    if result.success?
+      session[:user_token] = result.token
+      redirect_to root_path
+    else
+      flash.now[:message] = t(result.message)
+      render :new
+    end
+  end
+
+  private
+
+  def session_params
+    params.require(:session).permit(:email, :password)
+  end
+end
+```
+
+The `call` class method is the proper way to invoke an interactor. The hash argument is converted to the interactor instance's context. The `call` instance method is invoked along with any hooks that the interactor might define. Finally, the context (along with any changes made to it) is returned.
+
+## When to Use an Interactor
+
+Given the user authentication example, your controller may look like:
+
+```
+class SessionsController < ApplicationController
+  def create
+    result = AuthenticateUser.call(session_params)
+
+    if result.success?
+      session[:user_token] = result.token
+      redirect_to root_path
+    else
+      flash.now[:message] = t(result.message)
+      render :new
+    end
+  end
+
+  private
+
+  def session_params
+    params.require(:session).permit(:email, :password)
+  end
+end
+```
+
+For such a simple use case, using an interactor can actually require *more* code. So why use an interactor?
+
+### Clarity
+
+[We](http://collectiveidea.com) often use interactors right off the bat for all of our destructive actions (`POST`, `PUT` and `DELETE` requests) and since we put our interactors in `app/interactors`, a glance at that directory gives any developer a quick understanding of everything the application *does*.
+
+```
+▾ app/
+  ▸ controllers/
+  ▸ helpers/
+  ▾ interactors/
+      authenticate_user.rb
+      cancel_account.rb
+      publish_post.rb
+      register_user.rb
+      remove_post.rb
+  ▸ mailers/
+  ▸ models/
+  ▸ views/
+```
+
+**TIP:** Name your interactors after your business logic, not your implementation. `CancelAccount` will serve you better than `DestroyUser` as the account cancellation interaction takes on more responsibility in the future.
+
+### The Future™
+
+**SPOLIER ALERT:** Your use case won't *stay* so simple.
+
+In [our](http://collectiveidea.com) experience, a simple task like authenticating a user will eventually take on multiple responsibilities:
+
+* Welcoming back a user who hadn't logged in for a while
+* Prompting a user to update his or her password
+* Locking out a user in the case of too many failed attempts
+* Sending the lock-out email notification
+
+The list goes on, and as that list grows, so does your controller. This is how fat controllers are born.
+
+If instead you use an interactor right away, as responsibilities are added, your controller (and its tests) change very little or not at all. Choosing the right kind of interactor can also prevent simply shifting those added responsibilities to the interactor.
+
+## Kinds of Interactors
+
+There are two kinds of interactors built into the Interactor library: basic interactors and organizers.
+
+### Interactors
+
+A basic interactor is a class that includes `Interactor` and defines `call`.
+
+```
 class AuthenticateUser
   include Interactor
 
-  def perform
-    if user = User.authenticate(context[:email], context[:password])
-      context[:user] = user
+  def call
+    if user = User.authenticate(context.email, context.password)
+      context.user = user
+      context.token = user.secret_token
+    else
+      context.fail!(message: "authenticate_user.failure")
+    end
+  end
+end
+```
+
+Basic interactors are the building blocks. They are your application's single-purpose units of work.
+
+### Organizers
+
+An organizer is an important variation on the basic interactor. Its single purpose is to run *other* interactors.
+
+```
+class PlaceOrder
+  include Interactor::Organizer
+
+  organize CreateOrder, ChargeCard, SendThankYou
+end
+```
+
+In the controller, you can run the `PlaceOrder` organizer just like you would any other interactor:
+
+```
+class OrdersController < ApplicationController
+  def create
+    result = PlaceOrder.call(order_params: order_params)
+
+    if result.success?
+      redirect_to result.order
+    else
+      @order = result.order
+      render :new
+    end
+  end
+
+  private
+
+  def order_params
+    params.require(:order).permit!
+  end
+end
+```
+
+The organizer passes its context to the interactors that it organizes, one at a time and in order. Each interactor may change that context before it's passed along to the next interactor.
+
+#### Rollback
+
+If any one of the organized interactors fails its context, the organizer stops. If the `ChargeCard` interactor fails, `SendThankYou` is never called.
+
+In addition, any interactors that had already run are given the chance to undo themselves, in reverse order. Simply define the `rollback` method on your interactors:
+
+```
+class CreateOrder
+  include Interactor
+
+  def call
+    order = Order.create(order_params)
+
+    if order.persisted?
+      context.order = order
     else
       context.fail!
     end
   end
+
+  def rollback
+    context.order.destroy
+  end
 end
 ```
 
-The interactor also has convenience methods for dealing with its context. Anything added to the context is available via getter method on the interactor instance. The following is equivalent:
+**NOTE:** The interactor that fails is *not* rolled back. Because every interactor should have a single purpose, there should be no need to clean up after any failed interactor.
 
-```ruby
+## Testing Interactors
+
+When written correctly, an interactor is easy to test because it only *does* one thing. Take the following interactor:
+
+```
 class AuthenticateUser
   include Interactor
 
-  def perform
-    if user = User.authenticate(email, password)
-      context[:user] = user
+  def call
+    if user = User.authenticate(context.email, context.password)
+      context.user. = user
+      context.token = user.secret_token
     else
-      fail!
+      context.fail!(message: "authenticate_user.failure")
     end
   end
 end
 ```
 
-An interactor can fail with an optional hash that is merged into the context.
+You can test just this interactor's single purpose and how it affects the context.
 
-```ruby
-fail!(message: "Uh oh!")
+```
+describe AuthenticateUser do
+  describe "#call" do
+ end
+    let(:interactor) { AuthenticateUser.new(email: "john@example.com", password: "secret") }
+    let(:context) { interactor.context }
+
+    context "when given valid credentials" do
+      let(:user) { double(:user, secret_token: "token") }
+
+      before do
+        allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(user)
+      end
+
+      it "succeeds" do
+        interactor.call
+
+        expect(context).to be_a_success
+      end
+
+      it "provides the user" do
+        expect {
+          interactor.call
+        }.to change {
+          context.user
+        }.from(nil).to(user)
+      end
+
+      it "provides the user's secret token" do
+        expect {
+          interactor.call
+        }.to change {
+          context.token
+        }.from(nil).to("token")
+      end
+    end
+
+    context "when given invalid credentials" do
+      before do
+        allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(nil)
+      end
+
+      it "fails" do
+        interactor.call
+
+        expect(context).to be_a_failure
+      end
+
+      it "provides a failure message" do
+        expect {
+          interactor.call
+        }.to change {
+          context.message
+        }.from(nil).to be_present
+      end
+    end
+  end
+end
 ```
 
-Interactors are successful until explicitly failed. Instances respond to `success?` and `failure?`.
+[We](http://collectiveidea.com) use RSpec but the same approach applies to any testing framework.
 
-### Organizers
+### Isolation
 
-In the example above, one could argue that the interactor is simple enough that it could be excluded altogether. While that's probably true, in [our](http://collectiveidea.com) experience, these interactions don't stay simple for long. When they get more complex, the `AuthenticateUser` interactor can be converted to an organizer.
+You may notice that we stub `User.authenticate` in our test rather than creating users in the database. That's because our purpose in `spec/interactors/authenticate_user_spec.rb` is to test just the `AuthenticateUser` interactor. The `User.authenticate` method is put through its own paces in `spec/models/user_spec.rb`.
 
-```ruby
+It's a good idea to define your own interfaces to your models. Doing so makes it easy to draw a line between which responsibilities belong to the interactor and which to the model. The `User.authenticate` method is a good, clear line. Imagine the interactor otherwise:
+
+```
 class AuthenticateUser
-  include Interactor::Organizer
-
-  organize FindUserByEmailAndPassword, SendWelcomeEmail
-end
-```
-
-And your controller doesn't change a bit!
-
-The `AuthenticateUser` organizer receives its context from the controller and passes it to the interactors, which each manipulate it in turn.
-
-```ruby
-class FindUserByEmailAndPassword
   include Interactor
 
-  def perform
-    if user = User.authenticate(email, password)
-      context[:user] = user
+  def call
+    user = User.where(email: context.email).first
+
+    # Yuck!
+    if user && BCrypt::Password.new(user.password_digest) == context.password
+      context.user = user
     else
-      fail!
+      context.fail!(message: "authenticate_user.failure")
     end
   end
 end
 ```
 
-```ruby
-class SendWelcomeEmail
-  include Interactor
+It would be very difficult to test this interactor in isolation and even if you did, as soon as you change your ORM or your encryption algorithm (both model concerns), your interactors (business concerns) break.
 
-  def perform
-    if user.newly_created?
-      Notifier.welcome(user).deliver
-      context[:new_user] = true
+*Draw clear lines.*
+
+### Integration
+
+While it's important to test your interactors in isolation, it's just as important to write good integration or acceptance tests.
+
+One of the pitfalls of testing in isolation is that when you stub a method, you could be hiding the fact that the method is broken, has changed or doesn't even exist.
+
+When you write full-stack tests that tie all of the pieces together, you can be sure that your application's individual pieces are working together as expected. That becomes even more important when you add a new layer to your code like interactors.
+
+**TIP:** If you track your test coverage, try for 100% coverage *before* integrations tests. Then keep writing integration tests until you sleep well at night.
+
+### Controllers
+
+One of the advantages of using interactors is how much they simplify controllers and their tests. Because you're testing your interactors thoroughly in isolation as well as in integration tests (right?), you can remove your business logic from your controller tests.
+
+```
+class SessionsController < ApplicationController
+  def create
+    result = AuthenticateUser.call(session_params)
+
+    if result.success?
+      session[:user_token] = result.token
+      redirect_to root_path
+    else
+      flash.now[:message] = t(result.message)
+      render :new
+    end
+  end
+
+  private
+
+  def session_params
+    params.require(:session).permit(:email, :password)
+  end
+end
+```
+
+```
+require "spec_helper"
+
+describe SessionsController do
+  describe "#create" do
+    before do
+      expect(AuthenticateUser).to receive(:call).once.with(email: "john@doe.com", password: "secret").and_return(context)
+    end
+
+    context "when successful" do
+      let(:user) { double(:user) }
+      let(:context) { double(:context, success?: true, user: user, token: "token") }
+
+      it "saves the user's secret token in the session" do
+        expect {
+          post :create, session: { email: "john@doe.com", password: "secret" }
+        }.to change {
+          session[:user_token]
+        }.from(nil).to("token")
+      end
+
+      it "redirects to the homepage" do
+        response = post :create, session: { email: "john@doe.com", password: "secret" }
+
+        expect(response).to redirect_to(root_path)
+      end
+    end
+
+    context "when unsuccessful" do
+      let(:context) { double(:context, success?: false, message: "message") }
+
+      it "sets a flash message" do
+        expect {
+          post :create, session: { email: "john@doe.com", password: "secret" }
+        }.to change {
+          flash[:message]
+        }.from(nil).to(I18n.translate("message"))
+      end
+
+      it "renders the login form" do
+        response = post :create, session: { email: "john@doe.com", password: "secret" }
+
+        expect(response).to render_template(:new)
+      end
     end
   end
 end
 ```
 
-#### Inception
-
-Because interactors and organizers adhere to the same interface, it's trivial for an organizer to organize… organizers!
-
-#### Rollback
-
-If an organizer has three interactors and the second one fails, the third one is never called.
-
-In addition to halting the chain, an organizer will also *rollback* through the interactors that it has successfully performed so that each interactor has the opportunity to undo itself. Just define a `rollback` method. It has all the same access to the context as `perform` does.
-
-Note that the the failed interactor itself will not be rolled back. Interactors are expected to be single-purpose, so there should be nothing to undo if the interactor fails.
-
-## Conventions
-
-### Good Practice
-
-To allow rollbacks to work without fuss in organizers, interactors should only *add* to the context. They should not transform any values already in the context. For example, the following is a bad idea:
-
-```ruby
-class FindUser
-  include Interactor
-
-  def perform
-    context[:user] = User.find(context[:user])
-    # Now, context[:user] contains a User object.
-    # Before, context[:user] held a user ID.
-    # This is bad.
-  end
-end
-```
-
-If an organizer rolls back, any interactor before `FindUser` will now see a `User` object during the rollback when they were probably expecting a simple ID. This could cause problems.
-
-### Rails
-
-We love Rails, and we use Interactor with Rails. We put our interactors in `app/interactors` and we name them as verbs:
-
-* `AddProductToCart`
-* `AuthenticateUser`
-* `PlaceOrder`
-* `RegisterUser`
-* `RemoveProductFromCart`
-
-See [Interactor Rails](https://github.com/collectiveidea/interactor-rails)
-
-## Contributions
-
-Interactor is open source and contributions from the community are encouraged! No contribution is too small. Please consider:
-
-* adding an awesome feature
-* fixing a terrible bug
-* updating documentation
-* fixing a not-so-bad bug
-* fixing typos
-
-For the best chance of having your changes merged, please:
-
-1. Ask us! We'd love to hear what you're up to.
-2. Fork the project.
-3. Commit your changes and tests (if applicable (they're applicable)).
-4. Submit a pull request with a thorough explanation and at least one animated GIF.
-
-## Thanks
-
-A very special thank you to [Attila Domokos](https://github.com/adomokos) for his fantastic work on [LightService](https://github.com/adomokos/light-service). Interactor is inspired heavily by the concepts put to code by Attila.
-
-Interactor was born from a desire for a slightly different (in our minds, simplified) interface. We understand that this is a matter of personal preference, so please take a look at LightService as well!
+This controller test will have to change very little during the life of the application because all of the magic happens in the interactor.
