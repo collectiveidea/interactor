@@ -1,4 +1,4 @@
-## 3.0.0 / Unreleased
+## 3.0.0 / 2014-09-07
 
 * [FEATURE] Halt performance if the interactor fails prior
 * [ENHANCEMENT] Add support for Ruby 2.1
