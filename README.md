@@ -583,6 +583,19 @@ end
 This controller test will have to change very little during the life of the
 application because all of the magic happens in the interactor.
 
+### Rails
+
+[We](http://collectiveidea.com) love Rails, and we use Interactor with Rails. We
+put our interactors in `app/interactors` and we name them as verbs:
+
+* `AddProductToCart`
+* `AuthenticateUser`
+* `PlaceOrder`
+* `RegisterUser`
+* `RemoveProductFromCart`
+
+See: [Interactor Rails](https://github.com/collectiveidea/interactor-rails)
+
 ## Contributions
 
 Interactor is open source and contributions from the community are encouraged!
