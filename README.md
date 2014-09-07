@@ -6,6 +6,14 @@
 [![Test Coverage](http://img.shields.io/codeclimate/coverage/github/collectiveidea/interactor.svg?style=flat-square)](https://codeclimate.com/github/collectiveidea/interactor)
 [![Dependency Status](https://img.shields.io/gemnasium/collectiveidea/interactor.svg?style=flat-square)](https://gemnasium.com/collectiveidea/interactor)
 
+## Getting Started
+
+Add Interactor to your Gemfile and `bundle install`.
+
+```ruby
+gem "interactor", "~> 3.0"
+```
+
 ## What is an Interactor?
 
 An interactor is a simple, single-purpose object.
