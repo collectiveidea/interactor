@@ -8,7 +8,7 @@ matrix:
     - rvm: ruby-head
 rvm:
   - 1.9.3
-  - 2.0.0
+  - "2.0"
   - "2.1"
   - ruby-head
 script: bundle exec rspec
