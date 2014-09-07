@@ -83,6 +83,18 @@ def zero_email_sent
 end
 ```
 
+#### After Hooks
+
+Interactors can also perform teardown operations after the interactor instance is run.
+
+```
+after do
+  context.user.reload
+end
+```
+
+**NOTE:** An interactor can define multiple before/after hooks, allowing common hooks to be extracted into interactor concerns.
+
 ### An Example Interactor
 
 Your application could use an interactor to authenticate a user.
