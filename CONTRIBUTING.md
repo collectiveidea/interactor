@@ -7,7 +7,7 @@ Please consider:
 
 * adding a feature
 * squashing a bug
-* writing documentation
+* writing [documentation](http://tomdoc.org)
 * reporting an issue
 * fixing a typo
 * correcting [style](https://github.com/styleguide/ruby)

@@ -1,3 +1,7 @@
+## 3.0.1 / 2014-09-09
+
+* [ENHANCEMENT] Add TomDoc code documentation
+
 ## 3.0.0 / 2014-09-07
 
 * [FEATURE] Halt performance if the interactor fails prior

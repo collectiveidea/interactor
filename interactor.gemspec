@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name    = "interactor"
-  spec.version = "3.0.0"
+  spec.version = "3.0.1"
 
   spec.author      = "Collective Idea"
   spec.email       = "info@collectiveidea.com"
