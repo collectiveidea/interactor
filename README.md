@@ -390,7 +390,7 @@ context.
 ```ruby
 describe AuthenticateUser do
   describe "#call" do
- end
+
     let(:interactor) { AuthenticateUser.new(email: "john@example.com", password: "secret") }
     let(:context) { interactor.context }
 
