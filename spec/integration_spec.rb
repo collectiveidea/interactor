@@ -16,16 +16,18 @@ describe "Integration" do
   #  ├─ organizer2
   #  │   ├─ interactor2a
   #  │   ├─ interactor2b
-  #  │   └─ interactor2c
+  #  │   ├─ interactor2c
+  #  │   └─ interactor2d
   #  ├─ interactor3
   #  ├─ organizer4
   #  │   ├─ interactor4a
   #  │   ├─ interactor4b
   #  │   └─ interactor4c
-  #  └─ interactor5
+  #  ├─ interactor5
+  #  └─ interactor6
 
   let(:organizer) {
-    build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+    build_organizer(organize: [organizer2, interactor3, organizer4, interactor5, interactor6]) do
       before do
         context.steps << :before
       end
@@ -37,7 +39,7 @@ describe "Integration" do
   }
 
   let(:organizer2) {
-    build_organizer(organize: [interactor2a, interactor2b, interactor2c]) do
+    build_organizer(organize: [interactor2a, interactor2b, interactor2c, interactor2d]) do
       before do
         context.steps << :before2
       end
@@ -104,6 +106,22 @@ describe "Integration" do
 
       def rollback
         context.steps << :rollback2c
+      end
+    end
+  }
+
+  let(:interactor2d) {
+    build_interactor do
+      around :around_method
+
+      def call
+        context.steps << :call2d
+      end
+
+      def around_method
+        context.steps << :around_before2d
+        run!
+        context.steps << :around_after2d
       end
     end
   }
@@ -220,6 +238,34 @@ describe "Integration" do
     end
   }
 
+  let(:interactor6) {
+    build_interactor do
+      around :around_method6
+      
+      around do
+        context.steps << :around_before6b
+        run!
+        context.steps << :around_after6b
+      end
+
+      around do
+        context.steps << :around_before6b2
+        run!
+        context.steps << :around_after6b2
+      end
+
+      def call
+        context.steps << :call6
+      end
+
+      def around_method6
+        context.steps << :around_before6m
+        run!
+        context.steps << :around_after6m
+      end
+    end
+  }
+
   let(:context) { Interactor::Context.build(steps: []) }
 
   context "when successful" do
@@ -234,6 +280,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,
@@ -242,6 +289,7 @@ describe "Integration" do
             :before4c, :call4c, :after4c,
           :after4,
           :before5, :call5, :after5,
+          :around_before6m, :around_before6b, :around_before6b2, :call6, :around_after6b2, :around_after6b, :around_after6m,
         :after
       ])
     end
@@ -324,6 +372,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,
@@ -369,6 +418,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,
@@ -428,6 +478,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
         :rollback2c,
         :rollback2b,
@@ -469,6 +520,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
         :rollback2c,
         :rollback2b,
@@ -516,6 +568,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3,
         :rollback2c,
@@ -558,6 +611,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3,
         :rollback2c,
@@ -606,6 +660,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3,
         :rollback3,
@@ -649,6 +704,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3,
         :rollback3,
@@ -698,6 +754,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,
@@ -744,6 +801,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,
@@ -796,6 +854,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,
@@ -843,6 +902,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,
@@ -896,6 +956,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,
@@ -944,6 +1005,7 @@ describe "Integration" do
             :before2a, :call2a, :after2a,
             :before2b, :call2b, :after2b,
             :before2c, :call2c, :after2c,
+            :around_before2d, :call2d, :around_after2d,
           :after2,
           :before3, :call3, :after3,
           :before4,

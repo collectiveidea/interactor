@@ -10,6 +10,51 @@ module Interactor
 
     # Internal: Interactor::Hooks class methods.
     module ClassMethods
+
+      # Public: Declare hooks to run around Interactor invocation. The around
+      # method may be called multiple times; subsequent calls append declared
+      # hooks to existing around hooks.
+      # 
+      # Blocks or methods passed to the around method are responsible for invoking
+      # the interactor by calling the method run!.
+      #
+      # hooks - Zero or more Symbol method names representing instance methods
+      #         to be called around interactor invocation.
+      # block - An optional block to be executed as a hook. If given, the block
+      #         is executed after methods corresponding to any given Symbols.
+      #
+      # Examples
+      #
+      #   class MyInteractor
+      #     include Interactor
+      #
+      #     around :time_action
+      #
+      #     around do
+      #       puts "hello"
+      #       run!
+      #       puts "goodbye"
+      #     end
+      #
+      #     def call
+      #       puts "called"
+      #     end
+      #
+      #     private
+      #
+      #     def time_action
+      #       start_time = Time.now
+      #       run!
+      #       end_time = Time.now
+      #     end
+      #   end
+      #
+      # Returns nothing.
+      def around(*hooks, &block)
+        hooks << block if block
+        hooks.each { |hook| around_hooks.push(hook) }
+      end
+
       # Public: Declare hooks to run before Interactor invocation. The before
       # method may be called multiple times; subsequent calls append declared
       # hooks to existing before hooks.
@@ -84,6 +129,25 @@ module Interactor
         hooks.each { |hook| after_hooks.unshift(hook) }
       end
 
+      # Internal: An Array of declared hooks to run around the Interactor
+      # invocation. The hooks appear in the order in which they will be run.
+      #
+      # Examples
+      #
+      #   class MyInteractor
+      #     include Interactor
+      #
+      #     around :time_action, :say_hello_and_goodbye
+      #   end
+      #
+      #   MyInteractor.around_hooks
+      #   # => [:time_action, :say_hello_and_goodbye]
+      #
+      # Returns an Array of Symbols and Procs.
+      def around_hooks
+        @around_hooks ||= []
+      end
+
       # Internal: An Array of declared hooks to run before Interactor
       # invocation. The hooks appear in the order in which they will be run.
       #
@@ -125,7 +189,7 @@ module Interactor
 
     private
 
-    # Internal: Run before and after hooks around yielded execution. The
+    # Internal: Run around, before and after hooks encompassing yielded execution. The
     # required block is surrounded with hooks and executed.
     #
     # Examples
@@ -146,9 +210,23 @@ module Interactor
     #
     # Returns nothing.
     def with_hooks
-      run_before_hooks
-      yield
-      run_after_hooks
+      run_around_hooks do
+        run_before_hooks
+        yield
+        run_after_hooks
+      end
+    end
+
+    # Internal: Run around hooks recursively.
+    #
+    # Returns nothing.
+    def run_around_hooks(&block)
+      hook = self.class.around_hooks.shift
+      if hook
+        run_hook(hook)
+      else
+        yield
+      end
     end
 
     # Internal: Run before hooks.
