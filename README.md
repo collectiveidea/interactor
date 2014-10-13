@@ -108,8 +108,100 @@ after do
 end
 ```
 
-**NOTE:** An interactor can define multiple before/after hooks, allowing common
-hooks to be extracted into interactor concerns.
+#### Around Hooks
+
+You can also define around hooks in the same way as before or after hooks, using
+either a block or a symbol method name. The difference is that an around block
+or method accepts a single argument. Invoking the `call` method on that argument
+will continue invocation of the interactor. For example, with a block:
+
+```ruby
+around do |interactor|
+  context.start_time = Time.now
+  interactor.call
+  context.finish_time = Time.now
+end
+```
+
+With a method:
+
+```ruby
+around :time_execution
+
+def time_execution(interactor)
+  context.start_time = Time.now
+  interactor.call
+  context.finish_time = Time.now
+end
+```
+
+#### Hook Sequence
+
+Before hooks are invoked in the order in which they were defined while after
+hooks are invoked in the opposite order. Around hooks are invoked outside of any
+defined before and after hooks. For example:
+
+```ruby
+around do |interactor|
+  puts "around before 1"
+  interactor.call
+  puts "around after 1"
+end
+
+around do |interactor|
+  puts "around before 2"
+  interactor.call
+  puts "around after 2"
+end
+
+before do
+  puts "before 1"
+end
+
+before do
+  puts "before 2"
+end
+
+after do
+  puts "after 1"
+end
+
+after do
+  puts "after 2"
+end
+```
+
+will output:
+
+```
+around before 1
+around before 2
+before 1
+before 2
+after 2
+after 1
+around after 2
+around after 1
+```
+
+#### Interactor Concerns
+
+An interactor can define multiple before/after hooks, allowing common hooks to
+be extracted into interactor concerns.
+
+```ruby
+module InteractorTimer
+  extend ActiveSupport::Concern
+
+  included do
+    around do |interactor|
+      context.start_time = Time.now
+      interactor.call
+      context.finish_time = Time.now
+    end
+  end
+end
+```
 
 ### An Example Interactor
 
