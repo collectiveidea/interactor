@@ -165,7 +165,7 @@ describe "Integration" do
   }
 
   let(:organizer4) {
-    build_organizer(organize: [interactor4a, interactor4b, interactor4c]) do
+    build_organizer(organize: [interactor4a, interactor4b, interactor4c, procbased]) do
       around do |interactor|
         context.steps << :around_before4
         interactor.call
@@ -286,6 +286,10 @@ describe "Integration" do
     end
   }
 
+  let(:procbased) {
+    Proc.new {|context| context.steps << :proc_call }
+  }
+
   let(:context) { Interactor::Context.new(steps: []) }
 
   context "when successful" do
@@ -306,6 +310,7 @@ describe "Integration" do
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+            :proc_call,
           :after4, :around_after4,
           :around_before5, :before5, :call5, :after5, :around_after5,
         :after, :around_after
@@ -484,6 +489,7 @@ describe "Integration" do
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+            :proc_call,
           :after4, :around_after4,
           :around_before5, :before5, :call5, :after5, :around_after5,
         :rollback5,
@@ -535,6 +541,7 @@ describe "Integration" do
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+            :proc_call,
           :after4, :around_after4,
           :around_before5, :before5, :call5, :after5, :around_after5,
         :rollback5,
@@ -592,6 +599,7 @@ describe "Integration" do
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+            :proc_call,
           :after4, :around_after4,
           :around_before5, :before5, :call5, :after5, :around_after5,
         :after,
@@ -644,6 +652,7 @@ describe "Integration" do
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+            :proc_call,
           :after4, :around_after4,
           :around_before5, :before5, :call5, :after5, :around_after5,
         :after,
