@@ -1,11 +1,13 @@
+## 3.1.0 / 2014-10-13
+
+* [FEATURE] Add around hooks
+
 ## 3.0.1 / 2014-09-09
 
 * [ENHANCEMENT] Add TomDoc code documentation
 
 ## 3.0.0 / 2014-09-07
 
-* [FEATURE] Halt performance if the interactor fails prior
-* [ENHANCEMENT] Add support for Ruby 2.1
 * [FEATURE] Remove "magical" access to the context through the interactor
 * [FEATURE] Manage context values via setters/getters rather than hash access
 * [FEATURE] Change the primary interactor API method from "perform" to "call"
@@ -14,6 +16,11 @@
 * [FEATURE] Abort execution immediately upon interactor failure
 * [ENHANCEMENT] Build a suite of realistic integration tests
 * [ENHANCEMENT] Move rollback responsibility into the context
+
+## 2.1.1 / 2014-09-30
+
+* [FEATURE] Halt performance if the interactor fails prior
+* [ENHANCEMENT] Add support for Ruby 2.1
 
 ## 2.1.0 / 2013-09-05
 
