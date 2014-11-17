@@ -24,7 +24,7 @@ module Interactor
     # Internal: Interactor::Organizer class methods.
     module ClassMethods
       # Public: Declare Interactors to be invoked as part of the
-      # Interactor::Organizer's invocation. These interactors will invoked in
+      # Interactor::Organizer's invocation. These interactors are invoked in
       # the order in which they are declared.
       #
       # interactors - Zero or more (or an Array of) Interactor classes.
@@ -70,7 +70,7 @@ module Interactor
     # Internal: Interactor::Organizer instance methods.
     module InstanceMethods
       # Internal: Invoke the organized Interactors. An Interactor::Organizer is
-      # expected not to define its own "call" method in favor of this default
+      # expected not to define its own "#call" method in favor of this default
       # implementation.
       #
       # Returns nothing.
