@@ -25,7 +25,7 @@ represents one thing that your application *does*.
 ### Context
 
 An interactor is given a *context*.  The context contains everything the
-interactor needs to do it's work.
+interactor needs to do its work.
 
 The context is created when the interactor is called with a hash:
 
