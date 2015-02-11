@@ -108,6 +108,8 @@ after do
 end
 ```
 
+NB: After hooks are only run on success.  If the `fail!` method is called, the interactor's after hooks are not run.
+
 #### Around Hooks
 
 You can also define around hooks in the same way as before or after hooks, using
@@ -134,6 +136,8 @@ def time_execution(interactor)
   context.finish_time = Time.now
 end
 ```
+
+NB: If the `fail!` method is called, all of the interactor's around hooks cease execution, and no code after `interactor.call` will be run.
 
 #### Hook Sequence
 
