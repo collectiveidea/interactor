@@ -482,9 +482,7 @@ context.
 ```ruby
 describe AuthenticateUser do
   describe "#call" do
-
-    let(:interactor) { AuthenticateUser.new(email: "john@example.com", password: "secret") }
-    let(:context) { interactor.context }
+    subject(:context) { AuthenticateUser.call(email: "john@example.com", password: "secret") }
 
     context "when given valid credentials" do
       let(:user) { double(:user, secret_token: "token") }
@@ -493,26 +491,14 @@ describe AuthenticateUser do
         allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(user)
       end
 
-      it "succeeds" do
-        interactor.call
-
-        expect(context).to be_a_success
-      end
+      it { is_expected.to be_a_success }
 
       it "provides the user" do
-        expect {
-          interactor.call
-        }.to change {
-          context.user
-        }.from(nil).to(user)
+        expect(subject.user).to eq(user)
       end
 
       it "provides the user's secret token" do
-        expect {
-          interactor.call
-        }.to change {
-          context.token
-        }.from(nil).to("token")
+        expect(subject.token).to eq("token")
       end
     end
 
@@ -521,18 +507,10 @@ describe AuthenticateUser do
         allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(nil)
       end
 
-      it "fails" do
-        interactor.call
-
-        expect(context).to be_a_failure
-      end
+      it { is_expected.to be_a_failure }
 
       it "provides a failure message" do
-        expect {
-          interactor.call
-        }.to change {
-          context.message
-        }.from(nil).to be_present
+        expect(subject.message).to_not be_present
       end
     end
   end
