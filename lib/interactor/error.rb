@@ -29,7 +29,6 @@ module Interactor
     end
   end
 
-
   class ContractError < StandardError
     attr_reader :context
 
@@ -50,7 +49,7 @@ module Interactor
     def missing_message
       return unless @missing_properties.any?
       insert = error_inserts(@missing_properties)
-      "Expected #{insert[:term]} #{insert[:list]} not to be nil."
+      "Expected interactor to be called with #{insert[:term]} #{insert[:list]}."
     end
 
     def undeclared_message

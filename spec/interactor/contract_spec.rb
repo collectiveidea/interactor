@@ -19,9 +19,14 @@ module Interactor
         expect(interactor.property).to eq(:foo)
       end
 
+      it "does not raise an error if the expected property is present but nil" do
+        contracted.call(property: nil)
+        expect { contracted.call(property: nil) }.not_to raise_error
+      end
+
       it "raises an error if the context doesn't include the expected property" do
         expect { contracted.call() }.to raise_error(
-          Interactor::ContractError, "Expected property 'property' not to be nil."
+          Interactor::ContractError, "Expected interactor to be called with property 'property'."
         )
       end
 

@@ -7,7 +7,7 @@ module Interactor
 
       def validate_contract_expectations
         missing_properties = self.class.required_properties.select do |attr|
-          context[attr].nil?
+          !context.members.include?(attr)
         end
 
         extra_properties = context.members.select do |attr|
