@@ -177,5 +177,9 @@ module Interactor
     def _called
       @called ||= []
     end
+
+    def members
+      @table.keys
+    end
   end
 end

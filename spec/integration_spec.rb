@@ -1,6 +1,9 @@
 describe "Integration" do
   def build_interactor(&block)
     interactor = Class.new.send(:include, Interactor)
+    interactor.class_eval do
+      allows(:steps) { [] }
+    end
     interactor.class_eval(&block) if block
     interactor
   end
@@ -8,6 +11,10 @@ describe "Integration" do
   def build_organizer(options = {}, &block)
     organizer = Class.new.send(:include, Interactor::Organizer)
     organizer.organize(options[:organize]) if options[:organize]
+    organizer.class_eval do
+      allows(:steps) { [] }
+    end
+
     organizer.class_eval(&block) if block
     organizer
   end
@@ -27,17 +34,17 @@ describe "Integration" do
   let(:organizer) {
     build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
       around do |interactor|
-        context.steps << :around_before
+        self.steps << :around_before
         interactor.call
-        context.steps << :around_after
+        self.steps << :around_after
       end
 
       before do
-        context.steps << :before
+        self.steps << :before
       end
 
       after do
-        context.steps << :after
+        self.steps << :after
       end
     end
   }
@@ -45,17 +52,17 @@ describe "Integration" do
   let(:organizer2) {
     build_organizer(organize: [interactor2a, interactor2b, interactor2c]) do
       around do |interactor|
-        context.steps << :around_before2
+        self.steps << :around_before2
         interactor.call
-        context.steps << :around_after2
+        self.steps << :around_after2
       end
 
       before do
-        context.steps << :before2
+        self.steps << :before2
       end
 
       after do
-        context.steps << :after2
+        self.steps << :after2
       end
     end
   }
@@ -63,25 +70,25 @@ describe "Integration" do
   let(:interactor2a) {
     build_interactor do
       around do |interactor|
-        context.steps << :around_before2a
+        self.steps << :around_before2a
         interactor.call
-        context.steps << :around_after2a
+        self.steps << :around_after2a
       end
 
       before do
-        context.steps << :before2a
+        self.steps << :before2a
       end
 
       after do
-        context.steps << :after2a
+        self.steps << :after2a
       end
 
       def call
-        context.steps << :call2a
+        self.steps << :call2a
       end
 
       def rollback
-        context.steps << :rollback2a
+        self.steps << :rollback2a
       end
     end
   }
@@ -89,25 +96,25 @@ describe "Integration" do
   let(:interactor2b) {
     build_interactor do
       around do |interactor|
-        context.steps << :around_before2b
+        self.steps << :around_before2b
         interactor.call
-        context.steps << :around_after2b
+        self.steps << :around_after2b
       end
 
       before do
-        context.steps << :before2b
+        self.steps << :before2b
       end
 
       after do
-        context.steps << :after2b
+        self.steps << :after2b
       end
 
       def call
-        context.steps << :call2b
+        self.steps << :call2b
       end
 
       def rollback
-        context.steps << :rollback2b
+        self.steps << :rollback2b
       end
     end
   }
@@ -115,25 +122,25 @@ describe "Integration" do
   let(:interactor2c) {
     build_interactor do
       around do |interactor|
-        context.steps << :around_before2c
+        self.steps << :around_before2c
         interactor.call
-        context.steps << :around_after2c
+        self.steps << :around_after2c
       end
 
       before do
-        context.steps << :before2c
+        self.steps << :before2c
       end
 
       after do
-        context.steps << :after2c
+        self.steps << :after2c
       end
 
       def call
-        context.steps << :call2c
+        self.steps << :call2c
       end
 
       def rollback
-        context.steps << :rollback2c
+        self.steps << :rollback2c
       end
     end
   }
@@ -141,25 +148,25 @@ describe "Integration" do
   let(:interactor3) {
     build_interactor do
       around do |interactor|
-        context.steps << :around_before3
+        self.steps << :around_before3
         interactor.call
-        context.steps << :around_after3
+        self.steps << :around_after3
       end
 
       before do
-        context.steps << :before3
+        self.steps << :before3
       end
 
       after do
-        context.steps << :after3
+        self.steps << :after3
       end
 
       def call
-        context.steps << :call3
+        self.steps << :call3
       end
 
       def rollback
-        context.steps << :rollback3
+        self.steps << :rollback3
       end
     end
   }
@@ -167,17 +174,17 @@ describe "Integration" do
   let(:organizer4) {
     build_organizer(organize: [interactor4a, interactor4b, interactor4c]) do
       around do |interactor|
-        context.steps << :around_before4
+        self.steps << :around_before4
         interactor.call
-        context.steps << :around_after4
+        self.steps << :around_after4
       end
 
       before do
-        context.steps << :before4
+        self.steps << :before4
       end
 
       after do
-        context.steps << :after4
+        self.steps << :after4
       end
     end
   }
@@ -185,25 +192,25 @@ describe "Integration" do
   let(:interactor4a) {
     build_interactor do
       around do |interactor|
-        context.steps << :around_before4a
+        self.steps << :around_before4a
         interactor.call
-        context.steps << :around_after4a
+        self.steps << :around_after4a
       end
 
       before do
-        context.steps << :before4a
+        self.steps << :before4a
       end
 
       after do
-        context.steps << :after4a
+        self.steps << :after4a
       end
 
       def call
-        context.steps << :call4a
+        self.steps << :call4a
       end
 
       def rollback
-        context.steps << :rollback4a
+        self.steps << :rollback4a
       end
     end
   }
@@ -211,25 +218,25 @@ describe "Integration" do
   let(:interactor4b) {
     build_interactor do
       around do |interactor|
-        context.steps << :around_before4b
+        self.steps << :around_before4b
         interactor.call
-        context.steps << :around_after4b
+        self.steps << :around_after4b
       end
 
       before do
-        context.steps << :before4b
+        self.steps << :before4b
       end
 
       after do
-        context.steps << :after4b
+        self.steps << :after4b
       end
 
       def call
-        context.steps << :call4b
+        self.steps << :call4b
       end
 
       def rollback
-        context.steps << :rollback4b
+        self.steps << :rollback4b
       end
     end
   }
@@ -237,25 +244,25 @@ describe "Integration" do
   let(:interactor4c) {
     build_interactor do
       around do |interactor|
-        context.steps << :around_before4c
+        self.steps << :around_before4c
         interactor.call
-        context.steps << :around_after4c
+        self.steps << :around_after4c
       end
 
       before do
-        context.steps << :before4c
+        self.steps << :before4c
       end
 
       after do
-        context.steps << :after4c
+        self.steps << :after4c
       end
 
       def call
-        context.steps << :call4c
+        self.steps << :call4c
       end
 
       def rollback
-        context.steps << :rollback4c
+        self.steps << :rollback4c
       end
     end
   }
@@ -263,30 +270,30 @@ describe "Integration" do
   let(:interactor5) {
     build_interactor do
       around do |interactor|
-        context.steps << :around_before5
+        self.steps << :around_before5
         interactor.call
-        context.steps << :around_after5
+        self.steps << :around_after5
       end
 
       before do
-        context.steps << :before5
+        self.steps << :before5
       end
 
       after do
-        context.steps << :after5
+        self.steps << :after5
       end
 
       def call
-        context.steps << :call5
+        self.steps << :call5
       end
 
       def rollback
-        context.steps << :rollback5
+        self.steps << :rollback5
       end
     end
   }
 
-  let(:context) { Interactor::Context.new(steps: []) }
+  let(:context) { Interactor::Context.new }
 
   context "when successful" do
     it "calls and runs hooks in the proper sequence" do
@@ -294,7 +301,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -318,18 +325,18 @@ describe "Integration" do
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
           context.fail!
-          context.steps << :around_before
+          self.steps << :around_before
           interactor.call
-          context.steps << :around_after
+          self.steps << :around_after
         end
 
         before do
           context.fail!
-          context.steps << :before
+          self.steps << :before
         end
 
         after do
-          context.steps << :after
+          self.steps << :after
         end
       end
     }
@@ -348,18 +355,18 @@ describe "Integration" do
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before
+          self.steps << :around_before
           interactor.call
-          context.steps << :around_after
+          self.steps << :around_after
         end
 
         before do
           context.fail!
-          context.steps << :before
+          self.steps << :before
         end
 
         after do
-          context.steps << :after
+          self.steps << :after
         end
       end
     }
@@ -383,18 +390,18 @@ describe "Integration" do
     let(:organizer) {
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
-          context.steps << :around_before
+          self.steps << :around_before
           interactor.call
-          context.steps << :around_after
+          self.steps << :around_after
         end
 
         before do
           context.fail!
-          context.steps << :before
+          self.steps << :before
         end
 
         after do
-          context.steps << :after
+          self.steps << :after
         end
       end
     }
@@ -404,7 +411,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before
       ])
     end
@@ -414,18 +421,18 @@ describe "Integration" do
     let(:organizer) {
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
-          context.steps << :around_before
+          self.steps << :around_before
           interactor.call
-          context.steps << :around_after
+          self.steps << :around_after
         end
 
         before do
           raise "foo"
-          context.steps << :before
+          self.steps << :before
         end
 
         after do
-          context.steps << :after
+          self.steps << :after
         end
       end
     }
@@ -435,7 +442,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before
       ])
     end
@@ -451,18 +458,18 @@ describe "Integration" do
     let(:organizer) {
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
-          context.steps << :around_before
+          self.steps << :around_before
           interactor.call
-          context.steps << :around_after
+          self.steps << :around_after
         end
 
         before do
-          context.steps << :before
+          self.steps << :before
         end
 
         after do
           context.fail!
-          context.steps << :after
+          self.steps << :after
         end
       end
     }
@@ -472,7 +479,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -502,18 +509,18 @@ describe "Integration" do
     let(:organizer) {
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
-          context.steps << :around_before
+          self.steps << :around_before
           interactor.call
-          context.steps << :around_after
+          self.steps << :around_after
         end
 
         before do
-          context.steps << :before
+          self.steps << :before
         end
 
         after do
           raise "foo"
-          context.steps << :after
+          self.steps << :after
         end
       end
     }
@@ -523,7 +530,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -559,18 +566,18 @@ describe "Integration" do
     let(:organizer) {
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
-          context.steps << :around_before
+          self.steps << :around_before
           interactor.call
           context.fail!
-          context.steps << :around_after
+          self.steps << :around_after
         end
 
         before do
-          context.steps << :before
+          self.steps << :before
         end
 
         after do
-          context.steps << :after
+          self.steps << :after
         end
       end
     }
@@ -580,7 +587,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -611,18 +618,18 @@ describe "Integration" do
     let(:organizer) {
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
-          context.steps << :around_before
+          self.steps << :around_before
           interactor.call
           raise "foo"
-          context.steps << :around_after
+          self.steps << :around_after
         end
 
         before do
-          context.steps << :before
+          self.steps << :before
         end
 
         after do
-          context.steps << :after
+          self.steps << :after
         end
       end
     }
@@ -632,7 +639,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -670,25 +677,25 @@ describe "Integration" do
       build_interactor do
         around do |interactor|
           context.fail!
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -698,7 +705,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -717,25 +724,25 @@ describe "Integration" do
       build_interactor do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -745,7 +752,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -769,26 +776,26 @@ describe "Integration" do
     let(:interactor3) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
           context.fail!
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -798,7 +805,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -817,26 +824,26 @@ describe "Integration" do
     let(:interactor3) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
           raise "foo"
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -846,7 +853,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -871,26 +878,26 @@ describe "Integration" do
     let(:interactor3) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
           context.fail!
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -900,7 +907,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -919,26 +926,26 @@ describe "Integration" do
     let(:interactor3) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
           raise "foo"
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -948,7 +955,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -972,27 +979,29 @@ describe "Integration" do
   context "when a nested after hook fails" do
     let(:interactor3) {
       build_interactor do
+        allows(:steps) { [] }
+
         around do |interactor|
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
           context.fail!
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -1002,7 +1011,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1022,26 +1031,26 @@ describe "Integration" do
     let(:interactor3) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
           raise "foo"
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -1051,7 +1060,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1077,26 +1086,26 @@ describe "Integration" do
     let(:interactor3) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
           context.fail!
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -1106,7 +1115,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1126,26 +1135,26 @@ describe "Integration" do
     let(:interactor3) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before3
+          self.steps << :around_before3
           interactor.call
           raise "foo"
-          context.steps << :around_after3
+          self.steps << :around_after3
         end
 
         before do
-          context.steps << :before3
+          self.steps << :before3
         end
 
         after do
-          context.steps << :after3
+          self.steps << :after3
         end
 
         def call
-          context.steps << :call3
+          self.steps << :call3
         end
 
         def rollback
-          context.steps << :rollback3
+          self.steps << :rollback3
         end
       end
     }
@@ -1155,7 +1164,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1182,25 +1191,25 @@ describe "Integration" do
       build_interactor do
         around do |interactor|
           context.fail!
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1210,7 +1219,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1234,25 +1243,25 @@ describe "Integration" do
       build_interactor do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1262,7 +1271,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1291,26 +1300,26 @@ describe "Integration" do
     let(:interactor4b) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
           context.fail!
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1320,7 +1329,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1344,26 +1353,26 @@ describe "Integration" do
     let(:interactor4b) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
           raise "foo"
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1373,7 +1382,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1403,26 +1412,26 @@ describe "Integration" do
     let(:interactor4b) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
           context.fail!
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1432,7 +1441,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1456,26 +1465,26 @@ describe "Integration" do
     let(:interactor4b) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
           raise "foo"
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1485,7 +1494,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1515,26 +1524,26 @@ describe "Integration" do
     let(:interactor4b) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
           context.fail!
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1544,7 +1553,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1569,26 +1578,26 @@ describe "Integration" do
     let(:interactor4b) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
           raise "foo"
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1598,7 +1607,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1629,26 +1638,26 @@ describe "Integration" do
     let(:interactor4b) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
           context.fail!
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1658,7 +1667,7 @@ describe "Integration" do
         organizer.call(context)
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
@@ -1683,26 +1692,26 @@ describe "Integration" do
     let(:interactor4b) {
       build_interactor do
         around do |interactor|
-          context.steps << :around_before4b
+          self.steps << :around_before4b
           interactor.call
           raise "foo"
-          context.steps << :around_after4b
+          self.steps << :around_after4b
         end
 
         before do
-          context.steps << :before4b
+          self.steps << :before4b
         end
 
         after do
-          context.steps << :after4b
+          self.steps << :after4b
         end
 
         def call
-          context.steps << :call4b
+          self.steps << :call4b
         end
 
         def rollback
-          context.steps << :rollback4b
+          self.steps << :rollback4b
         end
       end
     }
@@ -1712,7 +1721,7 @@ describe "Integration" do
         organizer.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to([
+      }.from(nil).to([
         :around_before, :before,
           :around_before2, :before2,
             :around_before2a, :before2a, :call2a, :after2a, :around_after2a,

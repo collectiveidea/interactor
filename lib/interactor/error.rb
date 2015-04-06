@@ -28,4 +28,46 @@ module Interactor
       super
     end
   end
+
+
+  class ContractError < StandardError
+    attr_reader :context
+
+    def initialize(context=nil, opts={})
+      @context = context
+      @message = opts[:message]
+      @undeclared_properties = opts[:undeclared] || []
+      @missing_properties = opts[:missing] || []
+      super()
+    end
+
+    def message
+      @message || "#{missing_message} #{undeclared_message}".strip
+    end
+
+    private
+    
+    def missing_message
+      return unless @missing_properties.any?
+      insert = error_inserts(@missing_properties)
+      "Expected #{insert[:term]} #{insert[:list]} not to be nil."
+    end
+
+    def undeclared_message
+      return unless @undeclared_properties.any?
+      insert = error_inserts(@undeclared_properties)
+      "Called with undeclared #{insert[:term]} #{insert[:list]}."
+    end
+
+    def error_inserts(property_list)
+      if property_list.size > 1
+        term = "properties"
+        list = property_list.map {|p| "'#{p}'" }.join(', ')
+      else
+        term, list = "property", "'#{property_list.first}'"
+      end
+
+      { term: term, list: list}
+    end
+  end
 end
