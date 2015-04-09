@@ -36,26 +36,42 @@ module Interactor
             raise ContractError, message: "Invalid value '#{opts[:presence]}' for option 'presence'."
         end
 
-        attribute_defaults.merge!(attr => block) if block
+        if block
+          attribute_defaults.merge!(attr => block)
+        else
+          attribute_defaults.merge!(attr => opts[:default])
+        end
 
         delegate_properties
       end
 
       def expects(*args, &block)
+        opts = args.detect { |arg| arg.is_a?(Hash) } || {}
+        opts.merge!(presence: :required)
+        args.reject! { |arg| arg.is_a?(Hash) }
+
         args.each do |arg|
-          property(arg, presence: :required, &block)
+          property(arg, opts, &block)
         end
       end
 
       def allows(*args, &block)
+        opts = args.detect { |arg| arg.is_a?(Hash) } || {}
+        opts.merge!(presence: :permitted)
+        args.reject! { |arg| arg.is_a?(Hash) }
+
         args.each do |arg|
-          property(arg, presence: :permitted, &block)
+          property(arg, opts, &block)
         end
       end
 
       def provides(*args, &block)
+        opts = args.detect { |arg| arg.is_a?(Hash) } || {}
+        opts.merge!(presence: :provided)
+        args.reject! { |arg| arg.is_a?(Hash) }
+
         args.each do |arg|
-          property(arg, presence: :provided, &block)
+          property(arg, opts, &block)
         end
       end
 
@@ -63,8 +79,12 @@ module Interactor
         all_properties.each do |attr|
           define_method attr do
             next context[attr] if context[attr]
-            if proc = self.class.attribute_defaults[attr]
-              context[attr] = proc.call
+            if default = self.class.attribute_defaults[attr]
+              if default.is_a?(Proc)
+                context[attr] = default.call
+              else
+                context[attr] = self.send(default)
+              end
             end
           end
 

@@ -49,6 +49,18 @@ module Interactor
         expect(interactor.property).to eq(:bar)
       end
 
+      it "accepts a :method_name symbol as a default" do
+        contracted2 = build_contracted do
+          allows :property, default: :generate_property_default
+
+          def generate_property_default
+            :bar
+          end
+        end
+        interactor = contracted2.call()
+        expect(interactor.property).to eq(:bar)
+      end
+
       it "overrides the default block with an argument" do
         interactor = contracted.call(property: :foo)
         expect(interactor.property).to eq(:foo)
