@@ -10,15 +10,10 @@ module Interactor
           !context.members.include?(attr)
         end
 
-        extra_properties = context.members.select do |attr|
-          !self.class.required_and_permitted_properties.include?(attr)
-        end
-
-        if missing_properties.any? || extra_properties.any?
+        if missing_properties.any?
           raise ContractError.new(
                   self,
                   missing:    missing_properties,
-                  undeclared: extra_properties
                 )
         end
       end

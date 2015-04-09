@@ -30,10 +30,8 @@ module Interactor
         )
       end
 
-      it "raises an error if the context includes an unexpected property" do
-        expect { contracted.call(property: :foo, bar: 1) }.to raise_error(
-          Interactor::ContractError, "Called with undeclared property 'bar'."
-        )
+      it "does not raise an error if the context includes an unexpected property" do
+        expect { contracted.call(property: :foo, bar: 1) }.not_to raise_error
       end
     end
 

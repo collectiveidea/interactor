@@ -41,7 +41,7 @@ module Interactor
     end
 
     def message
-      @message || "#{missing_message} #{undeclared_message}".strip
+      @message || missing_message
     end
 
     private
@@ -50,12 +50,6 @@ module Interactor
       return unless @missing_properties.any?
       insert = error_inserts(@missing_properties)
       "Expected interactor to be called with #{insert[:term]} #{insert[:list]}."
-    end
-
-    def undeclared_message
-      return unless @undeclared_properties.any?
-      insert = error_inserts(@undeclared_properties)
-      "Called with undeclared #{insert[:term]} #{insert[:list]}."
     end
 
     def error_inserts(property_list)
