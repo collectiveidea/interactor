@@ -1,7 +1,9 @@
 require "interactor/context"
 require "interactor/error"
 require "interactor/hooks"
-require "interactor/contract"
+require "interactor/contract/property"
+require "interactor/contract/property_table"
+require "interactor/contract/contract"
 require "interactor/organizer"
 
 # Public: Interactor methods. Because Interactor is a module, custom Interactor
@@ -145,6 +147,7 @@ module Interactor
       validate_contract_expectations
       call
       ensure_contract_defaults
+      check_each_violation
       context.called!(self)
     end
   rescue

@@ -2,7 +2,7 @@ describe "Integration" do
   def build_interactor(&block)
     interactor = Class.new.send(:include, Interactor)
     interactor.class_eval do
-      allows(:steps) { [] }
+      permits(:steps) { [] }
     end
     interactor.class_eval(&block) if block
     interactor
@@ -12,7 +12,7 @@ describe "Integration" do
     organizer = Class.new.send(:include, Interactor::Organizer)
     organizer.organize(options[:organize]) if options[:organize]
     organizer.class_eval do
-      allows(:steps) { [] }
+      permits(:steps) { [] }
     end
 
     organizer.class_eval(&block) if block
@@ -979,7 +979,7 @@ describe "Integration" do
   context "when a nested after hook fails" do
     let(:interactor3) {
       build_interactor do
-        allows(:steps) { [] }
+        permits(:steps) { [] }
 
         around do |interactor|
           self.steps << :around_before3
