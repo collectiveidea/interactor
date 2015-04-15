@@ -156,28 +156,14 @@ module Interactor
         @property_table ||= PropertyTable.new
       end
 
-      def expected_properties
-        property_table.expected_properties
-      end
-
-      def permitted_properties
-        property_table.permitted_properties
-      end
-
-      def provided_properties
-        property_table.provided_properties
-      end
+      def expected_properties;  property_table.expected_properties; end
+      def permitted_properties; property_table.permitted_properties; end
+      def provided_properties;  property_table.provided_properties; end
+      def all_properties;       property_table.all_properties; end
+      def default_for(attr);    property_table.default_for(attr); end
 
       def expected_and_permitted_properties
         property_table.expected_and_permitted_properties
-      end
-
-      def default_for(attr)
-        property_table.default_for(attr)
-      end
-
-      def all_properties
-        property_table.all_properties
       end
 
     end
