@@ -62,6 +62,8 @@ module Interactor
 
     module ClassMethods
 
+      # Core DSL
+      #
       def contract_type(value)
         raise "Invalid contract type '#{value}'" unless Interactor::Contract::VALID_TYPES.include?(value)
         @contract_type = value
@@ -74,6 +76,21 @@ module Interactor
         delegate_properties
       end
 
+      def on_violation_for(*args, &block)
+        args.each do |arg|
+          if property = property_table.get(arg)
+            property.on_violation = block
+          else
+            property_table.set(arg, on_violation: block)
+          end
+        end
+      end
+
+      def on_violation(&block)
+        @on_violation_block = block
+      end
+
+      # Sugar for core DSL
       def expects(*args, &block)
         opts = args.detect { |arg| arg.is_a?(Hash) } || {}
         opts.merge!(presence: :expected)
@@ -102,20 +119,6 @@ module Interactor
         args.each do |arg|
           property(arg, opts, &block)
         end
-      end
-
-      def on_violation_for(*args, &block)
-        args.each do |arg|
-          if property = property_table.get(arg)
-            property.on_violation = block
-          else
-            property_table.set(arg, on_violation: block)
-          end
-        end
-      end
-
-      def on_violation(&block)
-        @on_violation_block = block
       end
 
       def on_violation_block
