@@ -1,6 +1,6 @@
 module Interactor
   module Contract
-    VALID_TYPES = [:open, :closed]
+    VALID_TYPES = %i(open closed)
 
     def self.included(base)
       base.class_eval do
@@ -61,11 +61,9 @@ module Interactor
           end
         end
       end
-
     end
 
     module ClassMethods
-
       # Core DSL
       #
       def contract_type(value)
@@ -169,7 +167,6 @@ module Interactor
       def expected_and_permitted_properties
         property_table.expected_and_permitted_properties
       end
-
     end
   end
 end

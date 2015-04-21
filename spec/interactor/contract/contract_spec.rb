@@ -263,9 +263,6 @@ module Interactor
         expect(interactor.property).to include(:foo)
         expect(interactor.property).to include(:bar)
       end
-
     end
-
-
   end
 end

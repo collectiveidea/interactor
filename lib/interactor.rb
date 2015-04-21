@@ -1,9 +1,9 @@
 require "interactor/context"
 require "interactor/error"
 require "interactor/hooks"
+require "interactor/contract"
 require "interactor/contract/property"
 require "interactor/contract/property_table"
-require "interactor/contract/contract"
 require "interactor/organizer"
 
 # Public: Interactor methods. Because Interactor is a module, custom Interactor

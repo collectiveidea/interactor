@@ -30,7 +30,6 @@ module Interactor
   end
 
   class ContractViolation < StandardError
-
     attr_reader :context, :property
 
     def initialize(context=nil, opts={})
