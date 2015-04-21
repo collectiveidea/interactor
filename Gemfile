@@ -4,5 +4,5 @@ gemspec
 
 group :test do
   gem "codeclimate-test-reporter", require: false
-  gem "rspec", "~> 3.1"
+  gem "rspec", "~> 3.2"
 end
