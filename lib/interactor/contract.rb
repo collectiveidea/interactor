@@ -94,28 +94,20 @@ module Interactor
 
       # Sugar for core DSL
       def expects(*args, &block)
-        opts = args.detect { |arg| arg.is_a?(Hash) } || {}
-        opts.merge!(presence: :expected)
-        args.reject! { |arg| arg.is_a?(Hash) }
-
-        args.each do |arg|
-          property(arg, opts, &block)
-        end
+        presence_is(:expected, args, block)
       end
 
       def permits(*args, &block)
-        opts = args.detect { |arg| arg.is_a?(Hash) } || {}
-        opts.merge!(presence: :permitted)
-        args.reject! { |arg| arg.is_a?(Hash) }
-
-        args.each do |arg|
-          property(arg, opts, &block)
-        end
+        presence_is(:permitted, args, block)
       end
 
       def provides(*args, &block)
+        presence_is(:provided, args, block)
+      end
+
+      def presence_is(presence, args, block)
         opts = args.detect { |arg| arg.is_a?(Hash) } || {}
-        opts.merge!(presence: :provided)
+        opts.merge!(presence: presence)
         args.reject! { |arg| arg.is_a?(Hash) }
 
         args.each do |arg|
