@@ -20,7 +20,6 @@ notifications:
     urls:
       - http://buildlight.collectiveidea.com/
 rvm:
-  - 1.9.3
   - "2.0"
   - "2.1"
   - "2.2"
