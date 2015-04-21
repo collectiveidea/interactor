@@ -3,7 +3,7 @@ require "English"
 
 Gem::Specification.new do |spec|
   spec.name    = "interactor"
-  spec.version = "3.1.0"
+  spec.version = "4.0.0"
 
   spec.author      = "Collective Idea"
   spec.email       = "info@collectiveidea.com"
