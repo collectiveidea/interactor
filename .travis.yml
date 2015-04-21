@@ -6,6 +6,7 @@ branches:
   only:
     - master
     - v4
+cache: bundler
 env:
   global:
     - secure: | # CODECLIMATE_REPO_TOKEN
@@ -35,3 +36,4 @@ rvm:
   - "2.7"
   - ruby-head
 script: bundle exec rake
+sudo: false
