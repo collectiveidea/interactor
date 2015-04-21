@@ -29,38 +29,19 @@ module Interactor
     end
   end
 
-  class ContractError < StandardError
-    attr_reader :context
+  class ContractViolation < StandardError
+
+    attr_reader :context, :property
 
     def initialize(context=nil, opts={})
       @context = context
+      @property = opts[:property]
       @message = opts[:message]
-      @undeclared_properties = opts[:undeclared] || []
-      @missing_properties = opts[:missing] || []
       super()
     end
 
     def message
-      @message || missing_message
-    end
-
-    private
-    
-    def missing_message
-      return unless @missing_properties.any?
-      insert = error_inserts(@missing_properties)
-      "Expected interactor to be called with #{insert[:term]} #{insert[:list]}."
-    end
-
-    def error_inserts(property_list)
-      if property_list.size > 1
-        term = "properties"
-        list = property_list.map {|p| "'#{p}'" }.join(', ')
-      else
-        term, list = "property", "'#{property_list.first}'"
-      end
-
-      { term: term, list: list}
+      @message || "Property '#{property}' violated the interactor's contract."
     end
   end
 end

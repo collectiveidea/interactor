@@ -72,24 +72,24 @@ module Interactor
       it "can fail the context" do
         contracted = build_contracted do
           expects :property
-          on_violation do |violation, property_name, context|
-            context.fail!(error: "Property #{property_name} failed with error: #{violation.message}")
+          on_violation do |violation, context|
+            context.fail!(error: "Property #{violation.property} failed with error: #{violation.message}")
           end
         end
 
         interactor = contracted.call
         expect(interactor).to be_failure
-        expect(interactor.error).to eq('Property property failed with error: Expected interactor to be called with property \'property\'.')
+        expect(interactor.error).to eq('Property property failed with error: Expected context to include property \'property\'.')
       end
 
       it "can raise an error" do
         contracted = build_contracted do
           expects :property
-          on_violation do |violation, property_name, context|
-            raise "Property #{property_name} failed with error: #{violation.message}"
+          on_violation do |violation, context|
+            raise "Property #{violation.property} failed with error: #{violation.message}"
           end
         end
-        expect { contracted.call }.to raise_error(RuntimeError, 'Property property failed with error: Expected interactor to be called with property \'property\'.')
+        expect { contracted.call }.to raise_error(RuntimeError, 'Property property failed with error: Expected context to include property \'property\'.')
       end
     end
 
@@ -103,8 +103,8 @@ module Interactor
             context.fail!(error: context[:property2])
           end
 
-          on_violation do |violation, property_name, context|
-            context.fail!(error: "Property #{property_name} failed with error: #{violation.message}")
+          on_violation do |violation, context|
+            context.fail!(error: "Property #{violation.property} failed with error: #{violation.message}")
           end
         end
       }
@@ -119,7 +119,7 @@ module Interactor
         interactor = contracted.call
         expect(interactor).to be_failure
 
-        expect(interactor.error).to eq('Property property failed with error: Expected interactor to be called with property \'property\'.')
+        expect(interactor.error).to eq('Property property failed with error: Expected context to include property \'property\'.')
       end
     end
 
@@ -136,13 +136,12 @@ module Interactor
       end
 
       it "does not raise an error if the expected property is present but nil" do
-        contracted.call(property: nil)
         expect { contracted.call(property: nil) }.not_to raise_error
       end
 
       it "raises an error if the context doesn't include the expected property" do
         expect { contracted.call() }.to raise_error(
-          Interactor::ContractError, "Expected interactor to be called with property 'property'."
+          Interactor::ContractViolation, "Expected context to include property 'property'."
         )
       end
     end

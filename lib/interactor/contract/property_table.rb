@@ -41,6 +41,18 @@ module Interactor
         expected_properties + permitted_properties
       end
 
+      def undeclared_properties(context)
+        context.members.select do |attr|
+          !expected_and_permitted_properties.include?(attr)
+        end
+      end
+
+      def missing_properties(context)
+        expected_properties.select do |attr|
+          !context.members.include?(attr)
+        end
+      end
+
       def default_for(property_name)
         @table[property_name].default
       end

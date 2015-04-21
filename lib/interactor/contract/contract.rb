@@ -13,18 +13,24 @@ module Interactor
 
       def validate_contract_expectations
         missing_properties.each do |property_name|
-          violation_table[property_name] = ContractError.new(self, missing: [property_name])
+          violation_table[property_name] = ContractViolation.new(
+            self,
+            property: property_name,
+            message: "Expected context to include property '#{property_name}'."
+          )
         end
 
         extra_properties.each do |property_name|
-          violation_table[property_name] = ContractError.new(self, undeclared: [property_name])
+          violation_table[property_name] = ContractViolation.new(
+            self,
+            property: property_name,
+            message: "Expected context not to include property '#{property_name}'."
+          )
         end
       end
 
       def missing_properties
-        @missing_properties ||= self.class.expected_properties.select do |attr|
-          !context.members.include?(attr)
-        end
+        @missing_properties ||= self.class.property_table.missing_properties(context)
       end
 
       def extra_properties
@@ -32,9 +38,7 @@ module Interactor
           if self.class.contract_open?
             []
           else
-            context.members.select do |attr|
-              !self.class.expected_and_permitted_properties.include?(attr)
-            end
+            self.class.property_table.undeclared_properties(context)
           end
         end
       end
@@ -51,7 +55,7 @@ module Interactor
           if block = self.class.property_table.get(property_name).on_violation
             block.call(context)
           elsif self.class.on_violation_block
-            self.class.on_violation_block.call(violation, property_name, context)
+            self.class.on_violation_block.call(violation, context)
           else
             raise violation
           end
