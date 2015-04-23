@@ -522,14 +522,14 @@ describe AuthenticateUser do
       end
 
       it "fails" do
-        interactor.call
+        interactor.run
 
         expect(context).to be_a_failure
       end
 
       it "provides a failure message" do
         expect {
-          interactor.call
+          interactor.run
         }.to change {
           context.message
         }.from(nil).to be_present
