@@ -510,7 +510,7 @@ describe AuthenticateUser do
       it { is_expected.to be_a_failure }
 
       it "provides a failure message" do
-        expect(subject.message).to_not be_present
+        expect(subject.message).to be_present
       end
     end
   end
