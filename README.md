@@ -481,11 +481,9 @@ context.
 
 ```ruby
 describe AuthenticateUser do
-  describe "#call" do
+  subject(:context) { AuthenticateUser.call(email: "john@example.com", password: "secret") }
 
-    let(:interactor) { AuthenticateUser.new(email: "john@example.com", password: "secret") }
-    let(:context) { interactor.context }
-
+  describe ".call" do
     context "when given valid credentials" do
       let(:user) { double(:user, secret_token: "token") }
 
@@ -494,25 +492,15 @@ describe AuthenticateUser do
       end
 
       it "succeeds" do
-        interactor.call
-
         expect(context).to be_a_success
       end
 
       it "provides the user" do
-        expect {
-          interactor.call
-        }.to change {
-          context.user
-        }.from(nil).to(user)
+        expect(context.user).to eq(user)
       end
 
       it "provides the user's secret token" do
-        expect {
-          interactor.call
-        }.to change {
-          context.token
-        }.from(nil).to("token")
+        expect(context.token).to eq("token")
       end
     end
 
@@ -522,17 +510,11 @@ describe AuthenticateUser do
       end
 
       it "fails" do
-        interactor.call
-
         expect(context).to be_a_failure
       end
 
       it "provides a failure message" do
-        expect {
-          interactor.call
-        }.to change {
-          context.message
-        }.from(nil).to be_present
+        expect(context.message).to be_present
       end
     end
   end
