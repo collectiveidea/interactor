@@ -337,7 +337,7 @@ account cancellation interaction takes on more responsibility in the future.
 
 ### The Future™
 
-**SPOLIER ALERT:** Your use case won't *stay* so simple.
+**SPOILER ALERT:** Your use case won't *stay* so simple.
 
 In [our](http://collectiveidea.com) experience, a simple task like
 authenticating a user will eventually take on multiple responsibilities:
