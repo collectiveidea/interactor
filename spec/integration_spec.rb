@@ -1738,4 +1738,26 @@ describe "Integration" do
       }.to raise_error("foo")
     end
   end
+
+  context "when one interactor calls another" do
+    class First
+      include Interactor
+      def call
+        Second.call!
+      end
+    end
+
+    class Second
+      include Interactor
+      def call
+        context.fail!(foo: :bar)
+      end
+    end
+
+    it "updates first context after fail" do
+      result = First.call
+      expect(result).to be_failure
+      expect(result.foo).to eq :bar
+    end
+  end
 end
