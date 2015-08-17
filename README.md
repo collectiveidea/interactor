@@ -236,7 +236,7 @@ class SessionsController < ApplicationController
   def create
     if user = User.authenticate(session_params[:email], session_params[:password])
       session[:user_token] = user.secret_token
-      redirect_to user
+      redirect_to root_path
     else
       flash.now[:message] = "Please try again."
       render :new
