@@ -101,6 +101,14 @@ module Interactor
         }.from("bar").to("baz")
       end
 
+      it "updates the context with a string key" do
+        expect {
+          context.fail!("foo" => "baz") rescue nil
+        }.to change {
+          context.foo
+        }.from("bar").to("baz")
+      end
+
       it "raises failure" do
         expect {
           context.fail!
