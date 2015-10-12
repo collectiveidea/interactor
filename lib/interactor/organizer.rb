@@ -78,6 +78,8 @@ module Interactor
         self.class.organized.each do |interactor|
           interactor.call!(context)
         end
+      rescue Halt # we want to stop the organizer, but not explicitly fail
+        nil
       end
     end
   end
