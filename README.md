@@ -523,7 +523,38 @@ end
 
 [We](http://collectiveidea.com) use RSpec but the same approach applies to any
 testing framework.
+## Testing Organizers
 
+If you're using RSpec, there's a helper method called `mock_organizer` that
+you can use to simplify your Organizer specs.
+
+To use the helper you must require
+
+`require "interactor/test_helpers"` in your `spec_helper.rb`
+
+The spec would then look something like this --
+
+```ruby
+RSpec.describe ExampleOrganizer do
+  include Interactor::TestHelpers
+
+  before(:example) do
+    mock_organizer(ExampleOrganizer)
+  end
+
+  describe ".call" do
+    it "calls FirstInteractor" do
+      expect(FirstInteractor).to receive(:call!)
+      ExampleOrganizer.call
+    end
+
+    it "calls SecondInteractor" do
+      expect(SecondInteractor).to receive(:call!)
+      ExampleOrganizer.call
+    end
+  end
+end
+```
 ### Isolation
 
 You may notice that we stub `User.authenticate` in our test rather than creating
