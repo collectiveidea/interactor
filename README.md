@@ -5,6 +5,7 @@
 [![Code Climate](https://img.shields.io/codeclimate/github/collectiveidea/interactor.svg?style=flat-square)](https://codeclimate.com/github/collectiveidea/interactor)
 [![Test Coverage](http://img.shields.io/codeclimate/coverage/github/collectiveidea/interactor.svg?style=flat-square)](https://codeclimate.com/github/collectiveidea/interactor)
 [![Dependency Status](https://img.shields.io/gemnasium/collectiveidea/interactor.svg?style=flat-square)](https://gemnasium.com/collectiveidea/interactor)
+[![codebeat](https://codebeat.co/badges/6f5bac2a-4e12-43df-a728-52e8d8f1101a)](https://codebeat.co/projects/github-com-collectiveidea-interactor)
 
 ## Getting Started
 
