@@ -55,7 +55,7 @@ module Interactor
       #   class MyOrganizer
       #     include Interactor::Organizer
       #
-      #     organizer InteractorOne, InteractorTwo
+      #     organize InteractorOne, InteractorTwo
       #   end
       #
       #   MyOrganizer.organized
