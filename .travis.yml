@@ -14,6 +14,11 @@ language: ruby
 matrix:
   allow_failures:
     - rvm: ruby-head
+notifications:
+  webhooks:
+    on_start: always
+    urls:
+      - http://buildlight.collectiveidea.com/
 rvm:
   - 1.9.3
   - "2.0"
