@@ -75,6 +75,85 @@ module Interactor
     def call!(context = {})
       new(context).tap(&:run!).context
     end
+
+    # Public: Declare input parameters. This method will simply delegate
+    #   specified methods to the to the context.
+    #
+    # input_parameters_list - zero or more Symbol argument names that are
+    #   expected to present at the context. Private instance methods
+    #   with corresponding names will be created.
+    #
+    # Examples
+    #
+    #   class MyInteractor
+    #     include Interactor
+    #
+    #     parameters :message
+    #
+    #     def call
+    #       puts message
+    #     end
+    #   end
+    #
+    #   MyInteractor.call(message: "Hello!")
+    #   # Hello!
+    #   # => #<Interactor::Context message="Hello!">
+    #
+    # Returns array of Symbols, representing expected arguments' names
+
+    def parameters(*input_parameters_list)
+      input_parameters_list.each do |parameter_name|
+        define_method parameter_name do
+          context.public_send(parameter_name)
+        end
+        private parameter_name
+      end
+    end
+
+    # Public: Declare input parameters. This method will simply delegate
+    #   specified methods to the to the context. If any of the specified
+    #   parameters is missing on call, it will fail the context.
+    #
+    # input_parameters_list - zero or more Symbol argument names that are
+    #   expected to present at the context. Private instance methods
+    #   with corresponding names will be created. All these arguments
+    #   will be verified to present in the context in before hook.
+    #
+    # Examples
+    #
+    #   class MyInteractor
+    #     include Interactor
+    #
+    #     parameters! :foo, :bar
+    #
+    #     def call
+    #       puts "#{foo} #{bar}"
+    #     end
+    #   end
+    #
+    #   MyInteractor.call(foo: "foo")
+    #   # => #<Interactor::Context foo="foo">
+    #
+    #   MyInteractor.call!(foo: "foo")
+    #   # => #<Interactor::Failure: #<Interactor::Context foo="foo">>
+    #
+    #   MyInteractor.call(foo: "foo", bar: "bar")
+    #   # foo bar
+    #   # => #<Interactor::Context foo="foo", bar="bar">
+    #
+    #   MyInteractor.call!(foo: "foo", bar: "bar")
+    #   # foo bar
+    #   # => #<Interactor::Context foo="foo", bar="bar">
+
+    def parameters!(*input_parameters_list)
+      parameters(*input_parameters_list)
+
+      before do
+        input_parameters_list.each do |parameter_name|
+          context.fail! if context.public_send(parameter_name).nil?
+        end
+      end
+    end
   end
 
   # Internal: Initialize an Interactor.

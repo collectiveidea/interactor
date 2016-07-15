@@ -61,6 +61,53 @@ shared_examples :lint do
     end
   end
 
+  describe ".parameters" do
+    let(:context) { double(:context, foo: "foo", bar: "bar") }
+    let(:instance) { interactor.new }
+
+    it "defines instance parameter methods" do
+      expect(Interactor::Context).to receive(:build) { context }
+
+      interactor.parameters(:foo, :bar)
+
+      expect(instance.private_methods).to include(:foo, :bar)
+      expect(instance.send(:foo)).to eq "foo"
+      expect(instance.send(:bar)).to eq "bar"
+    end
+  end
+
+  describe ".parameters!" do
+    it "defines instance parameter methods" do
+      expect(interactor).to receive(:parameters).with(:foo, :bar).once
+
+      interactor.parameters!(:foo, :bar)
+    end
+
+    context "with missing parameter" do
+      let(:context) { double foo: "foo", bar: nil, called!: double }
+
+      it "fails the context" do
+        expect(Interactor::Context).to receive(:build) { context }
+        expect(context).to receive(:fail!)
+
+        interactor.parameters!(:foo, :bar)
+        interactor.call
+      end
+    end
+
+    context "with all required parameters specified" do
+      let(:context) { double foo: "foo", bar: "bar", called!: double }
+
+      it "does not fail the context" do
+        expect(Interactor::Context).to receive(:build) { context }
+        expect(context).not_to receive(:fail!)
+
+        interactor.parameters!(:foo, :bar)
+        interactor.call
+      end
+    end
+  end
+
   describe "#run" do
     let(:instance) { interactor.new }
 
