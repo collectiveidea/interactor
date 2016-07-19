@@ -28,4 +28,11 @@ module Interactor
       super
     end
   end
+
+  # Internal: Error gets raised if context params are required
+  # but are either not specified, are nil, or are not the specified type.
+  class RequirementsNotMet < StandardError
+
+  end
+
 end
