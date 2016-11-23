@@ -10,7 +10,7 @@ module Interactor
   # the context is responsible for tracking individual interactor invocations
   # for the purpose of rollback.
   #
-  # The context may be maniupulated using arbitrary getter and setter methods.
+  # The context may be manipulated using arbitrary getter and setter methods.
   #
   # Examples
   #
