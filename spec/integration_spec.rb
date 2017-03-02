@@ -1773,17 +1773,17 @@ describe "Integration" do
         organizer4.call(context) rescue nil
       }.to change {
         context.steps
-      }.from([]).to %i(
-        around_before4
-        before4
-        around_before4a
-        before4a
-        call4a
-        after4a
-        around_after4a
-        around_before4b
-        before4b
-      )
+      }.from([]).to([
+        :around_before4,
+        :before4,
+        :around_before4a,
+        :before4a,
+        :call4a,
+        :after4a,
+        :around_after4a,
+        :around_before4b,
+        :before4b
+      ])
     end
   end
 
