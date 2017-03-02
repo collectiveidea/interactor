@@ -1,5 +1,6 @@
 require "interactor/context"
-require "interactor/error"
+require "interactor/failure"
+require "interactor/halt"
 require "interactor/hooks"
 require "interactor/organizer"
 
@@ -143,8 +144,8 @@ module Interactor
       call
       context.called!(self)
     end
-  rescue
-    context.rollback!
+  rescue => exception
+    context.rollback! unless exception.is_a?(Halt)
     raise
   end
 

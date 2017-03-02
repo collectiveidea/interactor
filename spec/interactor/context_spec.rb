@@ -56,6 +56,28 @@ module Interactor
       end
     end
 
+    describe '#halted?' do
+      let(:context) { Context.build }
+
+      subject { context.halted? }
+
+      it { is_expected.to eq false }
+    end
+
+    describe '#halt!' do
+      let(:context) { Context.build }
+      subject { -> { context.halt! rescue nil } }
+
+      it { is_expected.to_not change { context.success? } }
+      it { is_expected.to change { context.halted? }.from(false).to(true) }
+
+      context "when exception isn't rescued" do
+        subject { -> { context.halt! } }
+
+        it { is_expected.to raise_error { Halt } }
+      end
+    end
+
     describe "#fail!" do
       let(:context) { Context.build(foo: "bar") }
 
