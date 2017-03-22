@@ -1,0 +1,51 @@
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# Allow some style changes in specs
+Metrics/ModuleLength:
+  Exclude:
+    - spec/**/*
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+Style/BlockDelimiters:
+  Exclude:
+    - spec/**/*
+Style/RescueModifier:
+  Exclude:
+    - spec/**/*
+Metrics/MethodLength:
+  Exclude:
+    - spec/interactor/hooks_spec.rb
+Style/IndentArray:
+  Exclude:
+    - spec/integration_spec.rb
+    - spec/interactor/hooks_spec.rb
+
+# Allow nice tree-like comments in specs
+Style/AsciiComments:
+  Exclude:
+    - spec/integration_spec.rb
+
+# Here inconsistent indentation helps to understand
+# tree nature of callbacks.
+Style/AlignArray:
+  Exclude:
+    - spec/integration_spec.rb
+
+# Rubocop suggests using $INPUT_RECORD_SEPARATOR
+# variable from stdlib 'English' module over $/.
+# This module appeared in Ruby 2.0, so we could use it
+# only if we drop 1.9.3 support
+Style/SpecialGlobalVars:
+  Exclude:
+    - interactor.gemspec
+
+# This could be removed if throws are used instead of
+# raising Failure in #fail!
+Lint/HandleExceptions:
+  Exclude:
+    - lib/interactor.rb

@@ -153,14 +153,12 @@ module Interactor
   # each interactor class.
   #
   # Returns nothing.
-  def call
-  end
+  def call; end
 
   # Public: Reverse prior invocation of an Interactor instance. Any interactor
   # class that requires undoing upon downstream failure is expected to overwrite
   # the "rollback" instance method.
   #
   # Returns nothing.
-  def rollback
-  end
+  def rollback; end
 end
