@@ -270,7 +270,7 @@ class SessionsController < ApplicationController
 
     if result.success?
       session[:user_token] = result.token
-      redirect_to root_path
+      redirect_to result.user
     else
       flash.now[:message] = t(result.message)
       render :new
@@ -301,7 +301,7 @@ class SessionsController < ApplicationController
 
     if result.success?
       session[:user_token] = result.token
-      redirect_to root_path
+      redirect_to result.user
     else
       flash.now[:message] = t(result.message)
       render :new
@@ -602,7 +602,7 @@ class SessionsController < ApplicationController
 
     if result.success?
       session[:user_token] = result.token
-      redirect_to root_path
+      redirect_to result.user
     else
       flash.now[:message] = t(result.message)
       render :new
@@ -625,7 +625,7 @@ describe SessionsController do
     end
 
     context "when successful" do
-      let(:user) { double(:user) }
+      let(:user) { double(:user, id: 1) }
       let(:context) { double(:context, success?: true, user: user, token: "token") }
 
       it "saves the user's secret token in the session" do
@@ -639,7 +639,7 @@ describe SessionsController do
       it "redirects to the homepage" do
         response = post :create, session: { email: "john@doe.com", password: "secret" }
 
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(user_path(user))
       end
     end
 
