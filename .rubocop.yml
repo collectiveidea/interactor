@@ -36,16 +36,11 @@ Style/AlignArray:
   Exclude:
     - spec/integration_spec.rb
 
-# Rubocop suggests using $INPUT_RECORD_SEPARATOR
-# variable from stdlib 'English' module over $/.
-# This module appeared in Ruby 2.0, so we could use it
-# only if we drop 1.9.3 support
-Style/SpecialGlobalVars:
-  Exclude:
-    - interactor.gemspec
-
 # This could be removed if throws are used instead of
 # raising Failure in #fail!
 Lint/HandleExceptions:
   Exclude:
     - lib/interactor.rb
+
+AllCops:
+  TargetRubyVersion: 2.1
