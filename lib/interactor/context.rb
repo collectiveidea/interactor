@@ -121,9 +121,17 @@ module Interactor
     #
     # Raises Interactor::Failure initialized with the Interactor::Context.
     def fail!(context = {})
+      fail(context)
+      raise Failure, self
+    end
+
+    def fail(context = {})
       modifiable.update(context)
       @failure = true
-      raise Failure, self
+    end
+
+    def to_hash
+      modifiable
     end
 
     # Internal: Track that an Interactor has been called. The "called!" method
