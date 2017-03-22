@@ -25,7 +25,8 @@ describe "Integration" do
   #  └─ interactor5
 
   let(:organizer) {
-    build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+    interactors = [organizer2, interactor3, organizer4, interactor5]
+    build_organizer(organize: interactors) do
       around do |interactor|
         context.steps << :around_before
         interactor.call
@@ -315,7 +316,8 @@ describe "Integration" do
 
   context "when an around hook fails early" do
     let(:organizer) {
-      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+      interactors = [organizer2, interactor3, organizer4, interactor5]
+      build_organizer(organize: interactors) do
         around do |interactor|
           context.fail!
           context.steps << :around_before
@@ -345,8 +347,9 @@ describe "Integration" do
 
   context "when an around hook errors early" do
     let(:organizer) {
-      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
-        around do |interactor|
+      interactors = [organizer2, interactor3, organizer4, interactor5]
+      build_organizer(organize: interactors) do
+        around do |_interactor|
           raise "foo"
         end
 
@@ -382,7 +385,8 @@ describe "Integration" do
 
   context "when a before hook fails" do
     let(:organizer) {
-      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+      interactors = [organizer2, interactor3, organizer4, interactor5]
+      build_organizer(organize: interactors) do
         around do |interactor|
           context.steps << :around_before
           interactor.call
@@ -413,7 +417,8 @@ describe "Integration" do
 
   context "when a before hook errors" do
     let(:organizer) {
-      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+      interactors = [organizer2, interactor3, organizer4, interactor5]
+      build_organizer(organize: interactors) do
         around do |interactor|
           context.steps << :around_before
           interactor.call
@@ -453,7 +458,8 @@ describe "Integration" do
 
   context "when an after hook fails" do
     let(:organizer) {
-      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+      interactors = [organizer2, interactor3, organizer4, interactor5]
+      build_organizer(organize: interactors) do
         around do |interactor|
           context.steps << :around_before
           interactor.call
@@ -504,7 +510,8 @@ describe "Integration" do
 
   context "when an after hook errors" do
     let(:organizer) {
-      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+      interactors = [organizer2, interactor3, organizer4, interactor5]
+      build_organizer(organize: interactors) do
         around do |interactor|
           context.steps << :around_before
           interactor.call
@@ -564,7 +571,8 @@ describe "Integration" do
 
   context "when an around hook fails late" do
     let(:organizer) {
-      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+      interactors = [organizer2, interactor3, organizer4, interactor5]
+      build_organizer(organize: interactors) do
         around do |interactor|
           context.steps << :around_before
           interactor.call
@@ -616,7 +624,8 @@ describe "Integration" do
 
   context "when an around hook errors late" do
     let(:organizer) {
-      build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
+      interactors = [organizer2, interactor3, organizer4, interactor5]
+      build_organizer(organize: interactors) do
         around do |interactor|
           context.steps << :around_before
           interactor.call
@@ -725,7 +734,7 @@ describe "Integration" do
   context "when a nested around hook errors early" do
     let(:interactor3) {
       build_interactor do
-        around do |interactor|
+        around do |_interactor|
           raise "foo"
         end
 
@@ -1255,7 +1264,7 @@ describe "Integration" do
   context "when a deeply nested around hook errors early" do
     let(:interactor4b) {
       build_interactor do
-        around do |interactor|
+        around do |_interactor|
           raise "foo"
         end
 
