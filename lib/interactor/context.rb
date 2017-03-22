@@ -121,7 +121,11 @@ module Interactor
     #
     # Raises Interactor::Failure initialized with the Interactor::Context.
     def fail!(context = {})
-      modifiable.update(context)
+      symbolized_context = {}
+      context.each do |k, v|
+        symbolized_context[k.to_sym] = v
+      end
+      modifiable.update(symbolized_context)
       @failure = true
       raise Failure, self
     end
