@@ -42,5 +42,8 @@ Lint/HandleExceptions:
   Exclude:
     - lib/interactor.rb
 
+Style/EmptyMethod:
+  Enabled: false
+
 AllCops:
   TargetRubyVersion: 2.1
