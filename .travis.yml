@@ -15,6 +15,7 @@ language: ruby
 matrix:
   allow_failures:
     - rvm: ruby-head
+    - rvm: "2.0"
 notifications:
   webhooks:
     on_start: always
@@ -27,5 +28,5 @@ rvm:
   - "2.3.3"
   - "2.4.0"
   - ruby-head
-script: bundle exec rspec
+script: bundle exec rake
 sudo: false
