@@ -13,9 +13,8 @@ Gem::Specification.new do |spec|
 
   spec.test_files = spec.files.grep(/^spec/)
 
-  spec.required_ruby_version = ">= 2.1"
+  spec.required_ruby_version = ">= 2.0"
 
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.4"
-  spec.add_development_dependency "rubocop", "~> 0.47.1"
 end

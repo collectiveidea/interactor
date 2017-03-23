@@ -2,6 +2,11 @@ describe "Integration" do
   def build_interactor(&block)
     interactor = Class.new.send(:include, Interactor)
     interactor.class_eval(&block) if block
+    interactor.class_eval do
+      def unexpected_error!
+        raise "foo"
+      end
+    end
     interactor
   end
 
@@ -9,6 +14,11 @@ describe "Integration" do
     organizer = Class.new.send(:include, Interactor::Organizer)
     organizer.organize(options[:organize]) if options[:organize]
     organizer.class_eval(&block) if block
+    organizer.class_eval do
+      def unexpected_error!
+        raise "foo"
+      end
+    end
     organizer
   end
 
@@ -349,8 +359,11 @@ describe "Integration" do
     let(:organizer) {
       interactors = [organizer2, interactor3, organizer4, interactor5]
       build_organizer(organize: interactors) do
-        around do |_interactor|
-          raise "foo"
+        around do |interactor|
+          unexpected_error!
+          context.steps << :around_before
+          interactor.call
+          context.steps << :around_after
         end
 
         before do
@@ -426,7 +439,8 @@ describe "Integration" do
         end
 
         before do
-          raise "foo"
+          unexpected_error!
+          context.steps << :before
         end
 
         after do
@@ -523,7 +537,8 @@ describe "Integration" do
         end
 
         after do
-          raise "foo"
+          unexpected_error!
+          context.steps << :after
         end
       end
     }
@@ -629,7 +644,8 @@ describe "Integration" do
         around do |interactor|
           context.steps << :around_before
           interactor.call
-          raise "foo"
+          unexpected_error!
+          context.steps << :around_after
         end
 
         before do
@@ -734,8 +750,11 @@ describe "Integration" do
   context "when a nested around hook errors early" do
     let(:interactor3) {
       build_interactor do
-        around do |_interactor|
-          raise "foo"
+        around do |interactor|
+          unexpected_error!
+          context.steps << :around_before3
+          interactor.call
+          context.steps << :around_after3
         end
 
         before do
@@ -843,7 +862,8 @@ describe "Integration" do
         end
 
         before do
-          raise "foo"
+          unexpected_error!
+          context.steps << :before3
         end
 
         after do
@@ -956,7 +976,8 @@ describe "Integration" do
         end
 
         def call
-          raise "foo"
+          unexpected_error!
+          context.steps << :call3
         end
 
         def rollback
@@ -1058,7 +1079,8 @@ describe "Integration" do
         end
 
         after do
-          raise "foo"
+          unexpected_error!
+          context.steps << :after3
         end
 
         def call
@@ -1157,7 +1179,8 @@ describe "Integration" do
         around do |interactor|
           context.steps << :around_before3
           interactor.call
-          raise "foo"
+          unexpected_error!
+          context.steps << :around_after3
         end
 
         before do
@@ -1264,8 +1287,11 @@ describe "Integration" do
   context "when a deeply nested around hook errors early" do
     let(:interactor4b) {
       build_interactor do
-        around do |_interactor|
-          raise "foo"
+        around do |interactor|
+          unexpected_error!
+          context.steps << :around_before4b
+          interactor.call
+          context.steps << :around_after4b
         end
 
         before do
@@ -1383,7 +1409,8 @@ describe "Integration" do
         end
 
         before do
-          raise "foo"
+          unexpected_error!
+          context.steps << :before4b
         end
 
         after do
@@ -1506,7 +1533,8 @@ describe "Integration" do
         end
 
         def call
-          raise "foo"
+          unexpected_error!
+          context.steps << :call4b
         end
 
         def rollback
@@ -1618,7 +1646,8 @@ describe "Integration" do
         end
 
         after do
-          raise "foo"
+          unexpected_error!
+          context.steps << :after4b
         end
 
         def call
@@ -1727,7 +1756,8 @@ describe "Integration" do
         around do |interactor|
           context.steps << :around_before4b
           interactor.call
-          raise "foo"
+          unexpected_error!
+          context.steps << :around_after4b
         end
 
         before do
