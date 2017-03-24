@@ -1,21 +1,15 @@
-before_install:
-  - gem update bundler rake
+after_success: bundle exec codeclimate-test-reporter
+before_install: gem update bundler rake
 branches:
   only:
     - master
     - v4
 cache: bundler
-env:
-  global:
-    - secure: | # CODECLIMATE_REPO_TOKEN
-        BIemhM273wHZMpuULDMYGPsxYdfw+NMw7IQbOD6gy5r+dha07y9ssTYYE5Gn
-        t1ptAb09lhQ4gexXTr83i6angMrnHgQ1ZX2wfeoZ0FvWDHQht9YkXyiNH+R6
-        odHUeDIYAlUiqLX9nAkklL89Rc22BrHMGGNyuA8Uc5sktW5P/FE=
 language: ruby
 matrix:
   allow_failures:
-    - rvm: ruby-head
     - rvm: "2.0"
+    - rvm: ruby-head
 notifications:
   webhooks:
     on_start: always
