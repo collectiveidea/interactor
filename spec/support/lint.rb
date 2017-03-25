@@ -1,6 +1,14 @@
 shared_examples :lint do
   let(:interactor) { Class.new.send(:include, described_class) }
 
+  let(:context_double) do
+    double(:double, failure?: false, called!: nil, rollback!: nil)
+  end
+
+  let(:failed_context_double) do
+    double(:failed_context_double, failure?: true, called!: nil, rollback!: nil)
+  end
+
   describe ".call" do
     let(:context) { double(:context) }
     let(:instance) { double(:instance, context: context) }
@@ -66,25 +74,45 @@ shared_examples :lint do
     let(:instance) { interactor.new }
 
     it "runs the interactor" do
-      expect(instance).to receive(:run!).once.with(no_args)
+      expect(instance).to receive(:call).once.with(no_args)
 
       instance.run
     end
 
-    it "rescues failure" do
-      expect(instance).to receive(:run!).and_raise(Interactor::Failure)
-
+    it "catches :early_return" do
+      allow(instance).to receive(:call).and_throw(:early_return)
       expect {
         instance.run
-      }.not_to raise_error
+      }.not_to throw_symbol
     end
 
-    it "raises other errors" do
-      expect(instance).to receive(:run!).and_raise("foo")
+    context "when error is raised inside #call" do
+      it "propagates it and rollbacks context" do
+        allow(instance).to receive(:context) { context_double }
+        allow(instance).to receive(:call).and_raise("foo")
 
-      expect {
+        expect(instance.context).to receive(:rollback!)
+        expect {
+          instance.run
+        }.to raise_error("foo")
+      end
+    end
+
+    context "on call failure" do
+      before do
+        allow(instance).to receive(:context) { failed_context_double }
+      end
+
+      it "doesn't raise Failure" do
+        expect {
+          instance.run
+        }.not_to raise_error
+      end
+
+      it "rollbacks context on error" do
+        expect(instance.context).to receive(:rollback!)
         instance.run
-      }.to raise_error("foo")
+      end
     end
   end
 
@@ -92,25 +120,37 @@ shared_examples :lint do
     let(:instance) { interactor.new }
 
     it "calls the interactor" do
-      expect(instance).to receive(:call).once.with(no_args)
+      expect(instance).to receive(:run).once.with(no_args)
 
       instance.run!
     end
 
-    it "raises failure" do
-      expect(instance).to receive(:run!).and_raise(Interactor::Failure)
-
-      expect {
-        instance.run!
-      }.to raise_error(Interactor::Failure)
-    end
-
-    it "raises other errors" do
-      expect(instance).to receive(:run!).and_raise("foo")
+    it "propagates errors" do
+      expect(instance).to receive(:run).and_raise("foo")
 
       expect {
         instance.run
       }.to raise_error("foo")
+    end
+
+    context "on failure" do
+      before do
+        allow(instance).to receive(:context) { failed_context_double }
+      end
+
+      it "raises Interactor::Failure" do
+        expect {
+          instance.run!
+        }.to raise_error(Interactor::Failure)
+      end
+
+      it "makes context available from the error" do
+        begin
+          instance.run!
+        rescue Interactor::Failure => error
+          expect(error.context).to be(instance.context)
+        end
+      end
     end
   end
 

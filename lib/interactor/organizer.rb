@@ -8,7 +8,7 @@ module Interactor
   #   class MyOrganizer
   #     include Interactor::Organizer
   #
-  #     organizer InteractorOne, InteractorTwo
+  #     organize InteractorOne, InteractorTwo
   #   end
   module Organizer
     # Internal: Install Interactor::Organizer's behavior in the given class.
@@ -77,7 +77,8 @@ module Interactor
       # Returns nothing.
       def call
         self.class.organized.each do |interactor|
-          interactor.call!(context)
+          throw(:early_return) if context.failure?
+          interactor.call(context)
         end
       end
     end

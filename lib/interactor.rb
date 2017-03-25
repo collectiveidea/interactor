@@ -112,8 +112,16 @@ module Interactor
   #
   # Returns nothing.
   def run
-    run!
-  rescue Failure
+    catch(:early_return) do
+      with_hooks do
+        call
+        context.called!(self)
+      end
+    end
+    context.rollback! if context.failure?
+  rescue
+    context.rollback!
+    raise
   end
 
   # Internal: Invoke an Interactor instance along with all defined hooks. The
@@ -139,13 +147,8 @@ module Interactor
   # Returns nothing.
   # Raises Interactor::Failure if the context is failed.
   def run!
-    with_hooks do
-      call
-      context.called!(self)
-    end
-  rescue
-    context.rollback!
-    raise
+    run
+    raise(Failure, context) if context.failure?
   end
 
   # Public: Invoke an Interactor instance without any hooks, tracking, or

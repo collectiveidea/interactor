@@ -43,24 +43,33 @@ module Interactor
 
     describe "#call" do
       let(:instance) { organizer.new }
-      let(:context) { double(:context) }
+      let(:context) { double(:context, failure?: false) }
       let(:interactor2) { double(:interactor2) }
       let(:interactor3) { double(:interactor3) }
       let(:interactor4) { double(:interactor4) }
+      let(:organized_interactors) { [interactor2, interactor3, interactor4] }
 
       before do
         allow(instance).to receive(:context) { context }
-        allow(organizer).to receive(:organized) {
-          [interactor2, interactor3, interactor4]
-        }
+        allow(organizer).to receive(:organized) { organized_interactors }
+        organized_interactors.each do |organized_interactor|
+          allow(organized_interactor).to receive(:call)
+        end
       end
 
       it "calls each interactor in order with the context" do
-        expect(interactor2).to receive(:call!).once.with(context).ordered
-        expect(interactor3).to receive(:call!).once.with(context).ordered
-        expect(interactor4).to receive(:call!).once.with(context).ordered
+        expect(interactor2).to receive(:call).once.with(context).ordered
+        expect(interactor3).to receive(:call).once.with(context).ordered
+        expect(interactor4).to receive(:call).once.with(context).ordered
 
         instance.call
+      end
+
+      it "throws :early_return on failure of one of organizers" do
+        allow(context).to receive(:failure?).and_return(false, true)
+        expect {
+          instance.call
+        }.to throw_symbol(:early_return)
       end
     end
   end

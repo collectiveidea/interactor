@@ -123,7 +123,7 @@ module Interactor
     def fail!(context = {})
       context.each { |key, value| modifiable[key.to_sym] = value }
       @failure = true
-      raise Failure, self
+      throw :early_return
     end
 
     # Internal: Track that an Interactor has been called. The "called!" method
