@@ -23,6 +23,16 @@ module Interactor
           organizer.organized
         }.from([]).to([interactor2, interactor3])
       end
+
+      it "allows multiple organize calls" do
+        interactor4 = double(:interactor4)
+        expect {
+          organizer.organize(interactor2, interactor3)
+          organizer.organize(interactor4)
+        }.to change {
+          organizer.organized
+        }.from([]).to([interactor2, interactor3, interactor4])
+      end
     end
 
     describe ".organized" do
