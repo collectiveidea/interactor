@@ -41,11 +41,12 @@ module Interactor
       #     include Interactor::Organizer
       #
       #     organize [InteractorThree, InteractorFour]
+      #     organize InteractorFive
       #   end
       #
       # Returns nothing.
       def organize(*interactors)
-        @organized = interactors.flatten
+        organized.concat(interactors.flatten)
       end
 
       # Internal: An Array of declared Interactors to be invoked.
