@@ -65,11 +65,12 @@ module Interactor
         instance.call
       end
 
-      it "throws :early_return on failure of one of organizers" do
+      it "signals about early_return on failure of one of organizers" do
         allow(context).to receive(:failure?).and_return(false, true)
+        expect(context).to receive(:signal_early_return!).and_throw(:foo)
         expect {
           instance.call
-        }.to throw_symbol(:early_return)
+        }.to throw_symbol
       end
     end
   end

@@ -123,6 +123,10 @@ module Interactor
     def fail!(context = {})
       context.each { |key, value| modifiable[key.to_sym] = value }
       @failure = true
+      signal_early_return!
+    end
+
+    def signal_early_return!
       throw :early_return
     end
 

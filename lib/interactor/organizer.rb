@@ -77,7 +77,7 @@ module Interactor
       # Returns nothing.
       def call
         self.class.organized.each do |interactor|
-          throw(:early_return) if context.failure?
+          context.signal_early_return! if context.failure?
           interactor.call(context)
         end
       end
