@@ -173,18 +173,16 @@ module Interactor
   # based on their names.
   #
   # Returns an Array of arguments to be applied as an argument list.
-  def arguments_for_call
-    positional_arguments, keyword_arguments = [], {}
-    available_context_keys = context.to_h.keys
+  def arguments_for_call # rubocop:disable Metrics/MethodLength
+    positional_arguments = []
+    keyword_arguments = {}
 
     method(:call).parameters.each do |(type, name)|
-      next unless available_context_keys.include?(name)
+      next unless context.include?(name)
 
       case type
-      when :req, :opt
-        positional_arguments << context[name]
-      when :keyreq, :key
-        keyword_arguments[name] = context[name]
+      when :req, :opt then positional_arguments << context[name]
+      when :keyreq, :key then keyword_arguments[name] = context[name]
       end
     end
 
