@@ -1,7 +1,7 @@
 # This should always correspond to the required Ruby version specified in the
 # gemspec.
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 2.1
 
 # TODO: What should we do here?
 Style/FrozenStringLiteralComment:
