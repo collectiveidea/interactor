@@ -177,5 +177,10 @@ module Interactor
     def _called
       @called ||= []
     end
+
+    def success!(context = {})
+      update(context)
+      @failure = false
+    end
   end
 end
