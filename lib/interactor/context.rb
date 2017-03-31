@@ -179,3 +179,9 @@ module Interactor
     end
   end
 end
+
+require "yaml"
+
+Psych::Visitors::YAMLTree.class_eval do
+  alias_method :visit_Delegator, :visit_Object
+end
