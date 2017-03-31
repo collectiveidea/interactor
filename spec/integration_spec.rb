@@ -22,6 +22,8 @@ describe "Integration" do
     organizer
   end
 
+  # rubocop:disable Style/AsciiComments
+  #
   # organizer
   #  ├─ organizer2
   #  │   ├─ interactor2a
@@ -33,6 +35,8 @@ describe "Integration" do
   #  │   ├─ interactor4b
   #  │   └─ interactor4c
   #  └─ interactor5
+  #
+  # rubocop:enable Style/AsciiComments
 
   let(:organizer) {
     interactors = [organizer2, interactor3, organizer4, interactor5]
