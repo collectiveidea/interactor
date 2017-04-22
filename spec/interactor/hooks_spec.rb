@@ -353,6 +353,53 @@ module Interactor
           ])
         end
       end
+
+      context "inheritance" do
+        context "around_hooks" do
+          let(:hooked) {
+            build_hooked do
+              around :add_around_before_and_around_after
+              around { |hooked| hooked.call }
+            end
+          }
+
+          let(:inherited) { Class.new(hooked) }
+
+          it "inherites around hooks from parent class" do
+            expect(inherited.around_hooks).to eq(hooked.around_hooks)
+          end
+        end
+
+        context "before_hooks" do
+          let(:hooked) {
+            build_hooked do
+              before :add_before
+              before {}
+            end
+          }
+
+          let(:inherited) { Class.new(hooked) }
+
+          it "inherites before hooks from parent class" do
+            expect(inherited.before_hooks).to eq(hooked.before_hooks)
+          end
+        end
+
+        context "after_hooks" do
+          let(:hooked) {
+            build_hooked do
+              after :add_after
+              after {}
+            end
+          }
+
+          let(:inherited) { Class.new(hooked) }
+
+          it "inherites after hooks from parent class" do
+            expect(inherited.after_hooks).to eq(hooked.after_hooks)
+          end
+        end
+      end
     end
   end
 end

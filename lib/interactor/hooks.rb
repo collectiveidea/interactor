@@ -143,7 +143,7 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def around_hooks
-        @around_hooks ||= []
+        @around_hooks ||= superclass && superclass.respond_to?(:around_hooks) ? superclass.around_hooks.dup : []
       end
 
       # Internal: An Array of declared hooks to run before Interactor
@@ -162,7 +162,7 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def before_hooks
-        @before_hooks ||= []
+        @before_hooks ||= superclass && superclass.respond_to?(:before_hooks) ? superclass.before_hooks.dup : []
       end
 
       # Internal: An Array of declared hooks to run before Interactor
@@ -181,7 +181,7 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def after_hooks
-        @after_hooks ||= []
+        @after_hooks ||= superclass && superclass.respond_to?(:after_hooks) ? superclass.after_hooks.dup : []
       end
     end
 
