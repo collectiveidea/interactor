@@ -1,6 +1,7 @@
 require "interactor/context"
 require "interactor/error"
 require "interactor/hooks"
+require "interactor/organized_interactor"
 require "interactor/organizer"
 
 # Public: Interactor methods. Because Interactor is a module, custom Interactor

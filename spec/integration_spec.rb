@@ -1787,4 +1787,39 @@ describe "Integration" do
       ])
     end
   end
+
+  context "when conditions are passed to organize calls" do
+    let(:organizer) { build_organizer }
+
+    it "regard them while running interactors" do
+      organizer.class_eval do
+        def truthy_method
+          true
+        end
+
+        def falsey_method
+          false
+        end
+      end
+      organizer.organize(interactor2a, if: :truthy_method)
+      organizer.organize(interactor2b, if: :falsey_method)
+      organizer.organize(interactor2c, unless: :truthy_method)
+      organizer.organize(interactor3, unless: :falsey_method)
+      organizer.organize(interactor4a, if: -> { truthy_method })
+      organizer.organize(interactor4b, if: -> { falsey_method })
+      organizer.organize(interactor4c, unless: -> { truthy_method })
+      organizer.organize(interactor5, unless: -> { falsey_method })
+
+      expect {
+        organizer.call(context)
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before5, :before5, :call5, :after5, :around_after5
+      ])
+    end
+  end
 end

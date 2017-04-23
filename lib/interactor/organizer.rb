@@ -45,8 +45,12 @@ module Interactor
       #   end
       #
       # Returns nothing.
-      def organize(*interactors)
-        organized.concat(interactors.flatten)
+      def organize(*interactors, **options)
+        options_dup = options.dup.freeze
+        organized_interactors = interactors.flatten.map do |interactor|
+          OrganizedInteractor.new(interactor, options_dup)
+        end
+        organized.concat(organized_interactors)
       end
 
       # Internal: An Array of declared Interactors to be invoked.
@@ -76,8 +80,8 @@ module Interactor
       #
       # Returns nothing.
       def call
-        self.class.organized.each do |interactor|
-          interactor.call!(context)
+        self.class.organized.each do |organized_interactor|
+          organized_interactor.call!(context, self)
         end
       end
     end
