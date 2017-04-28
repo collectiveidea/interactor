@@ -166,24 +166,22 @@ module Interactor
 
   private
 
-  # Internal: Determine what arguments (if any) should be passed to the "call"
-  # instance method when invoking an Interactor. The "call" instance method may
-  # accept any combination of positional and keyword arguments. This method
-  # will extract values from the context in order to populate those arguments
-  # based on their names.
+  # Internal: Determine what keyword arguments (if any) should be passed to the
+  # "call" instance method when invoking an Interactor. The "call" instance
+  # method may accept any number of keyword arguments. This method will extract
+  # values from the context in order to populate those arguments based on their
+  # names.
   #
   # Returns an Array of arguments to be applied as an argument list.
-  def arguments_for_call # rubocop:disable Metrics/MethodLength
+  def arguments_for_call
     positional_arguments = []
     keyword_arguments = {}
 
     method(:call).parameters.each do |(type, name)|
+      next unless type == :keyreq || type == :key
       next unless context.include?(name)
 
-      case type
-      when :req, :opt then positional_arguments << context[name]
-      when :keyreq, :key then keyword_arguments[name] = context[name]
-      end
+      keyword_arguments[name] = context[name]
     end
 
     positional_arguments << keyword_arguments if keyword_arguments.any?
