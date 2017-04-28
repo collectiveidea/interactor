@@ -94,7 +94,7 @@ module Interactor
     @context = Context.build(context)
   end
 
-  # Internal: Invoke an interactor instance along with all defined hooks. The
+  # Internal: Invoke an Interactor instance along with all defined hooks. The
   # "run" method is used internally by the "call" class method. The following
   # are equivalent:
   #
@@ -112,8 +112,12 @@ module Interactor
   #
   # Returns nothing.
   def run
-    run!
-  rescue Failure
+    context.calling!(self) do
+      with_hooks do
+        call(*arguments_for_call)
+        context.called!(self)
+      end
+    end
   end
 
   # Internal: Invoke an Interactor instance along with all defined hooks. The
@@ -139,13 +143,8 @@ module Interactor
   # Returns nothing.
   # Raises Interactor::Failure if the context is failed.
   def run!
-    with_hooks do
-      call(*arguments_for_call)
-      context.called!(self)
-    end
-  rescue
-    context.rollback!
-    raise
+    run
+    context.raise! if context.failure?
   end
 
   # Public: Invoke an Interactor instance without any hooks, tracking, or

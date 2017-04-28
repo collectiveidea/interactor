@@ -98,9 +98,13 @@ module Interactor
       @failure || false
     end
 
-    # Public: Fail the Interactor::Context. Failing a context raises an error
-    # that may be rescued by the calling interactor. The context is also flagged
-    # as having failed.
+    # Public: Fail the Interactor::Context. Failing a context throws a "tag"
+    # that will only be caught by the originally called interactor. This allows
+    # execution to exit quickly, even from deeply nested interactor executions.
+    # If the context is failed outside the expected scenario of a calling
+    # interactor, nothing is thrown.
+    #
+    # The context is also flagged as having failed.
     #
     # Optionally the caller may provide a hash of key/value pairs to be merged
     # into the context before failure.
@@ -119,11 +123,66 @@ module Interactor
     #   context.fail!(foo: "baz")
     #   # => Interactor::Failure: #<Interactor::Context foo="baz">
     #
-    # Raises Interactor::Failure initialized with the Interactor::Context.
+    # Returns nothing.
+    # Throws the originally called interactor if present.
     def fail!(context = {})
       context.each { |key, value| self[key] = value }
       @failure = true
+      throw!
+    end
+
+    # Internal: Throw the originally called Interactor instance. This is used
+    # by the Interactor::Context#fail! method.
+    #
+    # Returns nothing.
+    # Throws an Interactor instance if possible.
+    def throw!
+      interactor = _calling.first
+      throw interactor if interactor
+    end
+
+    # Public: Raise an Interactor::Failure providing the current context as a
+    # payload. This is called upon completion of Interactor#run! if the context
+    # has failed.
+    #
+    # Raises Interactor::Failure.
+    def raise!
       raise Failure, self
+    end
+
+    # Internal: Track that an Interactor is being called. The "calling!" method
+    # is used by the interactor being invoked with this context. Before an
+    # interactor is called, the interactor instance is tracked in the context
+    # for the purpose of determining the originally called interactor. Knowing
+    # the originally called interactor allows the context to throw in such a way
+    # that only the originally called interactor will catch.
+    #
+    # The required block is executed and any throw as a result of context
+    # failure will be caught if the interactor given is the first interactor
+    # being called, making it the originally called interactor.
+    #
+    # interactor - An Interactor instance that will be called.
+    #
+    # Returns nothing.
+    def calling!(interactor)
+      _calling << interactor
+
+      catch interactor do
+        yield
+        return
+      end
+
+      # This line is only reached if a failure is thrown that is caught by the
+      # catch block above. This ensures that only the originally called
+      # interactor will attempt to roll back.
+      rollback!
+    rescue
+      # TODO: Rollback will no-op if called multiple times. Still, for a deeply
+      # nested interactor that raises an error, the rollback below will be
+      # attempted once for every level of nesting. Ideally, only the originally
+      # called interactor will attempt the rollback.
+      rollback!
+      raise
     end
 
     # Internal: Track that an Interactor has been called. The "called!" method
@@ -165,6 +224,26 @@ module Interactor
     # Returns true if the key is found or false otherwise.
     def include?(key)
       table.include?(key.to_sym)
+    end
+
+    # Internal: An Array of Interactor instances that have begun execution
+    # against this Interactor::Context instance.
+    #
+    # Examples
+    #
+    #   context = Interactor::Context.new
+    #   # => #<Interactor::Context>
+    #   context._calling
+    #   # => []
+    #
+    #   context = MyInteractor.call(foo: "bar")
+    #   # => #<Interactor::Context foo="baz">
+    #   context.calling
+    #   # => [#<MyInteractor @context=#<Interactor::Context foo="baz">>]
+    #
+    # Returns an Array of Interactor instances or an empty Array.
+    def _calling
+      @calling ||= []
     end
 
     # Internal: An Array of successfully called Interactor instances invoked
