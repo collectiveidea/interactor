@@ -164,6 +164,26 @@ module Interactor
       end
     end
 
+    describe "#include?" do
+      it "returns true if the key is found" do
+        context = Context.build(foo: "bar")
+
+        expect(context.include?(:foo)).to eq(true)
+      end
+
+      it "returns true if the symbolized key is found" do
+        context = Context.build(foo: "bar")
+
+        expect(context.include?("foo")).to eq(true)
+      end
+
+      it "returns false if the key is not found" do
+        context = Context.build(foo: "bar")
+
+        expect(context.include?(:hello)).to eq(false)
+      end
+    end
+
     describe "#_called" do
       let(:context) { Context.build }
 

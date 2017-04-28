@@ -140,7 +140,7 @@ module Interactor
   # Raises Interactor::Failure if the context is failed.
   def run!
     with_hooks do
-      call
+      call(*arguments_for_call)
       context.called!(self)
     end
   rescue
@@ -162,5 +162,29 @@ module Interactor
   #
   # Returns nothing.
   def rollback
+  end
+
+  private
+
+  # Internal: Determine what keyword arguments (if any) should be passed to the
+  # "call" instance method when invoking an Interactor. The "call" instance
+  # method may accept any number of keyword arguments. This method will extract
+  # values from the context in order to populate those arguments based on their
+  # names.
+  #
+  # Returns an Array of arguments to be applied as an argument list.
+  def arguments_for_call
+    positional_arguments = []
+    keyword_arguments = {}
+
+    method(:call).parameters.each do |(type, name)|
+      next unless type == :keyreq || type == :key
+      next unless context.include?(name)
+
+      keyword_arguments[name] = context[name]
+    end
+
+    positional_arguments << keyword_arguments if keyword_arguments.any?
+    positional_arguments
   end
 end

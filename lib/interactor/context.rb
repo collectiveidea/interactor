@@ -121,7 +121,7 @@ module Interactor
     #
     # Raises Interactor::Failure initialized with the Interactor::Context.
     def fail!(context = {})
-      context.each { |key, value| modifiable[key.to_sym] = value }
+      context.each { |key, value| self[key] = value }
       @failure = true
       raise Failure, self
     end
@@ -156,6 +156,15 @@ module Interactor
       return false if @rolled_back
       _called.reverse_each(&:rollback)
       @rolled_back = true
+    end
+
+    # Public: Check for the presence of a given key in the context. This does
+    # not check whether the value is truthy, just whether the key is set to any
+    # value at all.
+    #
+    # Returns true if the key is found or false otherwise.
+    def include?(key)
+      table.include?(key.to_sym)
     end
 
     # Internal: An Array of successfully called Interactor instances invoked
