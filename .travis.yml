@@ -30,4 +30,3 @@ rvm:
 script: bundle exec rspec
 after_success:
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bundle exec codeclimate-test-reporter; fi'
-
