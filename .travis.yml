@@ -28,5 +28,5 @@ rvm:
   - ruby-head
 script: bundle exec rspec
 after_success:
-  - bundle exec codeclimate-test-reporter
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bundle exec codeclimate-test-reporter; fi'
 
