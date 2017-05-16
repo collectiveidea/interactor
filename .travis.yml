@@ -4,6 +4,7 @@ branches:
   only:
     - master
     - v3
+    - fix/build-fail-on-codeclimate
 env:
   global:
     - secure: | # CODECLIMATE_REPO_TOKEN
@@ -28,3 +29,6 @@ rvm:
   - "2.4.0"
   - ruby-head
 script: bundle exec rspec
+after_success:
+  - bundle exec codeclimate-test-reporter
+
