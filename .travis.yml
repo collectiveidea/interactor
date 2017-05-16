@@ -4,7 +4,6 @@ branches:
   only:
     - master
     - v3
-
 env:
   global:
     - secure: | # CODECLIMATE_REPO_TOKEN
