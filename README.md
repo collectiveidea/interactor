@@ -16,7 +16,7 @@ gem "interactor", "~> 3.0"
 
 ## What is an Interactor?
 
-An interactor is a simple, single-purpose object.
+An interactor is a simple, [single-purpose](http://en.wikipedia.org/wiki/Single_responsibility_principle) object.
 
 Interactors are used to encapsulate your application's
 [business logic](http://en.wikipedia.org/wiki/Business_logic). Each interactor
@@ -24,10 +24,30 @@ represents one thing that your application *does*.
 
 ### Context
 
-An interactor is given a *context*. The context contains everything the
+An interactor is given a *context*.  The context contains everything the
 interactor needs to do its work.
 
-When an interactor does its single purpose, it affects its given context.
+The context is created when the interactor is called with a hash:
+
+In the example below the hash { email: 'example@example.com'} is passed 
+and is turned into OpenStruct object and becomes the context.
+
+Example:
+
+```ruby
+class TestInteractor
+  include Interactor
+
+  # NOTE: this is a not a class method, but an instance method. 
+  # The Interactor module defines a class method to call this instance method.
+  def call
+    context.email = context.email.strip.downcase
+    puts "Email address: #{context.email}"
+  end
+end
+
+TestInteractor.call(email: 'example@example.com')
+```
 
 #### Adding to the Context
 
