@@ -102,7 +102,7 @@ A symbol argument can also be given, rather than a block.
 ```ruby
 before :zero_emails_sent
 
-def zero_email_sent
+def zero_emails_sent
   context.emails_sent = 0
 end
 ```
