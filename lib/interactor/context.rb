@@ -98,6 +98,25 @@ module Interactor
       @failure || false
     end
 
+    # Public: Whether the Interactor::Context has halted. By default, a new
+    # context is successful and only changes when explicitly halted.
+    #
+    # Examples
+    #
+    #   context = Interactor::Context.new
+    #   # => #<Interactor::Context>
+    #   context.halted?
+    #   # => false
+    #   context.halt!
+    #   # => Interactor::Halt: #<Interactor::Context>
+    #   context.halted?
+    #   # => true
+    #
+    # Returns false by default or true if halted.
+    def halted?
+      @halt || false
+    end
+
     # Public: Fail the Interactor::Context. Failing a context raises an error
     # that may be rescued by the calling interactor. The context is also flagged
     # as having failed.
@@ -124,6 +143,34 @@ module Interactor
       context.each { |key, value| modifiable[key.to_sym] = value }
       @failure = true
       raise Failure, self
+    end
+
+    # Public: Halt the Interactor::Context. Halting a context raises an error
+    # that may be rescued by the calling interactor. The context is also flagged
+    # as having halted, yet not failed.
+    #
+    # Optionally the caller may provide a hash of key/value pairs to be merged
+    # into the context before failure.
+    #
+    # context - A Hash whose key/value pairs are merged into the existing
+    #           Interactor::Context instance. (default: {})
+    #
+    # Examples
+    #
+    #   context = Interactor::Context.new
+    #   # => #<Interactor::Context>
+    #   context.fail!
+    #   # => Interactor::Halt: #<Interactor::Context>
+    #   context.fail! rescue false
+    #   # => false
+    #   context.fail!(foo: "baz")
+    #   # => Interactor::Halt: #<Interactor::Context foo="baz">
+    #
+    # Raises Interactor::Halt initialized with the Interactor::Context.
+    def halt!(context = {})
+      modifiable.update(context)
+      @halt = true
+      raise Halt, self
     end
 
     # Internal: Track that an Interactor has been called. The "called!" method

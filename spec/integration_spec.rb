@@ -1738,4 +1738,53 @@ describe "Integration" do
       }.to raise_error("foo")
     end
   end
+
+  context "when a deeply nested call gets halted" do
+    let(:interactor4b) {
+      build_interactor do
+        around do |interactor|
+          context.steps << :around_before4b
+          interactor.call
+          context.steps << :around_after4b
+        end
+
+        before do
+          context.steps << :before4b
+        end
+
+        after do
+          context.steps << :after4b
+        end
+
+        def call
+          context.halt!
+          context.steps << :call4b
+        end
+
+        def rollback
+          context.steps << :rollback4b
+        end
+      end
+    }
+
+
+    it 'stops without doing rollback' do
+      expect {
+        organizer4.call(context) rescue nil
+      }.to change {
+        context.steps
+      }.from([]).to([
+        :around_before4,
+        :before4,
+        :around_before4a,
+        :before4a,
+        :call4a,
+        :after4a,
+        :around_after4a,
+        :around_before4b,
+        :before4b
+      ])
+    end
+  end
+
 end
