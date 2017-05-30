@@ -124,6 +124,60 @@ module Interactor
       end
     end
 
+    describe "#halt!" do
+      let(:context) { Context.build(foo: "bar") }
+
+      it "sets success to true" do
+        context.halt! rescue nil
+        expect(context).to be_a_success
+      end
+
+      it "sets failure to false" do
+        context.halt! rescue nil
+        expect(context).to_not be_a_failure
+      end
+
+      it "preserves failure" do
+        context.fail! rescue nil
+
+        expect {
+          context.halt! rescue nil
+        }.not_to change {
+                   context.failure?
+                 }
+      end
+
+      it "preserves the context" do
+        expect {
+          context.halt! rescue nil
+        }.not_to change {
+                   context.foo
+                 }
+      end
+
+      it "updates the context" do
+        expect {
+          context.halt!(foo: "baz") rescue nil
+        }.to change {
+               context.foo
+             }.from("bar").to("baz")
+      end
+
+      it "to raise a Halt failure" do
+        expect {
+          context.halt!
+        }.to raise_error(Halt)
+      end
+
+      it "makes the context available from the failure" do
+        begin
+          context.halt!
+        rescue Halt => error
+          expect(error.context).to eq(context)
+        end
+      end
+    end
+
     describe "#called!" do
       let(:context) { Context.build }
       let(:instance1) { double(:instance1) }

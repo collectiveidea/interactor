@@ -53,5 +53,29 @@ module Interactor
         instance.call
       end
     end
+
+    describe 'halting in a chain' do
+      let(:instance) { organizer.new }
+      let(:context) { double(:context) }
+      let(:interactor2) { double(:interactor2) }
+      let(:interactor3) { double(:interactor3) }
+      let(:interactor4) { double(:interactor4) }
+
+      before do
+        allow(instance).to receive(:context) { context }
+        allow(organizer).to receive(:organized) {
+                              [interactor2, interactor3, interactor4]
+                            }
+      end
+
+      it 'halts and does not call the latter' do
+        expect(interactor2).to receive(:call!).once.with(context).ordered
+        expect(interactor3).to receive(:call!).once.with(context).ordered.and_raise(Halt)
+        expect(interactor4).to_not receive(:call!)
+
+        instance.call
+      end
+
+    end
   end
 end

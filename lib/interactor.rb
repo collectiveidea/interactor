@@ -143,7 +143,9 @@ module Interactor
       call
       context.called!(self)
     end
-  rescue
+  rescue Halt => e # allow stopping of organizer
+    raise
+  rescue # rescue everything else
     context.rollback!
     raise
   end

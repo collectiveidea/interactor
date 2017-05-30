@@ -28,4 +28,9 @@ module Interactor
       super
     end
   end
+
+  # Internal: Organizer halting error raised during Interactor::Context halt.
+  # The error stores a copy of the halted context for debugging purposes.
+  class Halt < Failure
+  end
 end
