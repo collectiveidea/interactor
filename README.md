@@ -14,6 +14,14 @@ Add Interactor to your Gemfile and `bundle install`.
 gem "interactor", "~> 3.0"
 ```
 
+In Rails you can run:
+
+```
+$ rails generate interactor:interactor my_interactor
+```
+
+This will create the an Interactor named "MyInteractor" in "app/interactors/my_interactor.rb".
+
 ## What is an Interactor?
 
 An interactor is a simple, single-purpose object.
