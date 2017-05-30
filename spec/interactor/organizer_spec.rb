@@ -41,13 +41,15 @@ module Interactor
       before do
         allow(instance).to receive(:context) { context }
         allow(organizer).to receive(:organized) {
-          [interactor2, interactor3, interactor4]
+          [interactor2, :mapping1, interactor3, :mapping2, interactor4]
         }
       end
 
       it "calls each interactor in order with the context" do
         expect(interactor2).to receive(:call!).once.with(context).ordered
+        expect(instance).to receive(:mapping1).once.with(no_args).ordered
         expect(interactor3).to receive(:call!).once.with(context).ordered
+        expect(instance).to receive(:mapping2).once.with(no_args).ordered
         expect(interactor4).to receive(:call!).once.with(context).ordered
 
         instance.call

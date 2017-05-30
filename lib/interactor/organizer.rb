@@ -76,7 +76,8 @@ module Interactor
       # Returns nothing.
       def call
         self.class.organized.each do |interactor|
-          interactor.call!(context)
+          self.send(interactor) if interactor.is_a?(Symbol)
+          interactor.call!(context) unless interactor.is_a?(Symbol)
         end
       end
     end
