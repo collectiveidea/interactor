@@ -1,6 +1,9 @@
 require "interactor/context"
 require "interactor/error"
 require "interactor/hooks"
+require "interactor/contract"
+require "interactor/contract/property"
+require "interactor/contract/property_table"
 require "interactor/organizer"
 
 # Public: Interactor methods. Because Interactor is a module, custom Interactor
@@ -21,6 +24,7 @@ module Interactor
     base.class_eval do
       extend ClassMethods
       include Hooks
+      include Contract
 
       # Public: Gets the Interactor::Context of the Interactor instance.
       attr_reader :context
@@ -140,7 +144,10 @@ module Interactor
   # Raises Interactor::Failure if the context is failed.
   def run!
     with_hooks do
+      validate_contract_expectations
       call
+      ensure_contract_defaults
+      check_each_violation
       context.called!(self)
     end
   rescue
