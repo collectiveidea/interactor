@@ -1,4 +1,4 @@
-require "ostruct"
+require 'ostruct'
 
 module Interactor
   # Public: The object for tracking state of an Interactor's invocation. The
@@ -28,32 +28,39 @@ module Interactor
   #   # => "baz"
   #   context
   #   # => #<Interactor::Context foo="baz" hello="world">
-  class Context < OpenStruct
-    # Internal: Initialize an Interactor::Context or preserve an existing one.
-    # If the argument given is an Interactor::Context, the argument is returned.
-    # Otherwise, a new Interactor::Context is initialized from the provided
-    # hash.
-    #
-    # The "build" method is used during interactor initialization.
-    #
-    # context - A Hash whose key/value pairs are used in initializing a new
-    #           Interactor::Context object. If an existing Interactor::Context
-    #           is given, it is simply returned. (default: {})
-    #
-    # Examples
-    #
-    #   context = Interactor::Context.build(foo: "bar")
-    #   # => #<Interactor::Context foo="bar">
-    #   context.object_id
-    #   # => 2170969340
-    #   context = Interactor::Context.build(context)
-    #   # => #<Interactor::Context foo="bar">
-    #   context.object_id
-    #   # => 2170969340
-    #
-    # Returns the Interactor::Context.
-    def self.build(context = {})
-      self === context ? context : new(context)
+
+  module CommonContext
+    module ClassMethods
+      # Internal: Initialize an Interactor::Context or preserve an existing one.
+      # If the argument given is an Interactor::Context, the argument is returned.
+      # Otherwise, a new Interactor::Context is initialized from the provided
+      # hash.
+      #
+      # The "build" method is used during interactor initialization.
+      #
+      # context - A Hash whose key/value pairs are used in initializing a new
+      #           Interactor::Context object. If an existing Interactor::Context
+      #           is given, it is simply returned. (default: {})
+      #
+      # Examples
+      #
+      #   context = Interactor::Context.build(foo: "bar")
+      #   # => #<Interactor::Context foo="bar">
+      #   context.object_id
+      #   # => 2170969340
+      #   context = Interactor::Context.build(context)
+      #   # => #<Interactor::Context foo="bar">
+      #   context.object_id
+      #   # => 2170969340
+      #
+      # Returns the Interactor::Context.
+      def build(context = {})
+        self === context ? context : new(context)
+      end
+    end
+
+    def self.included(base)
+      base.extend(ClassMethods)
     end
 
     # Public: Whether the Interactor::Context is successful. By default, a new
@@ -177,5 +184,9 @@ module Interactor
     def _called
       @called ||= []
     end
+  end
+
+  class Context < OpenStruct
+    include CommonContext
   end
 end
