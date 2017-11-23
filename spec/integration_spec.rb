@@ -1,15 +1,17 @@
 describe "Integration" do
   def build_interactor(&block)
     interactor = Class.new.send(:include, Interactor)
-    interactor.class_eval(&block) if block
-    interactor
+    interactor.tap do |i|
+      i.class_eval(&block) if block
+    end
   end
 
   def build_organizer(options = {}, &block)
     organizer = Class.new.send(:include, Interactor::Organizer)
-    organizer.organize(options[:organize]) if options[:organize]
-    organizer.class_eval(&block) if block
-    organizer
+    organizer.tap do |org|
+      org.organize(options[:organize]) if options[:organize]
+      org.class_eval(&block) if block  
+    end
   end
 
   # organizer
