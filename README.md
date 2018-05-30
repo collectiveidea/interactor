@@ -4,7 +4,6 @@
 [![Build Status](https://img.shields.io/travis/collectiveidea/interactor/master.svg?style=flat-square)](https://travis-ci.org/collectiveidea/interactor)
 [![Code Climate](https://img.shields.io/codeclimate/github/collectiveidea/interactor.svg?style=flat-square)](https://codeclimate.com/github/collectiveidea/interactor)
 [![Test Coverage](http://img.shields.io/codeclimate/coverage/github/collectiveidea/interactor.svg?style=flat-square)](https://codeclimate.com/github/collectiveidea/interactor)
-[![Dependency Status](https://img.shields.io/gemnasium/collectiveidea/interactor.svg?style=flat-square)](https://gemnasium.com/collectiveidea/interactor)
 
 ## Getting Started
 
