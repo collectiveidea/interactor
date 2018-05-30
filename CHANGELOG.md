@@ -1,3 +1,8 @@
+## 3.1.1 / 2018-05-30
+
+* [BUGFIX] Allow Context#fail! to accept a hash with string keys
+* [ENHANCEMENT] Many documentation updates
+
 ## 3.1.0 / 2014-10-13
 
 * [FEATURE] Add around hooks
