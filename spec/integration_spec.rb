@@ -165,7 +165,7 @@ describe "Integration" do
   }
 
   let(:organizer4) {
-    build_organizer(organize: [interactor4a, interactor4b, interactor4c]) do
+    build_organizer(organize: [procbased, interactor4a, interactor4b, interactor4c]) do
       around do |interactor|
         context.steps << :around_before4
         interactor.call
@@ -286,6 +286,10 @@ describe "Integration" do
     end
   }
 
+  let(:procbased) {
+    Proc.new {|context| context.steps << :proc_call }
+  }
+
   let(:context) { Interactor::Context.new(steps: []) }
 
   context "when successful" do
@@ -303,6 +307,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
@@ -481,6 +486,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
@@ -532,6 +538,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
@@ -589,6 +596,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
@@ -641,6 +649,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
             :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
@@ -1219,6 +1228,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
         :rollback4a,
         :rollback3,
@@ -1271,6 +1281,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
         :rollback4a,
         :rollback3,
@@ -1329,6 +1340,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b,
         :rollback4a,
@@ -1382,6 +1394,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b,
         :rollback4a,
@@ -1441,6 +1454,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b,
         :rollback4a,
@@ -1494,6 +1508,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b,
         :rollback4a,
@@ -1553,6 +1568,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b,
         :rollback4b,
@@ -1607,6 +1623,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b,
         :rollback4b,
@@ -1667,6 +1684,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b,
         :rollback4b,
@@ -1721,6 +1739,7 @@ describe "Integration" do
           :after2, :around_after2,
           :around_before3, :before3, :call3, :after3, :around_after3,
           :around_before4, :before4,
+            :proc_call,
             :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
             :around_before4b, :before4b, :call4b, :after4b,
         :rollback4b,
