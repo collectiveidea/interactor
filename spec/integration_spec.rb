@@ -348,9 +348,6 @@ describe "Integration" do
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before
-          interactor.call
-          context.steps << :around_after
         end
 
         before do
@@ -425,7 +422,6 @@ describe "Integration" do
 
         before do
           raise "foo"
-          context.steps << :before
         end
 
         after do
@@ -521,7 +517,6 @@ describe "Integration" do
 
         after do
           raise "foo"
-          context.steps << :after
         end
       end
     }
@@ -626,7 +621,6 @@ describe "Integration" do
           context.steps << :around_before
           interactor.call
           raise "foo"
-          context.steps << :around_after
         end
 
         before do
@@ -733,9 +727,6 @@ describe "Integration" do
       build_interactor do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before3
-          interactor.call
-          context.steps << :around_after3
         end
 
         before do
@@ -844,7 +835,6 @@ describe "Integration" do
 
         before do
           raise "foo"
-          context.steps << :before3
         end
 
         after do
@@ -958,7 +948,6 @@ describe "Integration" do
 
         def call
           raise "foo"
-          context.steps << :call3
         end
 
         def rollback
@@ -1061,7 +1050,6 @@ describe "Integration" do
 
         after do
           raise "foo"
-          context.steps << :after3
         end
 
         def call
@@ -1161,7 +1149,6 @@ describe "Integration" do
           context.steps << :around_before3
           interactor.call
           raise "foo"
-          context.steps << :around_after3
         end
 
         before do
@@ -1270,9 +1257,6 @@ describe "Integration" do
       build_interactor do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before4b
-          interactor.call
-          context.steps << :around_after4b
         end
 
         before do
@@ -1391,7 +1375,6 @@ describe "Integration" do
 
         before do
           raise "foo"
-          context.steps << :before4b
         end
 
         after do
@@ -1515,7 +1498,6 @@ describe "Integration" do
 
         def call
           raise "foo"
-          context.steps << :call4b
         end
 
         def rollback
@@ -1628,7 +1610,6 @@ describe "Integration" do
 
         after do
           raise "foo"
-          context.steps << :after4b
         end
 
         def call
@@ -1738,7 +1719,6 @@ describe "Integration" do
           context.steps << :around_before4b
           interactor.call
           raise "foo"
-          context.steps << :around_after4b
         end
 
         before do
