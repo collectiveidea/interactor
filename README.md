@@ -4,6 +4,7 @@
 [![Build Status](https://img.shields.io/travis/collectiveidea/interactor/master.svg)](https://travis-ci.org/collectiveidea/interactor)
 [![Maintainability](https://img.shields.io/codeclimate/maintainability/collectiveidea/interactor.svg)](https://codeclimate.com/github/collectiveidea/interactor)
 [![Test Coverage](https://img.shields.io/codeclimate/coverage-letter/collectiveidea/interactor.svg)](https://codeclimate.com/github/collectiveidea/interactor)
+[![Ruby Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/testdouble/standard)
 
 ## Getting Started
 

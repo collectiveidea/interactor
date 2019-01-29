@@ -296,19 +296,19 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
-            :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
-          :after4, :around_after4,
-          :around_before5, :before5, :call5, :after5, :around_after5,
-        :after, :around_after
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
+        :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+        :after4, :around_after4,
+        :around_before5, :before5, :call5, :after5, :around_after5,
+        :after, :around_after,
       ])
     end
   end
@@ -348,9 +348,6 @@ describe "Integration" do
       build_organizer(organize: [organizer2, interactor3, organizer4, interactor5]) do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before
-          interactor.call
-          context.steps << :around_after
         end
 
         before do
@@ -366,7 +363,11 @@ describe "Integration" do
 
     it "aborts" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.not_to change {
         context.steps
       }
@@ -405,7 +406,7 @@ describe "Integration" do
       }.to change {
         context.steps
       }.from([]).to([
-        :around_before
+        :around_before,
       ])
     end
   end
@@ -421,7 +422,6 @@ describe "Integration" do
 
         before do
           raise "foo"
-          context.steps << :before
         end
 
         after do
@@ -432,11 +432,15 @@ describe "Integration" do
 
     it "aborts" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
-        :around_before
+        :around_before,
       ])
     end
 
@@ -474,18 +478,18 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
-            :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
-          :after4, :around_after4,
-          :around_before5, :before5, :call5, :after5, :around_after5,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
+        :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+        :after4, :around_after4,
+        :around_before5, :before5, :call5, :after5, :around_after5,
         :rollback5,
         :rollback4c,
         :rollback4b,
@@ -493,7 +497,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -513,30 +517,33 @@ describe "Integration" do
 
         after do
           raise "foo"
-          context.steps << :after
         end
       end
     }
 
     it "rolls back successfully called interactors and the failed interactor" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
-            :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
-          :after4, :around_after4,
-          :around_before5, :before5, :call5, :after5, :around_after5,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
+        :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+        :after4, :around_after4,
+        :around_before5, :before5, :call5, :after5, :around_after5,
         :rollback5,
         :rollback4c,
         :rollback4b,
@@ -544,7 +551,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -582,18 +589,18 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
-            :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
-          :after4, :around_after4,
-          :around_before5, :before5, :call5, :after5, :around_after5,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
+        :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+        :after4, :around_after4,
+        :around_before5, :before5, :call5, :after5, :around_after5,
         :after,
         :rollback5,
         :rollback4c,
@@ -602,7 +609,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -614,7 +621,6 @@ describe "Integration" do
           context.steps << :around_before
           interactor.call
           raise "foo"
-          context.steps << :around_after
         end
 
         before do
@@ -629,23 +635,27 @@ describe "Integration" do
 
     it "rolls back successfully called interactors and the failed interactor" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
-            :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
-          :after4, :around_after4,
-          :around_before5, :before5, :call5, :after5, :around_after5,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
+        :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+        :after4, :around_after4,
+        :around_before5, :before5, :call5, :after5, :around_after5,
         :after,
         :rollback5,
         :rollback4c,
@@ -654,7 +664,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -700,14 +710,14 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -717,9 +727,6 @@ describe "Integration" do
       build_interactor do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before3
-          interactor.call
-          context.steps << :around_after3
         end
 
         before do
@@ -742,19 +749,23 @@ describe "Integration" do
 
     it "rolls back successfully called interactors" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -800,15 +811,15 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -824,7 +835,6 @@ describe "Integration" do
 
         before do
           raise "foo"
-          context.steps << :before3
         end
 
         after do
@@ -843,20 +853,24 @@ describe "Integration" do
 
     it "rolls back successfully called interactors" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -902,15 +916,15 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -934,7 +948,6 @@ describe "Integration" do
 
         def call
           raise "foo"
-          context.steps << :call3
         end
 
         def rollback
@@ -945,20 +958,24 @@ describe "Integration" do
 
     it "rolls back successfully called interactors" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -1004,16 +1021,16 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -1033,7 +1050,6 @@ describe "Integration" do
 
         after do
           raise "foo"
-          context.steps << :after3
         end
 
         def call
@@ -1048,21 +1064,25 @@ describe "Integration" do
 
     it "rolls back successfully called interactors and the failed interactor" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -1108,16 +1128,16 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -1129,7 +1149,6 @@ describe "Integration" do
           context.steps << :around_before3
           interactor.call
           raise "foo"
-          context.steps << :around_after3
         end
 
         before do
@@ -1152,21 +1171,25 @@ describe "Integration" do
 
     it "rolls back successfully called interactors and the failed interactor" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -1212,19 +1235,19 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -1234,9 +1257,6 @@ describe "Integration" do
       build_interactor do
         around do |interactor|
           raise "foo"
-          context.steps << :around_before4b
-          interactor.call
-          context.steps << :around_after4b
         end
 
         before do
@@ -1259,24 +1279,28 @@ describe "Integration" do
 
     it "rolls back successfully called interactors" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -1322,20 +1346,20 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -1351,7 +1375,6 @@ describe "Integration" do
 
         before do
           raise "foo"
-          context.steps << :before4b
         end
 
         after do
@@ -1370,25 +1393,29 @@ describe "Integration" do
 
     it "rolls back successfully called interactors" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -1434,20 +1461,20 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -1471,7 +1498,6 @@ describe "Integration" do
 
         def call
           raise "foo"
-          context.steps << :call4b
         end
 
         def rollback
@@ -1482,25 +1508,29 @@ describe "Integration" do
 
     it "rolls back successfully called interactors" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -1546,21 +1576,21 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b,
         :rollback4b,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -1580,7 +1610,6 @@ describe "Integration" do
 
         after do
           raise "foo"
-          context.steps << :after4b
         end
 
         def call
@@ -1595,26 +1624,30 @@ describe "Integration" do
 
     it "rolls back successfully called interactors and the failed interactor" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b,
         :rollback4b,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
@@ -1660,21 +1693,21 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b, :after4b,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b, :after4b,
         :rollback4b,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
   end
@@ -1686,7 +1719,6 @@ describe "Integration" do
           context.steps << :around_before4b
           interactor.call
           raise "foo"
-          context.steps << :around_after4b
         end
 
         before do
@@ -1709,26 +1741,30 @@ describe "Integration" do
 
     it "rolls back successfully called interactors and the failed interactor" do
       expect {
-        organizer.call(context) rescue nil
+        begin
+          organizer.call(context)
+        rescue
+          nil
+        end
       }.to change {
         context.steps
       }.from([]).to([
         :around_before, :before,
-          :around_before2, :before2,
-            :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-            :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-            :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
-          :after2, :around_after2,
-          :around_before3, :before3, :call3, :after3, :around_after3,
-          :around_before4, :before4,
-            :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-            :around_before4b, :before4b, :call4b, :after4b,
+        :around_before2, :before2,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :after2, :around_after2,
+        :around_before3, :before3, :call3, :after3, :around_after3,
+        :around_before4, :before4,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b, :after4b,
         :rollback4b,
         :rollback4a,
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a
+        :rollback2a,
       ])
     end
 
