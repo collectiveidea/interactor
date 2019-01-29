@@ -16,7 +16,7 @@ module Interactor
       end
 
       it "doesn't affect the original hash" do
-        hash = { foo: "bar" }
+        hash = {foo: "bar"}
         context = Context.build(hash)
 
         expect(context).to be_a(Context)
@@ -61,7 +61,11 @@ module Interactor
 
       it "sets success to false" do
         expect {
-          context.fail! rescue nil
+          begin
+            context.fail!
+          rescue
+            nil
+          end
         }.to change {
           context.success?
         }.from(true).to(false)
@@ -69,17 +73,29 @@ module Interactor
 
       it "sets failure to true" do
         expect {
-          context.fail! rescue nil
+          begin
+            context.fail!
+          rescue
+            nil
+          end
         }.to change {
           context.failure?
         }.from(false).to(true)
       end
 
       it "preserves failure" do
-        context.fail! rescue nil
+        begin
+          context.fail!
+        rescue
+          nil
+        end
 
         expect {
-          context.fail! rescue nil
+          begin
+            context.fail!
+          rescue
+            nil
+          end
         }.not_to change {
           context.failure?
         }
@@ -87,7 +103,11 @@ module Interactor
 
       it "preserves the context" do
         expect {
-          context.fail! rescue nil
+          begin
+            context.fail!
+          rescue
+            nil
+          end
         }.not_to change {
           context.foo
         }
@@ -95,7 +115,11 @@ module Interactor
 
       it "updates the context" do
         expect {
-          context.fail!(foo: "baz") rescue nil
+          begin
+            context.fail!(foo: "baz")
+          rescue
+            nil
+          end
         }.to change {
           context.foo
         }.from("bar").to("baz")
@@ -103,7 +127,11 @@ module Interactor
 
       it "updates the context with a string key" do
         expect {
-          context.fail!("foo" => "baz") rescue nil
+          begin
+            context.fail!("foo" => "baz")
+          rescue
+            nil
+          end
         }.to change {
           context.foo
         }.from("bar").to("baz")

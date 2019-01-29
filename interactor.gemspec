@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 Gem::Specification.new do |spec|
   spec.name    = "interactor"
   spec.version = "3.1.1"
