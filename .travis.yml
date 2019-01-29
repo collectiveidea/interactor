@@ -32,4 +32,4 @@ rvm:
   - "2.4"
   - "2.5"
   - ruby-head
-script: bundle exec rspec
+script: bundle exec rake
