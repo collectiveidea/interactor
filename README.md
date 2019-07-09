@@ -22,6 +22,29 @@ Interactors are used to encapsulate your application's
 [business logic](http://en.wikipedia.org/wiki/Business_logic). Each interactor
 represents one thing that your application *does*.
 
+### An Example Interactor
+
+Your application could use an interactor to authenticate a user.
+
+```ruby
+class AuthenticateUser
+  include Interactor
+
+  def call
+    if user = User.authenticate(context.email, context.password)
+      context.user = user
+      context.token = user.secret_token
+    else
+      context.fail!(message: "authenticate_user.failure")
+    end
+  end
+end
+```
+
+To define an interactor, simply create a class that includes the `Interactor`
+module and give it a `call` instance method. The interactor can access its
+`context` from within `call`.
+
 ### Context
 
 An interactor is given a *context*. The context contains everything the
@@ -216,29 +239,6 @@ module InteractorTimer
   end
 end
 ```
-
-### An Example Interactor
-
-Your application could use an interactor to authenticate a user.
-
-```ruby
-class AuthenticateUser
-  include Interactor
-
-  def call
-    if user = User.authenticate(context.email, context.password)
-      context.user = user
-      context.token = user.secret_token
-    else
-      context.fail!(message: "authenticate_user.failure")
-    end
-  end
-end
-```
-
-To define an interactor, simply create a class that includes the `Interactor`
-module and give it a `call` instance method. The interactor can access its
-`context` from within `call`.
 
 ## Interactors in the Controller
 
