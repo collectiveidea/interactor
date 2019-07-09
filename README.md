@@ -1,10 +1,10 @@
 # Interactor
 
-[![Gem Version](https://img.shields.io/gem/v/interactor.svg?style=flat-square)](http://rubygems.org/gems/interactor)
-[![Build Status](https://img.shields.io/travis/collectiveidea/interactor/master.svg?style=flat-square)](https://travis-ci.org/collectiveidea/interactor)
-[![Code Climate](https://img.shields.io/codeclimate/github/collectiveidea/interactor.svg?style=flat-square)](https://codeclimate.com/github/collectiveidea/interactor)
-[![Test Coverage](http://img.shields.io/codeclimate/coverage/github/collectiveidea/interactor.svg?style=flat-square)](https://codeclimate.com/github/collectiveidea/interactor)
-[![Dependency Status](https://img.shields.io/gemnasium/collectiveidea/interactor.svg?style=flat-square)](https://gemnasium.com/collectiveidea/interactor)
+[![Gem Version](https://img.shields.io/gem/v/interactor.svg)](http://rubygems.org/gems/interactor)
+[![Build Status](https://img.shields.io/travis/collectiveidea/interactor/master.svg)](https://travis-ci.org/collectiveidea/interactor)
+[![Maintainability](https://img.shields.io/codeclimate/maintainability/collectiveidea/interactor.svg)](https://codeclimate.com/github/collectiveidea/interactor)
+[![Test Coverage](https://img.shields.io/codeclimate/coverage-letter/collectiveidea/interactor.svg)](https://codeclimate.com/github/collectiveidea/interactor)
+[![Ruby Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/testdouble/standard)
 
 ## Getting Started
 
@@ -21,6 +21,29 @@ An interactor is a simple, single-purpose object.
 Interactors are used to encapsulate your application's
 [business logic](http://en.wikipedia.org/wiki/Business_logic). Each interactor
 represents one thing that your application *does*.
+
+### An Example Interactor
+
+Your application could use an interactor to authenticate a user.
+
+```ruby
+class AuthenticateUser
+  include Interactor
+
+  def call
+    if user = User.authenticate(context.email, context.password)
+      context.user = user
+      context.token = user.secret_token
+    else
+      context.fail!(message: "authenticate_user.failure")
+    end
+  end
+end
+```
+
+To define an interactor, simply create a class that includes the `Interactor`
+module and give it a `call` instance method. The interactor can access its
+`context` from within `call`.
 
 ### Context
 
@@ -80,7 +103,7 @@ context.success? # => false
 
 Normally, however, these exceptions are not seen. In the recommended usage, the controller invokes the interactor using the class method `call`, then checks the `success?` method of the context.
 
-This works because the `call` class method swallows exceptions.  When unit testing an interactor, if calling custom business logic methods directly and bypassing `call`, be aware that `fail!` will generate such exceptions.
+This works because the `call` class method swallows these exceptions.  When unit testing an interactor, if calling custom business logic methods directly and bypassing `call`, be aware that `fail!` will generate such exceptions.
 
 See *Interactors in the Controller*, below, for the recommended usage of `call` and `success?`.
 
@@ -102,7 +125,7 @@ A symbol argument can also be given, rather than a block.
 ```ruby
 before :zero_emails_sent
 
-def zero_email_sent
+def zero_emails_sent
   context.emails_sent = 0
 end
 ```
@@ -216,29 +239,6 @@ module InteractorTimer
   end
 end
 ```
-
-### An Example Interactor
-
-Your application could use an interactor to authenticate a user.
-
-```ruby
-class AuthenticateUser
-  include Interactor
-
-  def call
-    if user = User.authenticate(context.email, context.password)
-      context.user = user
-      context.token = user.secret_token
-    else
-      context.fail!(message: "authenticate_user.failure")
-    end
-  end
-end
-```
-
-To define an interactor, simply create a class that includes the `Interactor`
-module and give it a `call` instance method. The interactor can access its
-`context` from within `call`.
 
 ## Interactors in the Controller
 

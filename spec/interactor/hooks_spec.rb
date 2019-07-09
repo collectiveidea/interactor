@@ -43,7 +43,7 @@ module Interactor
           expect(hooked.process).to eq([
             :around_before,
             :process,
-            :around_after
+            :around_after,
           ])
         end
       end
@@ -63,7 +63,7 @@ module Interactor
           expect(hooked.process).to eq([
             :around_before,
             :process,
-            :around_after
+            :around_after,
           ])
         end
       end
@@ -93,7 +93,7 @@ module Interactor
             :around_before2,
             :process,
             :around_after2,
-            :around_after1
+            :around_after1,
           ])
         end
       end
@@ -125,7 +125,7 @@ module Interactor
             :around_before2,
             :process,
             :around_after2,
-            :around_after1
+            :around_after1,
           ])
         end
       end
@@ -146,7 +146,7 @@ module Interactor
         it "runs the before hook method" do
           expect(hooked.process).to eq([
             :before,
-            :process
+            :process,
           ])
         end
       end
@@ -163,7 +163,7 @@ module Interactor
         it "runs the before hook block" do
           expect(hooked.process).to eq([
             :before,
-            :process
+            :process,
           ])
         end
       end
@@ -187,7 +187,7 @@ module Interactor
           expect(hooked.process).to eq([
             :before1,
             :before2,
-            :process
+            :process,
           ])
         end
       end
@@ -213,7 +213,7 @@ module Interactor
           expect(hooked.process).to eq([
             :before1,
             :before2,
-            :process
+            :process,
           ])
         end
       end
@@ -234,7 +234,7 @@ module Interactor
         it "runs the after hook method" do
           expect(hooked.process).to eq([
             :process,
-            :after
+            :after,
           ])
         end
       end
@@ -251,7 +251,7 @@ module Interactor
         it "runs the after hook block" do
           expect(hooked.process).to eq([
             :process,
-            :after
+            :after,
           ])
         end
       end
@@ -275,7 +275,7 @@ module Interactor
           expect(hooked.process).to eq([
             :process,
             :after2,
-            :after1
+            :after1,
           ])
         end
       end
@@ -301,7 +301,7 @@ module Interactor
           expect(hooked.process).to eq([
             :process,
             :after2,
-            :after1
+            :after1,
           ])
         end
       end
@@ -349,7 +349,7 @@ module Interactor
             :after2,
             :after1,
             :around_after2,
-            :around_after1
+            :around_after1,
           ])
         end
       end
