@@ -15,3 +15,8 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
+
+.idea
+.vscode
+
+.ruby-gemset
