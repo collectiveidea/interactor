@@ -80,7 +80,7 @@ context.success? # => false
 
 Normally, however, these exceptions are not seen. In the recommended usage, the controller invokes the interactor using the class method `call`, then checks the `success?` method of the context.
 
-This works because the `call` class method swallows exceptions.  When unit testing an interactor, if calling custom business logic methods directly and bypassing `call`, be aware that `fail!` will generate such exceptions.
+This works because the `call` class method swallows these exceptions.  When unit testing an interactor, if calling custom business logic methods directly and bypassing `call`, be aware that `fail!` will generate such exceptions.
 
 See *Interactors in the Controller*, below, for the recommended usage of `call` and `success?`.
 
