@@ -1,0 +1,45 @@
+# This should always correspond to the required Ruby version specified in the
+# gemspec.
+AllCops:
+  TargetRubyVersion: 2.0
+
+# TODO: What should we do here?
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# Allow some style changes in the specs.
+AmbiguousBlockAssociation:
+  Exclude:
+    - spec/**/*
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+Metrics/ModuleLength:
+  Exclude:
+    - spec/**/*
+Style/BlockDelimiters:
+  Exclude:
+    - spec/**/*
+
+# Here, inconsistent indentation helps to understand tree nature of callbacks.
+Style/AlignArray:
+  Exclude:
+    - spec/integration_spec.rb
+
+# TODO: Remove when throw is used rather than raise in Interactor::Context.fail!
+Lint/HandleExceptions:
+  Exclude:
+    - lib/interactor.rb
+Style/RescueModifier:
+  Exclude:
+    - spec/**/*
+
+# These style conventions are personal preference.
+Style/EmptyMethod:
+  Enabled: false
+Style/IndentArray:
+  EnforcedStyle: consistent
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/SymbolArray:
+  Enabled: false

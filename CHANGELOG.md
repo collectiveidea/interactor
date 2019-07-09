@@ -1,7 +1,7 @@
-## 3.1.1 / 2018-05-30
+## 4.0.0 / Unreleased
 
-* [BUGFIX] Allow Context#fail! to accept a hash with string keys
-* [ENHANCEMENT] Many documentation updates
+* [ENHANCEMENT] Add support for Ruby 2.2
+* [ENHANCEMENT] Drop support for Ruby 1.9
 
 ## 3.1.0 / 2014-10-13
 

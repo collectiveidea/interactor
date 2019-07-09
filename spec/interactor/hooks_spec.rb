@@ -1,7 +1,7 @@
 module Interactor
   describe Hooks do
     describe "#with_hooks" do
-      def build_hooked(&block)
+      def build_hooked(&block) # rubocop:disable Metrics/MethodLength
         hooked = Class.new.send(:include, Interactor::Hooks)
 
         hooked.class_eval do
