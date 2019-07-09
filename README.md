@@ -6,6 +6,21 @@
 [![Test Coverage](https://img.shields.io/codeclimate/coverage-letter/collectiveidea/interactor.svg)](https://codeclimate.com/github/collectiveidea/interactor)
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/testdouble/standard)
 
+---
+
+This is a fork of https://github.com/collectiveidea/interactor.  
+The original repo seems to be lacking in activity and the maintainers have not responded to PR requests for sometime 
+(with some of the PRs going back to 2017!). 
+We needed this _so much_ to organise our code at Zomato, and since waiting was not an option, Vive la Open Source!
+
+Some of the pending PRs in the original have been merged here already:
+- thejspr:patch-1
+- joevandyk:patch-1
+ 
+If the original repo comes alive again, this one will be deprecated. :)
+
+---
+
 ## Getting Started
 
 Add Interactor to your Gemfile and `bundle install`.
