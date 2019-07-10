@@ -29,7 +29,7 @@ module Interactor
   #   context
   #   # => #<Interactor::Context foo="baz" hello="world">
 
-  module CommonContext
+  module ContextBehaviour
     module ClassMethods
       # Internal: Initialize an Interactor::Context or preserve an existing one.
       # If the argument given is an Interactor::Context, the argument is returned.
@@ -187,6 +187,6 @@ module Interactor
   end
 
   class Context < OpenStruct
-    include CommonContext
+    include ContextBehaviour
   end
 end

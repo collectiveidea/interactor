@@ -13,9 +13,11 @@ The original repo seems to be lacking in activity and the maintainers have not r
 (with some of the PRs going back to 2017!). 
 We needed this _so much_ to organise our code at Zomato, and since waiting was not an option, Vive la Open Source!
 
-Some of the pending PRs in the original have been merged here already:
-- thejspr:patch-1
-- joevandyk:patch-1
+Some of the pending PRs and branches in the original have been merged here already:
+- thejspr:patch-1 (https://github.com/collectiveidea/interactor/pull/158)
+- joevandyk:patch-1 (https://github.com/collectiveidea/interactor/pull/168)
+- v4
+- jonstokes:js-di-context (via local branch jonstokes-js-di-context) 
  
 If the original repo comes alive again, this one will be deprecated. :)
 
@@ -28,6 +30,8 @@ Add Interactor to your Gemfile and `bundle install`.
 ```ruby
 gem "interactor", "~> 4.0"
 ```
+
+---
 
 ## What is an Interactor?
 
@@ -60,6 +64,8 @@ To define an interactor, simply create a class that includes the `Interactor`
 module and give it a `call` instance method. The interactor can access its
 `context` from within `call`.
 
+---
+
 ### Context
 
 An interactor is given a *context*. The context contains everything the
@@ -69,11 +75,15 @@ When an interactor does its single purpose, it affects its given context.
 
 #### Adding to the Context
 
-As an interactor runs it can add information to the context.
+As an interactor runs it can add information to the context. 
 
 ```ruby
 context.user = user
 ```
+
+The context uses `OpenStruct` internally, so it may be slow for your use.
+Additionally a non existent method will return `nil`.  
+If this is inconvenient, You can override this with a PORO. _See ["Custom Context"](#custom-context)_.
 
 #### Failing the Context
 
@@ -121,6 +131,28 @@ Normally, however, these exceptions are not seen. In the recommended usage, the 
 This works because the `call` class method swallows these exceptions.  When unit testing an interactor, if calling custom business logic methods directly and bypassing `call`, be aware that `fail!` will generate such exceptions.
 
 See *Interactors in the Controller*, below, for the recommended usage of `call` and `success?`.
+
+#### Custom Context
+
+You can also use a custom context class using the class method `:with_context_class`.
+
+```ruby
+class MyContext
+  include Interactor::ContextBehaviour  # include this to get the default context behaviour
+  
+  # custom behaviour here
+end
+
+class AuthenticateUser
+  include Interactor
+  
+  with_context_class MyContext
+   
+   # interactor behaviour here
+end
+```
+
+---
 
 ### Hooks
 
@@ -255,6 +287,8 @@ module InteractorTimer
 end
 ```
 
+---
+
 ## Interactors in the Controller
 
 Most of the time, your application will use its interactors from its
@@ -338,6 +372,8 @@ end
 For such a simple use case, using an interactor can actually require *more*
 code. So why use an interactor?
 
+---
+
 ### Clarity
 
 [We](http://collectiveidea.com) often use interactors right off the bat for all
@@ -383,6 +419,8 @@ If instead you use an interactor right away, as responsibilities are added, your
 controller (and its tests) change very little or not at all. Choosing the right
 kind of interactor can also prevent simply shifting those added responsibilities
 to the interactor.
+
+---
 
 ## Kinds of Interactors
 

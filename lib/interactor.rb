@@ -76,7 +76,9 @@ module Interactor
       new(context).tap(&:run!).context
     end
 
-    def context_with(klass)
+    # Public: Sets the context class to use instead of the default "Interactor::Context" class.
+    # This is useful if you want to set a more lightweight context object, or one with specialized behaviour.
+    def with_context_class(klass)
       @context_class = klass
     end
 
