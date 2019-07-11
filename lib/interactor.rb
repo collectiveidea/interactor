@@ -75,6 +75,16 @@ module Interactor
     def call!(context = {})
       new(context).tap(&:run!).context
     end
+
+    # Public: Sets the context class to use instead of the default "Interactor::Context" class.
+    # This is useful if you want to set a more lightweight context object, or one with specialized behaviour.
+    def with_context_class(klass)
+      @context_class = klass
+    end
+
+    def context_class
+      @context_class
+    end
   end
 
   # Internal: Initialize an Interactor.
@@ -91,7 +101,21 @@ module Interactor
   #   MyInteractor.new
   #   # => #<MyInteractor @context=#<Interactor::Context>>
   def initialize(context = {})
-    @context = Context.build(context)
+    @context = new_context(context)
+  end
+
+  def new_context(context)
+    if context_class
+      context_class.build(context)
+    elsif context.class.respond_to?(:build)
+      context.class.build(context)
+    else
+      Context.build(context)
+    end
+  end
+
+  def context_class
+    self.class.context_class
   end
 
   # Internal: Invoke an interactor instance along with all defined hooks. The
