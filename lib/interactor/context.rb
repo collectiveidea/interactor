@@ -128,7 +128,7 @@ module Interactor
     #
     # Raises Interactor::Failure initialized with the Interactor::Context.
     def fail!(context = {})
-      context.each { |key, value| modifiable[key.to_sym] = value }
+      context.each { |key, value| self[key.to_sym] = value }
       @failure = true
       raise Failure, self
     end
@@ -188,5 +188,31 @@ module Interactor
 
   class Context < OpenStruct
     include ContextBehaviour
+  end
+
+  class StrictContext < Context
+    def method_missing(mid, *args) # :nodoc:
+      len = args.length
+      if mname = mid[/.*(?==\z)/m]
+        if len != 1
+          raise ArgumentError, "wrong number of arguments (#{len} for 1)", caller(1)
+        end
+        modifiable?[new_ostruct_member!(mname)] = args[0]
+      elsif len == 0 # and /\A[a-z_]\w*\z/ =~ mid #
+        if @table.key?(mid)
+          new_ostruct_member!(mid) unless frozen?
+          @table[mid]
+        else
+          raise NoMethodError, "undefined method `#{mid}'"
+        end
+      else
+        begin
+          super
+        rescue NoMethodError => err
+          err.backtrace.shift
+          raise
+        end
+      end
+    end
   end
 end

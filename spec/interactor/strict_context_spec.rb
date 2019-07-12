@@ -1,25 +1,25 @@
 module Interactor
-  describe Context do
+  describe StrictContext do
     describe ".build" do
       it "converts the given hash to a context" do
-        context = Context.build(foo: "bar")
+        context = StrictContext.build(foo: "bar")
 
-        expect(context).to be_a(Context)
+        expect(context).to be_a(StrictContext)
         expect(context.foo).to eq("bar")
       end
 
       it "builds an empty context if no hash is given" do
-        context = Context.build
+        context = StrictContext.build
 
-        expect(context).to be_a(Context)
+        expect(context).to be_a(StrictContext)
         expect(context.send(:table)).to eq({})
       end
 
       it "doesn't affect the original hash" do
         hash = {foo: "bar"}
-        context = Context.build(hash)
+        context = StrictContext.build(hash)
 
-        expect(context).to be_a(Context)
+        expect(context).to be_a(StrictContext)
         expect {
           context.foo = "baz"
         }.not_to change {
@@ -27,22 +27,22 @@ module Interactor
         }
       end
 
-      it "returns nil when the attribute is not defined in the context" do
-        context = Context.build
+      it "raises NoMethodError when the attribute is not defined in the context" do
+        context = StrictContext.build
 
-        expect(context).to be_a(Context)
-        expect(context.foo).to eq(nil)
+        expect(context).to be_a(StrictContext)
+        expect { context.foo }.to raise_error(NoMethodError, "undefined method `foo'")
 
-        context = Context.build(foo: "bar")
-        expect(context).to be_a(Context)
-        expect(context.bar).to eq(nil)
+        context = StrictContext.build(foo: "bar")
+        expect(context).to be_a(StrictContext)
+        expect { context.bar }.to raise_error(NoMethodError, "undefined method `bar'")
       end
 
       it "preserves an already built context" do
-        context1 = Context.build(foo: "bar")
-        context2 = Context.build(context1)
+        context1 = StrictContext.build(foo: "bar")
+        context2 = StrictContext.build(context1)
 
-        expect(context2).to be_a(Context)
+        expect(context2).to be_a(StrictContext)
         expect {
           context2.foo = "baz"
         }.to change {
@@ -52,7 +52,7 @@ module Interactor
     end
 
     describe "#success?" do
-      let(:context) { Context.build }
+      let(:context) { StrictContext.build }
 
       it "is true by default" do
         expect(context.success?).to eq(true)
@@ -60,7 +60,7 @@ module Interactor
     end
 
     describe "#failure?" do
-      let(:context) { Context.build }
+      let(:context) { StrictContext.build }
 
       it "is false by default" do
         expect(context.failure?).to eq(false)
@@ -68,7 +68,7 @@ module Interactor
     end
 
     describe "#fail!" do
-      let(:context) { Context.build(foo: "bar") }
+      let(:context) { StrictContext.build(foo: "bar") }
 
       it "sets success to false" do
         expect {
@@ -164,7 +164,7 @@ module Interactor
     end
 
     describe "#called!" do
-      let(:context) { Context.build }
+      let(:context) { StrictContext.build }
       let(:instance1) { double(:instance1) }
       let(:instance2) { double(:instance2) }
 
@@ -179,7 +179,7 @@ module Interactor
     end
 
     describe "#rollback!" do
-      let(:context) { Context.build }
+      let(:context) { StrictContext.build }
       let(:instance1) { double(:instance1) }
       let(:instance2) { double(:instance2) }
 
@@ -204,7 +204,7 @@ module Interactor
     end
 
     describe "#_called" do
-      let(:context) { Context.build }
+      let(:context) { StrictContext.build }
 
       it "is empty by default" do
         expect(context._called).to eq([])
