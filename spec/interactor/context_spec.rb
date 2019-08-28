@@ -220,7 +220,7 @@ module Interactor
           end
 
           def to_h
-            { foo: foo }
+            {foo: foo}
           end
         end
       end
