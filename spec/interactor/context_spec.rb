@@ -1,25 +1,18 @@
 module Interactor
-  describe Context do
+  shared_examples "context" do
     describe ".build" do
       it "converts the given hash to a context" do
-        context = Context.build(foo: "bar")
+        context = context_class.build(foo: "bar")
 
-        expect(context).to be_a(Context)
+        expect(context).to be_a(context_class)
         expect(context.foo).to eq("bar")
-      end
-
-      it "builds an empty context if no hash is given" do
-        context = Context.build
-
-        expect(context).to be_a(Context)
-        expect(context.send(:table)).to eq({})
       end
 
       it "doesn't affect the original hash" do
         hash = {foo: "bar"}
-        context = Context.build(hash)
+        context = context_class.build(hash)
 
-        expect(context).to be_a(Context)
+        expect(context).to be_a(context_class)
         expect {
           context.foo = "baz"
         }.not_to change {
@@ -28,10 +21,10 @@ module Interactor
       end
 
       it "preserves an already built context" do
-        context1 = Context.build(foo: "bar")
-        context2 = Context.build(context1)
+        context1 = context_class.build(foo: "bar")
+        context2 = context_class.build(context1)
 
-        expect(context2).to be_a(Context)
+        expect(context2).to be_a(context_class)
         expect {
           context2.foo = "baz"
         }.to change {
@@ -41,7 +34,7 @@ module Interactor
     end
 
     describe "#success?" do
-      let(:context) { Context.build }
+      let(:context) { context_class.build }
 
       it "is true by default" do
         expect(context.success?).to eq(true)
@@ -49,7 +42,7 @@ module Interactor
     end
 
     describe "#failure?" do
-      let(:context) { Context.build }
+      let(:context) { context_class.build }
 
       it "is false by default" do
         expect(context.failure?).to eq(false)
@@ -57,7 +50,7 @@ module Interactor
     end
 
     describe "#fail!" do
-      let(:context) { Context.build(foo: "bar") }
+      let(:context) { context_class.build(foo: "bar") }
 
       it "sets success to false" do
         expect {
@@ -153,7 +146,7 @@ module Interactor
     end
 
     describe "#called!" do
-      let(:context) { Context.build }
+      let(:context) { context_class.build }
       let(:instance1) { double(:instance1) }
       let(:instance2) { double(:instance2) }
 
@@ -168,7 +161,7 @@ module Interactor
     end
 
     describe "#rollback!" do
-      let(:context) { Context.build }
+      let(:context) { context_class.build }
       let(:instance1) { double(:instance1) }
       let(:instance2) { double(:instance2) }
 
@@ -193,10 +186,50 @@ module Interactor
     end
 
     describe "#_called" do
-      let(:context) { Context.build }
+      let(:context) { context_class.build }
 
       it "is empty by default" do
         expect(context._called).to eq([])
+      end
+    end
+  end
+
+  describe Context do
+    it_behaves_like "context" do
+      let(:context_class) { Context }
+
+      it "builds an empty context if no hash is given" do
+        context = context_class.build
+
+        expect(context).to be_a(context_class)
+        expect(context.send(:table)).to eq({})
+      end
+    end
+  end
+
+  describe "Overwriting Context" do
+    it_behaves_like "context" do
+      let(:context_class) do
+        Class.new do
+          include Context::Mixin
+
+          attr_accessor :foo
+
+          def initialize(foo: nil)
+            @foo = foo
+          end
+
+          def to_h
+            { foo: foo }
+          end
+        end
+      end
+
+      it "builds the default context if no hash is given" do
+        context = context_class.build
+
+        expect(context).to be_a(context_class)
+        expect(context.to_h).to eq(foo: nil)
       end
     end
   end
