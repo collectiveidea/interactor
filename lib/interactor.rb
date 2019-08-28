@@ -75,6 +75,14 @@ module Interactor
     def call!(context = {})
       new(context).tap(&:run!).context
     end
+
+    def context_class
+      @context_class || Interactor::Context
+    end
+
+    def context_class=(klass)
+      @context_class = klass
+    end
   end
 
   # Internal: Initialize an Interactor.
@@ -91,7 +99,7 @@ module Interactor
   #   MyInteractor.new
   #   # => #<MyInteractor @context=#<Interactor::Context>>
   def initialize(context = {})
-    @context = Context.build(context)
+    @context = self.class.context_class.build(context)
   end
 
   # Internal: Invoke an interactor instance along with all defined hooks. The
