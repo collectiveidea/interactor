@@ -29,23 +29,27 @@ module Interactor
   #   context
   #   # => #<Interactor::Context foo="baz" hello="world">
   class Context < OpenStruct
+    # Public: The default mixin any Context implementation should use
     module Mixin
       def self.included(receiver)
         receiver.extend         ClassMethods
         receiver.send :include, InstanceMethods
       end
 
+      # Internal: Context class methods.
       module ClassMethods
-        # Internal: Initialize an Interactor::Context or preserve an existing one.
-        # If the argument given is an Interactor::Context, the argument is returned.
-        # Otherwise, a new Interactor::Context is initialized from the provided
-        # hash.
+        # Internal: Initialize an Interactor::Context or preserve an existing
+        # one.
+        # If the argument given is an Interactor::Context, the argument is
+        # returned. Otherwise, a new Interactor::Context is initialized from
+        # the provided hash.
         #
         # The "build" method is used during interactor initialization.
         #
         # context - A Hash whose key/value pairs are used in initializing a new
-        #           Interactor::Context object. If an existing Interactor::Context
-        #           is given, it is simply returned. (default: {})
+        #           Interactor::Context object. If an existing
+        #           Interactor::Context is given, it is simply returned.
+        #           (default: {})
         #
         # Examples
         #
@@ -64,9 +68,10 @@ module Interactor
         end
       end
 
+      # Internal: Context instance methods.
       module InstanceMethods
-        # Public: Whether the Interactor::Context is successful. By default, a new
-        # context is successful and only changes when explicitly failed.
+        # Public: Whether the Interactor::Context is successful. By default, a
+        # new context is successful and only changes when explicitly failed.
         #
         # The "success?" method is the inverse of the "failure?" method.
         #
@@ -107,12 +112,12 @@ module Interactor
           @failure || false
         end
 
-        # Public: Fail the Interactor::Context. Failing a context raises an error
-        # that may be rescued by the calling interactor. The context is also flagged
-        # as having failed.
+        # Public: Fail the Interactor::Context. Failing a context raises an
+        # error that may be rescued by the calling interactor. The context is
+        # also flagged as having failed.
         #
-        # Optionally the caller may provide a hash of key/value pairs to be merged
-        # into the context before failure.
+        # Optionally the caller may provide a hash of key/value pairs to be
+        # merged into the context before failure.
         #
         # context - A Hash whose key/value pairs are merged into the existing
         #           Interactor::Context instance. (default: {})
@@ -130,15 +135,15 @@ module Interactor
         #
         # Raises Interactor::Failure initialized with the Interactor::Context.
         def fail!(context = {})
-          context.each { |key, value| self.send("#{key}=", value) }
+          context.each { |key, value| send("#{key}=", value) }
           @failure = true
           raise Failure, self
         end
 
-        # Internal: Track that an Interactor has been called. The "called!" method
-        # is used by the interactor being invoked with this context. After an
-        # interactor is successfully called, the interactor instance is tracked in
-        # the context for the purpose of potential future rollback.
+        # Internal: Track that an Interactor has been called. The "called!"
+        # method is used by the interactor being invoked with this context.
+        # After an interactor is successfully called, the interactor instance is
+        # tracked in the context for the purpose of potential future rollback.
         #
         # interactor - An Interactor instance that has been successfully called.
         #
@@ -147,9 +152,10 @@ module Interactor
           _called << interactor
         end
 
-        # Public: Roll back the Interactor::Context. Any interactors to which this
-        # context has been passed and which have been successfully called are asked
-        # to roll themselves back by invoking their "rollback" instance methods.
+        # Public: Roll back the Interactor::Context. Any interactors to which
+        # this context has been passed and which have been successfully called
+        # are asked to roll themselves back by invoking their "rollback"
+        # instance methods.
         #
         # Examples
         #
@@ -160,7 +166,8 @@ module Interactor
         #   context
         #   # => #<Interactor::Context foo="bar">
         #
-        # Returns true if rolled back successfully or false if already rolled back.
+        # Returns true if rolled back successfully or false if already rolled
+        # back.
         def rollback!
           return false if @rolled_back
           _called.reverse_each(&:rollback)
