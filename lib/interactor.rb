@@ -22,6 +22,10 @@ module Interactor
       extend ClassMethods
       include Hooks
 
+      class << self
+        attr_accessor :exception_classes
+        attr_accessor :exception_handler
+      end
       # Public: Gets the Interactor::Context of the Interactor instance.
       attr_reader :context
     end
@@ -29,6 +33,11 @@ module Interactor
 
   # Internal: Interactor class methods.
   module ClassMethods
+    def fail_on_exeption(*exception_classes, exception_handler: nil)
+      @exception_classes = exception_classes
+      @exception_handler = exception_handler
+    end
+
     # Public: Invoke an Interactor. This is the primary public API method to an
     # interactor.
     #
@@ -140,8 +149,13 @@ module Interactor
   # Raises Interactor::Failure if the context is failed.
   def run!
     with_hooks do
-      call
-      context.called!(self)
+      begin
+        call
+        context.called!(self)
+      rescue *self.class.exception_classes => e
+        self.class.exception_handler&.call(e)
+        context.fail!(error: e)
+      end
     end
   rescue
     context.rollback!
