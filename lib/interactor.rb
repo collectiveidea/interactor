@@ -22,9 +22,11 @@ module Interactor
       extend ClassMethods
       include Hooks
 
+      # Internal: Expose instance variables of Interactor instance metaclass
+      # for reading.
       class << self
-        attr_accessor :exception_classes
-        attr_accessor :exception_handler
+        attr_reader :exception_classes
+        attr_reader :exception_handlers
       end
       # Public: Gets the Interactor::Context of the Interactor instance.
       attr_reader :context
@@ -33,9 +35,57 @@ module Interactor
 
   # Internal: Interactor class methods.
   module ClassMethods
-    def fail_on_exeption(*exception_classes, exception_handler: nil)
-      @exception_classes = exception_classes
-      @exception_handler = exception_handler
+    # Public: Specify exception classes that should result in failing context
+    # and provide a custom logic on rescued exception before failing. Failing
+    # the context is raising Interactor::Failure, this exception is silently
+    # swallowed by the interactor. Note that any code after failing the context
+    # will not be evaluated.
+    #
+    # Examples
+    #   class MyInteractor
+    #     include Interactor
+    #
+    #     fail_on_exception StandardErro
+    #     fail_on_exception NameError, NoMethodError
+    #
+    #     exception_handler = ->(e) { ErrorLogger.log(e) }
+    #
+    #     fail_on_exception MyBespokeError, exception_handler: exception_handler
+    #
+    #     def call
+    #       exception_raising_logic
+    #     end
+    #   end
+    #
+    #   MyInteractor.call
+    #   # => #<Interactor::Context error=#<NameError: undefined local variable
+    #   or method `method_raising_exception' for
+    #   #<MyInteractor:0x0000000003d17330> Did you mean?  method_missing>>
+    #
+    #   MyInteractor.call.success?
+    #   # => false
+    #
+    #   Returned context holds the rescued exception object
+    #
+    #   MyInteractor.call.error.class.name
+    #   # => "NameError"
+    #
+    #   Method accepts object representing exception classes of any type that
+    #   will respond to #to_s and return string, as an argument to
+    #   Kernel.const_get will result in previously initialized constant.
+    #   e.g. constant, symbol, string...
+
+    def fail_on_exception(*exceptions_to_fail_on, exception_handler: ->(e) {})
+      exceptions_to_fail_on = exceptions_to_fail_on.each do |it|
+        Kernel.const_get(it.to_s)
+      end
+      @exception_classes = Array(exception_classes) | exceptions_to_fail_on
+      return unless exception_handler
+      exceptions_to_fail_on.each do |exception_class|
+        @exception_handlers = Hash(exception_handlers).update(
+          exception_class.name.to_sym => exception_handler
+        )
+      end
     end
 
     # Public: Invoke an Interactor. This is the primary public API method to an
@@ -153,7 +203,7 @@ module Interactor
         call
         context.called!(self)
       rescue *self.class.exception_classes => e
-        self.class.exception_handler&.call(e)
+        self.class.exception_handlers[e.class.name.to_sym]&.call(e)
         context.fail!(error: e)
       end
     end
