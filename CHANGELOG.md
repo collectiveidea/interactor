@@ -1,3 +1,6 @@
+## 3.1.2 / 2019-12-29
+* [BUGFIX] Fix Context#fail! on Ruby 2.7
+
 ## 3.1.1 / 2018-05-30
 
 * [BUGFIX] Allow Context#fail! to accept a hash with string keys
