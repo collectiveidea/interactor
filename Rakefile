@@ -4,4 +4,4 @@ require "standard/rake"
 
 RSpec::Core::RakeTask.new(:spec)
 
-task default: [:standard, :spec]
+task default: [:spec, :standard]
