@@ -127,6 +127,11 @@ module Interactor
         hooks.each { |hook| after_hooks.unshift(hook) }
       end
 
+      def ensure_hook(*hooks, &block)
+        hooks << block if block
+        hooks.each { |hook| ensure_hooks.push(hook) }
+      end
+
       # Internal: An Array of declared hooks to run around Interactor
       # invocation. The hooks appear in the order in which they will be run.
       #
@@ -183,6 +188,10 @@ module Interactor
       def after_hooks
         @after_hooks ||= []
       end
+
+      def ensure_hooks
+        @ensure_hooks ||= []
+      end
     end
 
     private
@@ -213,6 +222,8 @@ module Interactor
         yield
         run_after_hooks
       end
+    ensure
+      run_ensure_hooks
     end
 
     # Internal: Run around hooks.
@@ -236,6 +247,10 @@ module Interactor
     # Returns nothing.
     def run_after_hooks
       run_hooks(self.class.after_hooks)
+    end
+
+    def run_ensure_hooks
+      run_hooks(self.class.ensure_hooks)
     end
 
     # Internal: Run a colection of hooks. The "run_hooks" method is the common
