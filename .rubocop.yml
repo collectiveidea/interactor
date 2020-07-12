@@ -22,12 +22,12 @@ Style/BlockDelimiters:
     - spec/**/*
 
 # Here, inconsistent indentation helps to understand tree nature of callbacks.
-Style/AlignArray:
+Layout/ArrayAlignment:
   Exclude:
     - spec/integration_spec.rb
 
 # TODO: Remove when throw is used rather than raise in Interactor::Context.fail!
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Exclude:
     - lib/interactor.rb
 Style/RescueModifier:
@@ -37,7 +37,7 @@ Style/RescueModifier:
 # These style conventions are personal preference.
 Style/EmptyMethod:
   Enabled: false
-Style/IndentArray:
+Layout/IndentArray:
   EnforcedStyle: consistent
 Style/StringLiterals:
   EnforcedStyle: double_quotes
