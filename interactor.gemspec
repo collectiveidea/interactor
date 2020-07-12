@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
 
   spec.test_files = spec.files.grep(/^spec/)
 
-  spec.required_ruby_version = ">= 2.0"
+  spec.required_ruby_version = ">= 2.5"
 
   spec.add_development_dependency "rake", "~> 13.0"
 end

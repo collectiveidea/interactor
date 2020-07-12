@@ -10,9 +10,6 @@ cache: bundler
 language: ruby
 matrix:
   allow_failures:
-    - rvm: "2.0"
-    - rvm: "2.1"
-    - rvm: "2.2"
     - rvm: ruby-head
 notifications:
   webhooks:
@@ -20,11 +17,6 @@ notifications:
     urls:
       - http://buildlight.collectiveidea.com/
 rvm:
-  - "2.0"
-  - "2.1"
-  - "2.2"
-  - "2.3"
-  - "2.4"
   - "2.5"
   - "2.6"
   - "2.7"
