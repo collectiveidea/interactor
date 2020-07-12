@@ -53,7 +53,7 @@ module Interactor
     #
     # Returns the Interactor::Context.
     def self.build(context = {})
-      self === context ? context : new(context)
+      context.is_a?(Context) ? context : new(context)
     end
 
     # Public: Whether the Interactor::Context is successful. By default, a new

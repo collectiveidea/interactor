@@ -1,3 +1,7 @@
+## 4.0.0 / Unreleased
+
+* [ENHANCEMENT] Drop support for all EOL Ruby versions (< 2.5)
+
 ## 3.1.2 / 2019-12-29
 * [BUGFIX] Fix Context#fail! on Ruby 2.7
 

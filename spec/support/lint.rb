@@ -43,7 +43,8 @@ shared_examples :lint do
     let(:context) { double(:context) }
 
     it "initializes a context" do
-      expect(Interactor::Context).to receive(:build).once.with(foo: "bar") { context }
+      expect(Interactor::Context).to receive(:build)
+        .once.with(foo: "bar") { context }
 
       instance = interactor.new(foo: "bar")
 

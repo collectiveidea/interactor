@@ -11,7 +11,7 @@
 Add Interactor to your Gemfile and `bundle install`.
 
 ```ruby
-gem "interactor", "~> 3.0"
+gem "interactor", "~> 4.0"
 ```
 
 ## What is an Interactor?
