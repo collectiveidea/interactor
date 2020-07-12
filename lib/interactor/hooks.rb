@@ -219,9 +219,9 @@ module Interactor
     #
     # Returns nothing.
     def run_around_hooks(&block)
-      self.class.around_hooks.reverse.inject(block) do |chain, hook|
+      self.class.around_hooks.reverse.inject(block) { |chain, hook|
         proc { run_hook(hook, chain) }
-      end.call
+      }.call
     end
 
     # Internal: Run before hooks.

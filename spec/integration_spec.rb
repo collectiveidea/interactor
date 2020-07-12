@@ -323,7 +323,7 @@ describe "Integration" do
         :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
         :after4, :around_after4,
         :around_before5, :before5, :call5, :after5, :around_after5,
-        :after, :around_after,
+        :after, :around_after
       ])
     end
   end
@@ -427,7 +427,7 @@ describe "Integration" do
       }.to change {
         context.steps
       }.from([]).to([
-        :around_before,
+        :around_before
       ])
     end
   end
@@ -463,7 +463,7 @@ describe "Integration" do
       }.to change {
         context.steps
       }.from([]).to([
-        :around_before,
+        :around_before
       ])
     end
 
@@ -521,7 +521,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -577,7 +577,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -636,7 +636,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -693,7 +693,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -746,7 +746,7 @@ describe "Integration" do
         :after2, :around_after2,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -797,7 +797,7 @@ describe "Integration" do
         :after2, :around_after2,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -851,7 +851,7 @@ describe "Integration" do
         :around_before3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -903,7 +903,7 @@ describe "Integration" do
         :around_before3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -957,7 +957,7 @@ describe "Integration" do
         :around_before3, :before3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -1009,7 +1009,7 @@ describe "Integration" do
         :around_before3, :before3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -1064,7 +1064,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -1117,7 +1117,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -1172,7 +1172,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -1225,7 +1225,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -1283,7 +1283,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -1339,7 +1339,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -1398,7 +1398,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -1455,7 +1455,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -1514,7 +1514,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -1571,7 +1571,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -1631,7 +1631,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -1689,7 +1689,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -1749,7 +1749,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
   end
@@ -1807,7 +1807,7 @@ describe "Integration" do
         :rollback3,
         :rollback2c,
         :rollback2b,
-        :rollback2a,
+        :rollback2a
       ])
     end
 
@@ -1829,15 +1829,15 @@ describe "Integration" do
         context.steps
       }.from([]).to([
         :around_before2, :before2,
-          :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
-          :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
-          :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
+        :around_before2a, :before2a, :call2a, :after2a, :around_after2a,
+        :around_before2b, :before2b, :call2b, :after2b, :around_after2b,
+        :around_before2c, :before2c, :call2c, :after2c, :around_after2c,
         :after2, :around_after2,
         :around_before3, :before3, :call3, :after3, :around_after3,
         :around_before4, :before4,
-          :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
-          :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
-          :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
+        :around_before4a, :before4a, :call4a, :after4a, :around_after4a,
+        :around_before4b, :before4b, :call4b, :after4b, :around_after4b,
+        :around_before4c, :before4c, :call4c, :after4c, :around_after4c,
         :after4, :around_after4,
         :around_before5, :before5, :call5, :after5, :around_after5
       ])

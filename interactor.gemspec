@@ -1,7 +1,7 @@
 require "English"
 
 Gem::Specification.new do |spec|
-  spec.name    = "interactor"
+  spec.name = "interactor"
   spec.version = "4.0.0"
 
   spec.author = "Collective Idea"
