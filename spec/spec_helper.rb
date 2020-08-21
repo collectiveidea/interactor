@@ -4,6 +4,5 @@ if ENV["CODECLIMATE_REPO_TOKEN"]
 end
 
 require "interactor"
-require "base_interactor"
 
 Dir[File.expand_path("../support/*.rb", __FILE__)].each { |f| require f }

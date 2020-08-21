@@ -1,8 +1,7 @@
-describe BaseInteractor do
+describe Interactor::BaseInteractor do
   let(:mock_class) do
     Class.new do
       include Interactor
-      include BaseInteractor
 
       requires :argument_1, :argument_2
     end
