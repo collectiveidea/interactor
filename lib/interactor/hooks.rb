@@ -144,7 +144,7 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def around_hooks
-        internal_around_hooks + ancestor_around_hooks
+        internal_around_hooks + ancestor_hooks(:around_hooks)
       end
 
       # Internal: An Array of declared hooks to run before Interactor
@@ -164,7 +164,7 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def before_hooks
-        internal_before_hooks + ancestor_before_hooks
+        internal_before_hooks + ancestor_hooks(:before_hooks)
       end
 
       # Internal: An Array of declared hooks to run after Interactor
@@ -184,8 +184,10 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def after_hooks
-        ancestor_after_hooks + internal_after_hooks
+        ancestor_hooks(:after_hooks) + internal_after_hooks
       end
+
+      private
 
       # Internal: An Array of declared hooks to run around Interactor
       # invocation. The hooks appear in the order in which they will be run.
@@ -244,81 +246,13 @@ module Interactor
         @internal_after_hooks ||= []
       end
 
-      # Internal: An Array of around hooks declared in ancestors.
-      # The hooks appear in the order in which they will be run.
-      #
-      # Examples
-      #
-      #   class MyParentInteractor
-      #     include Interactor
-      #
-      #     around :time_execution, :use_transaction
-      #   end
-      #
-      #   class MyChildInteractor < MyParentInteractor
-      #   end
-      #
-      #   MyChildInteractor.ancestor_around_hooks
-      #   # => [:time_execution, :use_transaction]
-      #
-      # Returns an Array of Symbols and Procs.
-      def ancestor_around_hooks
-        ancestor_hooks(:around_hooks)
-      end
-
-      # Internal: An Array of before hooks declared in ancestors.
-      # The hooks appear in the order in which they will be run.
-      #
-      # Examples
-      #
-      #   class MyParentInteractor
-      #     include Interactor
-      #
-      #     before :set_finish_time, :say_goodbye
-      #   end
-      #
-      #   class MyChildInteractor < MyParentInteractor
-      #   end
-      #
-      #   MyChildInteractor.ancestor_before_hooks
-      #   # => [:set_finish_time, :say_goodbye]
-      #
-      # Returns an Array of Symbols and Procs.
-      def ancestor_before_hooks
-        ancestor_hooks(:before_hooks)
-      end
-
-      # Internal: An Array of after hooks declared in ancestors.
-      # The hooks appear in the order in which they will be run.
-      #
-      # Examples
-      #
-      #   class MyParentInteractor
-      #     include Interactor
-      #
-      #     after :set_finish_time, :say_goodbye
-      #   end
-      #
-      #   class MyChildInteractor < MyParentInteractor
-      #   end
-      #
-      #   MyChildInteractor.ancestor_after_hooks
-      #   # => [:say_goodbye, :set_finish_time]
-      #
-      # Returns an Array of Symbols and Procs.
-      def ancestor_after_hooks
-        ancestor_hooks(:after_hooks)
-      end
-
-      private
-
       # Internal: Fetches hooks declared in the ancestor.
       #
       # name - A Symbol corresponding to the hook method in the ancestor.
       #
       # Returns an Array of Symbols and Procs.
-      def ancestor_hooks(name)
-        superclass&.respond_to?(name) ? superclass.send(name) : []
+      def ancestor_hooks(hook)
+        superclass&.respond_to?(hook) ? superclass.send(hook) : []
       end
     end
 
