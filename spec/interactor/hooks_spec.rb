@@ -43,7 +43,7 @@ module Interactor
           expect(hooked.process).to eq([
             :around_before,
             :process,
-            :around_after,
+            :around_after
           ])
         end
       end
@@ -63,7 +63,7 @@ module Interactor
           expect(hooked.process).to eq([
             :around_before,
             :process,
-            :around_after,
+            :around_after
           ])
         end
       end
@@ -93,7 +93,7 @@ module Interactor
             :around_before2,
             :process,
             :around_after2,
-            :around_after1,
+            :around_after1
           ])
         end
       end
@@ -125,7 +125,7 @@ module Interactor
             :around_before2,
             :process,
             :around_after2,
-            :around_after1,
+            :around_after1
           ])
         end
       end
@@ -146,7 +146,7 @@ module Interactor
         it "runs the before hook method" do
           expect(hooked.process).to eq([
             :before,
-            :process,
+            :process
           ])
         end
       end
@@ -163,7 +163,7 @@ module Interactor
         it "runs the before hook block" do
           expect(hooked.process).to eq([
             :before,
-            :process,
+            :process
           ])
         end
       end
@@ -187,7 +187,7 @@ module Interactor
           expect(hooked.process).to eq([
             :before1,
             :before2,
-            :process,
+            :process
           ])
         end
       end
@@ -213,7 +213,7 @@ module Interactor
           expect(hooked.process).to eq([
             :before1,
             :before2,
-            :process,
+            :process
           ])
         end
       end
@@ -234,7 +234,7 @@ module Interactor
         it "runs the after hook method" do
           expect(hooked.process).to eq([
             :process,
-            :after,
+            :after
           ])
         end
       end
@@ -251,7 +251,7 @@ module Interactor
         it "runs the after hook block" do
           expect(hooked.process).to eq([
             :process,
-            :after,
+            :after
           ])
         end
       end
@@ -275,7 +275,7 @@ module Interactor
           expect(hooked.process).to eq([
             :process,
             :after2,
-            :after1,
+            :after1
           ])
         end
       end
@@ -301,7 +301,7 @@ module Interactor
           expect(hooked.process).to eq([
             :process,
             :after2,
-            :after1,
+            :after1
           ])
         end
       end
@@ -349,8 +349,112 @@ module Interactor
             :after2,
             :after1,
             :around_after2,
-            :around_after1,
+            :around_after1
           ])
+        end
+      end
+
+      context "with inheritance" do
+        context "with multiple ancestors" do
+          let(:ancestor_top) {
+            build_hooked do
+              around do |interactor|
+                steps << :around_before_ancestor_top
+                interactor.call
+                steps << :around_after_ancestor_top
+              end
+
+              before do
+                steps << :before_ancestor_top
+              end
+
+              after do
+                steps << :after_ancestor_top
+              end
+            end
+          }
+
+          let(:ancestor) {
+            Class.new(ancestor_top) do
+              around do |interactor|
+                steps << :around_before_ancestor
+                interactor.call
+                steps << :around_after_ancestor
+              end
+
+              before do
+                steps << :before_ancestor
+              end
+
+              after do
+                steps << :after_ancestor
+              end
+            end
+          }
+
+          let(:hooked) {
+            Class.new(ancestor) do
+              around do |interactor|
+                steps << :around_before
+                interactor.call
+                steps << :around_after
+              end
+
+              before do
+                steps << :before
+              end
+
+              after do
+                steps << :after
+              end
+            end
+          }
+
+          it "runs hooks defined in ancestors" do
+            expect(hooked.process).to eq([
+              :around_before,
+              :around_before_ancestor,
+              :around_before_ancestor_top,
+              :before,
+              :before_ancestor,
+              :before_ancestor_top,
+              :process,
+              :after_ancestor_top,
+              :after_ancestor,
+              :after,
+              :around_after_ancestor_top,
+              :around_after_ancestor,
+              :around_after
+            ])
+          end
+        end
+
+        describe "with hooks added to ancestors at runtime" do
+          let(:ancestor) {
+            build_hooked do
+              before do
+                steps << :before_at_parse
+              end
+            end
+          }
+
+          let(:hooked) {
+            Class.new(ancestor)
+          }
+
+          before do
+            ancestor.before do
+              steps << :before_at_runtime
+            end
+          end
+
+          it "runs hooks defined in ancestors" do
+            expect(hooked.process).to eq([
+              :before_at_parse,
+              :before_at_runtime,
+              :process
+            ])
+          end
         end
       end
     end
