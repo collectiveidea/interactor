@@ -318,7 +318,7 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def ancestor_hooks(name)
-        superclass && superclass.respond_to?(name) ? superclass.send(name) : []
+        superclass&.respond_to?(name) ? superclass.send(name) : []
       end
     end
 
