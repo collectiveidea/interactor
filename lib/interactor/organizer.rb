@@ -8,7 +8,7 @@ module Interactor
   #   class MyOrganizer
   #     include Interactor::Organizer
   #
-  #     organizer InteractorOne, InteractorTwo
+  #     organize InteractorOne, InteractorTwo
   #   end
   module Organizer
     # Internal: Install Interactor::Organizer's behavior in the given class.
