@@ -58,6 +58,7 @@ module Interactor
 
     describe "#fail!" do
       let(:context) { Context.build(foo: "bar") }
+      let(:error_context) { Context.build }
 
       it "sets success to false" do
         expect {
@@ -113,41 +114,25 @@ module Interactor
         }
       end
 
-      it "updates the context" do
-        expect {
-          begin
-            context.fail!(foo: "baz")
-          rescue
-            nil
-          end
-        }.to change {
-          context.foo
-        }.from("bar").to("baz")
-      end
-
-      it "updates the context with a string key" do
-        expect {
-          begin
-            context.fail!("foo" => "baz")
-          rescue
-            nil
-          end
-        }.to change {
-          context.foo
-        }.from("bar").to("baz")
-      end
-
       it "raises failure" do
         expect {
           context.fail!
         }.to raise_error(Failure)
       end
 
-      it "makes the context available from the failure" do
+      it "error context does not contain context attributes" do
         begin
           context.fail!
         rescue Failure => error
-          expect(error.context).to eq(context)
+          expect(error.context.foo).to eq(nil)
+        end
+      end
+
+      it "context does not equal error context" do
+        begin
+          context.fail!
+        rescue Failure => error
+          expect(context).to_not eq(error.context)
         end
       end
     end
