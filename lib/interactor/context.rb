@@ -121,9 +121,10 @@ module Interactor
     #
     # Raises Interactor::Failure initialized with the Interactor::Context.
     def fail!(context = {})
-      context.each { |key, value| self[key.to_sym] = value }
-      @failure = true
-      raise Failure, self
+      error_context = Context.new
+      context.each { |key, value| error_context[key.to_sym] = value }
+      error_context.failure = @failure = true
+      raise Failure, error_context
     end
 
     # Internal: Track that an Interactor has been called. The "called!" method
