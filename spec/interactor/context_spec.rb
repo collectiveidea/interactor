@@ -57,8 +57,7 @@ module Interactor
     end
 
     describe "#fail!" do
-      let(:context) { Context.build(foo: "bar") }
-      let(:error_context) { Context.build }
+      let(:context) { Context.build(foo: "bar", user: {password: "12345678", password_confirmation: '12345678'}) }
 
       it "sets success to false" do
         expect {
@@ -114,26 +113,49 @@ module Interactor
         }
       end
 
+      it "updates the context" do
+        expect {
+          begin
+            context.fail!(foo: "baz")
+          rescue
+            nil
+          end
+        }.to change {
+          context.foo
+        }.from("bar").to("baz")
+      end
+
+      it "updates the context with a string key" do
+        expect {
+          begin
+            context.fail!("foo" => "baz")
+          rescue
+            nil
+          end
+        }.to change {
+          context.foo
+        }.from("bar").to("baz")
+      end
+
       it "raises failure" do
         expect {
           context.fail!
         }.to raise_error(Failure)
       end
 
-      it "error context does not contain context attributes" do
-        begin
-          context.fail!
-        rescue Failure => error
-          expect(error.context.foo).to eq(nil)
-        end
-      end
-
-      it "context does not equal error context" do
-        begin
-          context.fail!
-        rescue Failure => error
-          expect(context).to_not eq(error.context)
-        end
+      it "context does not include password or password_confirmation values" do
+        expect {
+          begin
+            context.fail!(user: {password: "12345678", password_confirmation: '12345678'})
+          rescue
+            nil
+          end
+        }.to change {
+          context.user
+          puts 'context.user'
+          puts context.user
+        }.from({password: "12345678", password_confirmation: "12345678"})
+          .to({password: "REDACTED", password_confirmation: "REDACTED"})
       end
     end
 
