@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "ostruct"
 
 module Interactor
@@ -52,9 +54,11 @@ module Interactor
     #   # => 2170969340
     #
     # Returns the Interactor::Context.
+    # rubocop:disable Style/CaseEquality
     def self.build(context = {})
       self === context ? context : new(context)
     end
+    # rubocop:enable Style/CaseEquality
 
     # Public: Whether the Interactor::Context is successful. By default, a new
     # context is successful and only changes when explicitly failed.
@@ -154,6 +158,7 @@ module Interactor
     # Returns true if rolled back successfully or false if already rolled back.
     def rollback!
       return false if @rolled_back
+
       _called.reverse_each(&:rollback)
       @rolled_back = true
     end

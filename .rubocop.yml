@@ -1,0 +1,74 @@
+AllCops:
+  TargetRubyVersion: 2.7
+  DisplayCopNames: true
+  ExtraDetails: true
+  NewCops: enable
+  Exclude:
+    - "_/**/*"
+    - "spec/samples/**/*"
+    - "bin/*"
+
+# Offense count: 5
+# Configuration parameters: IgnoredMethods.
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - 'spec/integration_spec.rb'
+    - 'spec/interactor/context_spec.rb'
+
+# Offense count: 41
+# Configuration parameters: CountComments, CountAsOne, ExcludedMethods, IgnoredMethods.
+# IgnoredMethods: refine
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"
+
+# Offense count: 1
+# Configuration parameters: CountComments, CountAsOne, ExcludedMethods, IgnoredMethods.
+Metrics/MethodLength:
+  Exclude:
+    - "spec/**/*"
+
+# Offense count: 2
+# Configuration parameters: CountComments, CountAsOne.
+Metrics/ModuleLength:
+  Exclude:
+    - "spec/**/*"
+
+# Offense count: 10
+# Configuration parameters: AllowedChars.
+# AllowedChars: ©
+Style/AsciiComments:
+  Exclude:
+    - 'spec/integration_spec.rb'
+
+# Offense count: 1
+# Cop supports --auto-correct.
+Style/RedundantBegin:
+  Exclude:
+    - 'spec/interactor/context_spec.rb'
+
+# Offense count: 22
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: implicit, explicit
+Style/RescueStandardError:
+  Exclude:
+    - 'spec/integration_spec.rb'
+    - 'spec/interactor/context_spec.rb'
+
+# Offense count: 233
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, ConsistentQuotesInMultiline.
+# SupportedStyles: single_quotes, double_quotes
+Style/StringLiterals:
+  EnforcedStyle: "double_quotes"
+
+
+# Offense count: 40
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyleForMultiline.
+# SupportedStylesForMultiline: comma, consistent_comma, no_comma
+Style/TrailingCommaInArrayLiteral:
+  Exclude:
+    - 'spec/integration_spec.rb'
+    - 'spec/interactor/hooks_spec.rb'

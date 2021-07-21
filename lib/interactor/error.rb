@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Interactor
   # Internal: Error raised during Interactor::Context failure. The error stores
   # a copy of the failed context for debugging purposes.

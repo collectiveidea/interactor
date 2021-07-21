@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Interactor
   describe Organizer do
     include_examples :lint
@@ -9,17 +11,17 @@ module Interactor
       let(:interactor3) { double(:interactor3) }
 
       it "sets interactors given class arguments" do
-        expect {
+        expect do
           organizer.organize(interactor2, interactor3)
-        }.to change {
+        end.to change {
           organizer.organized
         }.from([]).to([interactor2, interactor3])
       end
 
       it "sets interactors given an array of classes" do
-        expect {
+        expect do
           organizer.organize([interactor2, interactor3])
-        }.to change {
+        end.to change {
           organizer.organized
         }.from([]).to([interactor2, interactor3])
       end

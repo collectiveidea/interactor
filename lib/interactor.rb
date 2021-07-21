@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "interactor/context"
 require "interactor/error"
 require "interactor/hooks"
@@ -111,10 +113,12 @@ module Interactor
   # context is rolled back.
   #
   # Returns nothing.
+  # rubocop:disable Lint/SuppressedException
   def run
     run!
   rescue Failure
   end
+  # rubocop:enable Lint/SuppressedException
 
   # Internal: Invoke an Interactor instance along with all defined hooks. The
   # "run!" method is used internally by the "call!" class method. The following
@@ -138,6 +142,7 @@ module Interactor
   #
   # Returns nothing.
   # Raises Interactor::Failure if the context is failed.
+  # rubocop:disable Style/RescueStandardError
   def run!
     with_hooks do
       call
@@ -147,20 +152,19 @@ module Interactor
     context.rollback!
     raise
   end
+  # rubocop:enable Style/RescueStandardError
 
   # Public: Invoke an Interactor instance without any hooks, tracking, or
   # rollback. It is expected that the "call" instance method is overwritten for
   # each interactor class.
   #
   # Returns nothing.
-  def call
-  end
+  def call; end
 
   # Public: Reverse prior invocation of an Interactor instance. Any interactor
   # class that requires undoing upon downstream failure is expected to overwrite
   # the "rollback" instance method.
   #
   # Returns nothing.
-  def rollback
-  end
+  def rollback; end
 end

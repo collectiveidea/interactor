@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
 gemspec
 
 gem "standard"
 
-group :test do
-  gem "codeclimate-test-reporter", require: false
+group :development, :test do
+  # gem "codeclimate-test-reporter", require: false
+  gem "guard-bundler"
+  gem "guard-rspec"
+  gem "guard-rubocop"
   gem "rspec", "~> 3.7"
+  gem "rubocop"
 end

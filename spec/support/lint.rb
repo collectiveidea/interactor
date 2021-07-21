@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples :lint do
   let(:interactor) { Class.new.send(:include, described_class) }
 
@@ -73,17 +75,17 @@ shared_examples :lint do
     it "rescues failure" do
       expect(instance).to receive(:run!).and_raise(Interactor::Failure)
 
-      expect {
+      expect do
         instance.run
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "raises other errors" do
       expect(instance).to receive(:run!).and_raise("foo")
 
-      expect {
+      expect do
         instance.run
-      }.to raise_error("foo")
+      end.to raise_error("foo")
     end
   end
 
@@ -99,17 +101,17 @@ shared_examples :lint do
     it "raises failure" do
       expect(instance).to receive(:run!).and_raise(Interactor::Failure)
 
-      expect {
+      expect do
         instance.run!
-      }.to raise_error(Interactor::Failure)
+      end.to raise_error(Interactor::Failure)
     end
 
     it "raises other errors" do
       expect(instance).to receive(:run!).and_raise("foo")
 
-      expect {
+      expect do
         instance.run
-      }.to raise_error("foo")
+      end.to raise_error("foo")
     end
   end
 

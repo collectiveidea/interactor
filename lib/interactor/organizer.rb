@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Interactor
   # Public: Interactor::Organizer methods. Because Interactor::Organizer is a
   # module, custom Interactor::Organizer classes should include

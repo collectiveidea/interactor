@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Interactor
   describe Hooks do
     describe "#with_hooks" do
@@ -25,7 +27,7 @@ module Interactor
       end
 
       context "with an around hook method" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             around :add_around_before_and_around_after
 
@@ -37,19 +39,19 @@ module Interactor
               steps << :around_after
             end
           end
-        }
+        end
 
         it "runs the around hook method" do
-          expect(hooked.process).to eq([
-            :around_before,
-            :process,
-            :around_after,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         around_before
+                                         process
+                                         around_after
+                                       ])
         end
       end
 
       context "with an around hook block" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             around do |hooked|
               steps << :around_before
@@ -57,19 +59,19 @@ module Interactor
               steps << :around_after
             end
           end
-        }
+        end
 
         it "runs the around hook block" do
-          expect(hooked.process).to eq([
-            :around_before,
-            :process,
-            :around_after,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         around_before
+                                         process
+                                         around_after
+                                       ])
         end
       end
 
       context "with an around hook method and block in one call" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             around :add_around_before1_and_around_after1 do |hooked|
               steps << :around_before2
@@ -85,21 +87,21 @@ module Interactor
               steps << :around_after1
             end
           end
-        }
+        end
 
         it "runs the around hook method and block in order" do
-          expect(hooked.process).to eq([
-            :around_before1,
-            :around_before2,
-            :process,
-            :around_after2,
-            :around_after1,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         around_before1
+                                         around_before2
+                                         process
+                                         around_after2
+                                         around_after1
+                                       ])
         end
       end
 
       context "with an around hook method and block in multiple calls" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             around do |hooked|
               steps << :around_before1
@@ -117,21 +119,21 @@ module Interactor
               steps << :around_after2
             end
           end
-        }
+        end
 
         it "runs the around hook block and method in order" do
-          expect(hooked.process).to eq([
-            :around_before1,
-            :around_before2,
-            :process,
-            :around_after2,
-            :around_after1,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         around_before1
+                                         around_before2
+                                         process
+                                         around_after2
+                                         around_after1
+                                       ])
         end
       end
 
       context "with a before hook method" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             before :add_before
 
@@ -141,35 +143,35 @@ module Interactor
               steps << :before
             end
           end
-        }
+        end
 
         it "runs the before hook method" do
-          expect(hooked.process).to eq([
-            :before,
-            :process,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         before
+                                         process
+                                       ])
         end
       end
 
       context "with a before hook block" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             before do
               steps << :before
             end
           end
-        }
+        end
 
         it "runs the before hook block" do
-          expect(hooked.process).to eq([
-            :before,
-            :process,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         before
+                                         process
+                                       ])
         end
       end
 
       context "with a before hook method and block in one call" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             before :add_before1 do
               steps << :before2
@@ -181,19 +183,19 @@ module Interactor
               steps << :before1
             end
           end
-        }
+        end
 
         it "runs the before hook method and block in order" do
-          expect(hooked.process).to eq([
-            :before1,
-            :before2,
-            :process,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         before1
+                                         before2
+                                         process
+                                       ])
         end
       end
 
       context "with a before hook method and block in multiple calls" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             before do
               steps << :before1
@@ -207,19 +209,19 @@ module Interactor
               steps << :before2
             end
           end
-        }
+        end
 
         it "runs the before hook block and method in order" do
-          expect(hooked.process).to eq([
-            :before1,
-            :before2,
-            :process,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         before1
+                                         before2
+                                         process
+                                       ])
         end
       end
 
       context "with an after hook method" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             after :add_after
 
@@ -229,35 +231,35 @@ module Interactor
               steps << :after
             end
           end
-        }
+        end
 
         it "runs the after hook method" do
-          expect(hooked.process).to eq([
-            :process,
-            :after,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         process
+                                         after
+                                       ])
         end
       end
 
       context "with an after hook block" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             after do
               steps << :after
             end
           end
-        }
+        end
 
         it "runs the after hook block" do
-          expect(hooked.process).to eq([
-            :process,
-            :after,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         process
+                                         after
+                                       ])
         end
       end
 
       context "with an after hook method and block in one call" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             after :add_after1 do
               steps << :after2
@@ -269,19 +271,19 @@ module Interactor
               steps << :after1
             end
           end
-        }
+        end
 
         it "runs the after hook method and block in order" do
-          expect(hooked.process).to eq([
-            :process,
-            :after2,
-            :after1,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         process
+                                         after2
+                                         after1
+                                       ])
         end
       end
 
       context "with an after hook method and block in multiple calls" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             after do
               steps << :after1
@@ -295,19 +297,19 @@ module Interactor
               steps << :after2
             end
           end
-        }
+        end
 
         it "runs the after hook block and method in order" do
-          expect(hooked.process).to eq([
-            :process,
-            :after2,
-            :after1,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         process
+                                         after2
+                                         after1
+                                       ])
         end
       end
 
       context "with around, before and after hooks" do
-        let(:hooked) {
+        let(:hooked) do
           build_hooked do
             around do |hooked|
               steps << :around_before1
@@ -337,20 +339,20 @@ module Interactor
               steps << :after2
             end
           end
-        }
+        end
 
         it "runs hooks in the proper order" do
-          expect(hooked.process).to eq([
-            :around_before1,
-            :around_before2,
-            :before1,
-            :before2,
-            :process,
-            :after2,
-            :after1,
-            :around_after2,
-            :around_after1,
-          ])
+          expect(hooked.process).to eq(%i[
+                                         around_before1
+                                         around_before2
+                                         before1
+                                         before2
+                                         process
+                                         after2
+                                         after1
+                                         around_after2
+                                         around_after1
+                                       ])
         end
       end
     end
