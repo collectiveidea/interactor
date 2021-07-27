@@ -53,15 +53,15 @@ describe TooSimple::FullNameAction do
   end
 
   describe 'example' do
-    fit 'good data' do
-      result = TooSimple::FullNameAction.call(first_name: 'David', last_name: 'Cruwys')
+    it 'good data' do
+      result = TooSimple::FullNameAction.call(first_name: 'David')
 
       puts "first_name: #{result.first_name}"
       puts "last_name: #{result.last_name}"
       puts "full_name: #{result.full_name}"
     end
 
-    it 'bad data' do
+    fit 'bad data' do
       result = TooSimple::FullNameAction.call()
 
       puts "first_name: #{result.first_name}"

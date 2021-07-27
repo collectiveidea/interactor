@@ -50,7 +50,7 @@ describe TooSimple::AddNumbers do
   end
 
   describe 'example' do
-    fit 'good data' do
+    it 'good data' do
       result = TooSimple::AddNumbers.call(lhs: 20, rhs: 30)
 
       puts "lhs: #{result.lhs}"
@@ -58,7 +58,7 @@ describe TooSimple::AddNumbers do
       puts "sum: #{result.sum}"
     end
 
-    it 'bad data' do
+    fit 'bad data' do
       result = TooSimple::AddNumbers.call(lhs: 20)
 
       puts "lhs: #{result.lhs}"
