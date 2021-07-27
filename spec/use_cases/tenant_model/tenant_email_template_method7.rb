@@ -13,7 +13,8 @@ module Factories
     def contextual_email_template_id(klass)
       context_name = klass.name.underscore
 
-      template_id = self.send("#{context_name}_email_template") || self.enterprise.send("default_#{context_name}_emailt_id")
+      template_id = self.send("#{context_name}_email_template") ||
+                    self.enterprise.send("default_#{context_name}_emailt_id")
 
       return template_id if EmailTemplate.by_tenant(self).exist?(id: template_id)
 

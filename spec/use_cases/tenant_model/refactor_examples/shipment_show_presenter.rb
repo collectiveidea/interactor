@@ -19,8 +19,8 @@ module Presenters
   end
 
   def usage
-    presenter = ShipmentShowPresenter.instance(tenant:   @tenant,
-                                            shipment: @tenant.shipments.find(params[:id]))
+    presenter = ShipmentShowPresenter.present(tenant:   @tenant,
+                                              shipment: @tenant.shipments.find(params[:id]))
 
     if presenter.success?
       @model = @model.model
@@ -36,7 +36,7 @@ module Presenters
 
       # Model
       OpenStruct.new({
-        order_template_id: ContextualEmailTemplateId.instance(tenant: tenant, type: Order),
+        order_template_id: ContextualEmailTemplateId.call(tenant: tenant, type: Order),
         all: :other,
         fields: :needed,
         by: :view,
