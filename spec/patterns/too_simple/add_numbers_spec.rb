@@ -48,4 +48,25 @@ describe TooSimple::AddNumbers do
       it { is_expected.to be_truthy }
     end
   end
+
+  describe 'example' do
+    fit 'good data' do
+      result = TooSimple::AddNumbers.call(lhs: 20, rhs: 30)
+
+      puts "lhs: #{result.lhs}"
+      puts "rhs: #{result.rhs}"
+      puts "sum: #{result.sum}"
+    end
+
+    it 'bad data' do
+      result = TooSimple::AddNumbers.call(lhs: 20)
+
+      puts "lhs: #{result.lhs}"
+      puts "rhs: #{result.rhs}"
+      puts "sum: #{result.sum}"
+      puts "message: #{result.message}"
+      puts "success?: #{result.success?}"
+      puts "failure?: #{result.failure?}"
+    end
+  end
 end

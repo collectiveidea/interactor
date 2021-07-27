@@ -10,7 +10,7 @@ describe Factories::DocumentFactory do
     context 'when no type' do
       let(:params) { { data: data } }
 
-      fit { is_expected.to be_a(Factories::Document).and have_attributes(data: data, output: output)}
+      it { is_expected.to be_a(Factories::Document).and have_attributes(data: data, output: output)}
     end
 
     context 'when type: :json' do

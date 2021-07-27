@@ -51,4 +51,25 @@ describe TooSimple::FullNameAction do
       it { is_expected.to be_falsey}
     end
   end
+
+  describe 'example' do
+    fit 'good data' do
+      result = TooSimple::FullNameAction.call(first_name: 'David', last_name: 'Cruwys')
+
+      puts "first_name: #{result.first_name}"
+      puts "last_name: #{result.last_name}"
+      puts "full_name: #{result.full_name}"
+    end
+
+    it 'bad data' do
+      result = TooSimple::FullNameAction.call()
+
+      puts "first_name: #{result.first_name}"
+      puts "last_name: #{result.last_name}"
+      puts "full_name: #{result.full_name}"
+      puts "message: #{result.message}"
+      puts "success?: #{result.success?}"
+      puts "failure?: #{result.failure?}"
+    end
+  end
 end
