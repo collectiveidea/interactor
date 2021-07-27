@@ -21,10 +21,12 @@ group :green_pass_then_cop, halt_on_fail: true do
     dsl.watch_spec_files_for(ruby.lib_files)
     watch(%r{^lib/interactor/(.+)\.rb$}) { |m| "spec/unit/#{m[1]}_spec.rb" }
     watch(%r{^lib/interactor/commands/(.+)\.rb$}) { |m| "spec/unit/commands/#{m[1]}_spec.rb" }
+
+    watch(%r{^spec/patterns/(.+)\.rb$}) { |m| "spec/patterns/#{m[1]}_spec.rb" }
   end
 
-  guard :rubocop, all_on_start: false, cli: ["--format", "clang"] do
-    watch(/{.+\.rb$/)
-    watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |m| File.dirname(m[0]) }
-  end
+  # guard :rubocop, all_on_start: false, cli: ["--format", "clang"] do
+  #   watch(/{.+\.rb$/)
+  #   watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |m| File.dirname(m[0]) }
+  # end
 end

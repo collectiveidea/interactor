@@ -8,6 +8,7 @@ gem "standard"
 
 group :development, :test do
   # gem "codeclimate-test-reporter", require: false
+  gem "activesupport"
   gem "guard-bundler"
   gem "guard-rspec"
   gem "guard-rubocop"

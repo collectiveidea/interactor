@@ -22,11 +22,7 @@ module Interactor
         context = Context.build(hash)
 
         expect(context).to be_a(Context)
-        expect do
-          context.foo = "baz"
-        end.not_to change {
-          hash[:foo]
-        }
+        expect { context.foo = "baz" }.not_to change { hash[:foo] }
       end
 
       it "preserves an already built context" do
