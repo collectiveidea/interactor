@@ -183,9 +183,21 @@ module Interactor
     # Examples
     #
     #   context = MyInteractor.call(foo: "bar")
+    #
     #   # => #<Interactor::Context foo="bar">
     #   context => { foo: }
-    #   assert(foo == "bar")
+    #   foo == "bar"
+    #   # => true
+    #
+    #
+    #   case context
+    #   in success: true, result: { first:, second: }
+    #     do_stuff(first, second)
+    #   in failure: true, error_message:
+    #     log_error(message: error_message)
+    #   end
+    #
+    # Returns the context as a hash, including success and failure
     def deconstruct_keys(keys)
       to_h.merge(
         success: success?,
