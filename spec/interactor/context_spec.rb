@@ -208,6 +208,13 @@ module Interactor
 
         expect(foo).to eq(:bar)
       end
+
+      it 'includes success and failure' do
+        context => { success:, failure: }
+
+        expect(success).to be(true)
+        expect(failure).to be(false)
+      end
     end
   end
 end

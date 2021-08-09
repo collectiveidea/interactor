@@ -187,7 +187,10 @@ module Interactor
     #   context => { foo: }
     #   assert(foo == "bar")
     def deconstruct_keys(keys)
-      to_h
+      to_h.merge(
+        success: success?,
+        failure: failure?
+      )
     end
   end
 end
