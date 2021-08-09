@@ -203,17 +203,15 @@ module Interactor
     describe '#deconstruct_keys' do
       let(:context) { Context.build(foo: :bar) }
 
-      it 'deconstructs as hash pattern' do
-        context => { foo: }
+      let(:deconstructed) { context.deconstruct_keys([:foo, :success, :failure]) }
 
-        expect(foo).to eq(:bar)
+      it 'deconstructs as hash pattern' do
+        expect(deconstructed[:foo]).to eq(:bar)
       end
 
       it 'includes success and failure' do
-        context => { success:, failure: }
-
-        expect(success).to be(true)
-        expect(failure).to be(false)
+        expect(deconstructed[:success]).to eq(true)
+        expect(deconstructed[:failure]).to eq(false)
       end
     end
   end
