@@ -199,5 +199,15 @@ module Interactor
         expect(context._called).to eq([])
       end
     end
+
+    describe '#deconstruct_keys' do
+      let(:context) { Context.build(foo: :bar) }
+
+      it 'deconstructs as hash pattern' do
+        context => { foo: }
+
+        expect(foo).to eq(:bar)
+      end
+    end
   end
 end

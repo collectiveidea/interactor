@@ -177,5 +177,17 @@ module Interactor
     def _called
       @called ||= []
     end
+
+    # Internal: Support for ruby 3.0 pattern matching
+    #
+    # Examples
+    #
+    #   context = MyInteractor.call(foo: "bar")
+    #   # => #<Interactor::Context foo="bar">
+    #   context => { foo: }
+    #   assert(foo == "bar")
+    def deconstruct_keys(keys)
+      to_h
+    end
   end
 end
