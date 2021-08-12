@@ -3,7 +3,7 @@
 require "English"
 
 Gem::Specification.new do |spec|
-  spec.required_ruby_version = ">= 2.7"
+  spec.required_ruby_version = ">= 2.6.6"
   spec.name = "interactor"
   spec.version = "3.1.2"
 
