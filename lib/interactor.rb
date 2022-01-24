@@ -113,7 +113,10 @@ module Interactor
   # Returns nothing.
   def run
     run!
-  rescue Failure
+  rescue Failure => e
+    if context.object_id != e.context.object_id
+      raise
+    end
   end
 
   # Internal: Invoke an Interactor instance along with all defined hooks. The
