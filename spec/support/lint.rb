@@ -1,4 +1,7 @@
 shared_examples :lint do
+  let(:foo_params) do
+    { foo: 'bar' }
+  end
   let(:interactor) { Class.new.send(:include, described_class) }
 
   describe ".call" do
@@ -6,10 +9,10 @@ shared_examples :lint do
     let(:instance) { double(:instance, context: context) }
 
     it "calls an instance with the given context" do
-      expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
+      expect(interactor).to receive(:new).once.with(foo_params) { instance }
       expect(instance).to receive(:run).once.with(no_args)
 
-      expect(interactor.call(foo: "bar")).to eq(context)
+      expect(interactor.call(foo_params)).to eq(context)
     end
 
     it "provides a blank context if none is given" do
@@ -25,10 +28,10 @@ shared_examples :lint do
     let(:instance) { double(:instance, context: context) }
 
     it "calls an instance with the given context" do
-      expect(interactor).to receive(:new).once.with(foo: "bar") { instance }
+      expect(interactor).to receive(:new).once.with(foo_params) { instance }
       expect(instance).to receive(:run!).once.with(no_args)
 
-      expect(interactor.call!(foo: "bar")).to eq(context)
+      expect(interactor.call!(foo_params)).to eq(context)
     end
 
     it "provides a blank context if none is given" do
@@ -43,9 +46,9 @@ shared_examples :lint do
     let(:context) { double(:context) }
 
     it "initializes a context" do
-      expect(Interactor::Context).to receive(:build).once.with(foo: "bar") { context }
+      expect(Interactor::Context).to receive(:build).once.with(foo_params) { context }
 
-      instance = interactor.new(foo: "bar")
+      instance = interactor.new(foo_params)
 
       expect(instance).to be_a(interactor)
       expect(instance.context).to eq(context)
