@@ -48,6 +48,33 @@ module Interactor
         @organized = interactors.flatten
       end
 
+      # Public: Declare Interactors to be invoked as part of the
+      # Interactor::Organizer's invocation in an ensured block. These
+      # interactors are invoked in the order in which they are declared.
+      #
+      # interactors - Zero or more (or an Array of) Interactor classes.
+      #
+      # Examples
+      #
+      #   class MyFirstOrganizer
+      #     include Interactor::Organizer
+      #
+      #     organize InteractorOne, InteractorTwo
+      #     ensure_do InteractorThree, InteractorFour
+      #   end
+      #
+      #   class MySecondOrganizer
+      #     include Interactor::Organizer
+      #
+      #     organize [InteractorThree, InteractorFour]
+      #     ensure_do [InteractorFive, InteractorSix]
+      #   end
+      #
+      # Returns nothing.
+      def ensure_do(*interactors)
+        @ensured = interactors.flatten
+      end
+
       # Internal: An Array of declared Interactors to be invoked.
       #
       # Examples
@@ -65,6 +92,25 @@ module Interactor
       def organized
         @organized ||= []
       end
+
+      # Internal: An Array of declared Interactors to be invoked in an ensure block.
+      #
+      # Examples
+      #
+      #   class MyOrganizer
+      #     include Interactor::Organizer
+      #
+      #     organize InteractorOne, InteractorTwo
+      #     ensure_do InteractorThree, InteractorFour
+      #   end
+      #
+      #   MyOrganizer.ensured
+      #   # => [InteractorThree, InteractorFour]
+      #
+      # Returns an Array of Interactor classes or an empty Array.
+      def ensured
+        @ensured ||= []
+      end
     end
 
     # Internal: Interactor::Organizer instance methods.
@@ -75,8 +121,14 @@ module Interactor
       #
       # Returns nothing.
       def call
-        self.class.organized.each do |interactor|
-          interactor.call!(context)
+        begin
+          self.class.organized.each do |interactor|
+            interactor.call!(context)
+          end
+        ensure
+          self.class.ensured.each do |interactor|
+            interactor.call(context)
+          end
         end
       end
     end

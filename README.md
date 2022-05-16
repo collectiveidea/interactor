@@ -405,7 +405,9 @@ purpose is to run *other* interactors.
 class PlaceOrder
   include Interactor::Organizer
 
-  organize CreateOrder, ChargeCard, SendThankYou
+  organize CreateOrder, ChargeCard
+
+  ensure_do SendThankYou
 end
 ```
 
