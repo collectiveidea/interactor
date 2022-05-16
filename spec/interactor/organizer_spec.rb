@@ -3,6 +3,8 @@ module Interactor
     include_examples :lint
 
     let(:organizer) { Class.new.send(:include, Organizer) }
+    let(:instance) { organizer.new }
+    let(:context) { Interactor::Context.new }
 
     let(:interactor2) { double(:interactor2) }
     let(:interactor3) { double(:interactor3) }
@@ -33,9 +35,6 @@ module Interactor
     end
 
     describe "#call" do
-      let(:instance) { organizer.new }
-      let(:context) { double(:context) }
-
       before do
         allow(instance).to receive(:context) { context }
         allow(organizer).to receive(:organized) {
@@ -77,8 +76,6 @@ module Interactor
     end
 
     describe "#call" do
-      let(:instance) { organizer.new }
-      let(:context) { double(:context) }
       let(:interactor5) { double(:interactor5) }
 
       before do

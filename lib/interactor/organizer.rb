@@ -127,6 +127,7 @@ module Interactor
       def call!
         begin
           self.class.organized.each do |interactor|
+            context._current_interactor_class = interactor
             interactor.call!(context)
           end
         ensure
