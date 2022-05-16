@@ -121,6 +121,10 @@ module Interactor
       #
       # Returns nothing.
       def call
+        call!
+      end
+
+      def call!
         begin
           self.class.organized.each do |interactor|
             interactor.call!(context)
