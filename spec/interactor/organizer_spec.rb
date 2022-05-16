@@ -34,7 +34,7 @@ module Interactor
 
     describe "#call" do
       let(:instance) { organizer.new }
-      let(:context) { double(:context) }      
+      let(:context) { double(:context) }
 
       before do
         allow(instance).to receive(:context) { context }
@@ -79,7 +79,7 @@ module Interactor
     describe "#call" do
       let(:instance) { organizer.new }
       let(:context) { double(:context) }
-      let(:interactor5) { double(:interactor2) }
+      let(:interactor5) { double(:interactor5) }
 
       before do
         allow(instance).to receive(:context) { context }
