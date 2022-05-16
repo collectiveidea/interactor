@@ -100,7 +100,7 @@ module Interactor
         instance.call
       end
 
-      it "calls the ensure interactor when there is an error" do
+      it "calls the ensure interactor when there is an error in one organized interactor" do
         expect(interactor2).to receive(:call!).and_raise(Failure)
         expect(interactor5).to receive(:call).once.with(context)
 
