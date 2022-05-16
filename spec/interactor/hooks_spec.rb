@@ -7,6 +7,10 @@ module Interactor
         hooked.class_eval do
           attr_reader :steps
 
+          def self.create
+            new
+          end
+
           def self.process
             new.tap(&:process).steps
           end
@@ -306,7 +310,95 @@ module Interactor
         end
       end
 
-      context "with around, before and after hooks" do
+      context "with an ensure hook method" do
+        let(:hooked) {
+          build_hooked do
+          ensure_do :add_ensure
+
+            private
+
+            def add_ensure
+              steps << :ensure
+            end
+          end
+        }
+
+        it "runs the after hook methods" do
+          expect(hooked.process).to eq([
+            :process,
+            :ensure
+          ])
+        end
+      end
+
+      context "with an ensure hook block" do
+        let(:hooked) {
+          build_hooked do
+            ensure_do do
+              steps << :ensure
+            end
+          end
+        }
+
+        it "runs the after hook blocks" do
+          expect(hooked.process).to eq([
+            :process,
+            :ensure
+          ])
+        end
+      end
+
+      context "with an ensure hook method and block in one call" do
+        let(:hooked) {
+          build_hooked do
+            ensure_do :add_ensure1 do
+              steps << :ensure2
+            end
+
+            private
+
+            def add_ensure1
+              steps << :ensure1
+            end
+          end
+        }
+
+        it "runs the after hook method and block in order" do
+          expect(hooked.process).to eq([
+            :process,
+            :ensure2,
+            :ensure1
+          ])
+        end
+      end
+
+      context "with an ensure hook method and block in multiple calls" do
+        let(:hooked) {
+          build_hooked do
+            after do
+              steps << :ensure1
+            end
+
+            after :add_ensure2
+
+            private
+
+            def add_ensure2
+              steps << :ensure2
+            end
+          end
+        }
+
+        it "runs the after hook block and method in order" do
+          expect(hooked.process).to eq([
+            :process,
+            :ensure2,
+            :ensure1
+          ])
+        end
+      end
+
+      context "with around, before, after and ensure hooks" do
         let(:hooked) {
           build_hooked do
             around do |hooked|
@@ -336,6 +428,14 @@ module Interactor
             after do
               steps << :after2
             end
+
+            ensure_do do
+              steps << :ensure1
+            end
+
+            ensure_do do
+              steps << :ensure2
+            end
           end
         }
 
@@ -349,8 +449,32 @@ module Interactor
             :after2,
             :after1,
             :around_after2,
-            :around_after1
+            :around_after1,
+            :ensure2,
+            :ensure1
           ])
+        end
+      end
+
+      context "ensure hook run even if an exception is raised" do
+        let(:hooked) {
+          build_hooked do
+            ensure_do :add_ensure
+
+            private
+
+            def add_ensure
+              steps << :ensure
+            end
+          end
+        }
+
+        it "run the ensure hook" do
+          allow_any_instance_of(Interactor::Hooks).to receive(:run_around_hooks).and_raise(Failure)
+          object = hooked.create
+
+          expect { object.process }.to raise_error(Failure)
+          expect(object.steps).to eq([:ensure])
         end
       end
     end

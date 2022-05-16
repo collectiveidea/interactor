@@ -127,6 +127,43 @@ module Interactor
         hooks.each { |hook| after_hooks.unshift(hook) }
       end
 
+      # Public: Declare hooks to run after hooks in an ensure block.
+      # The ensure method may be called multiple times; subsequent calls prepend declared
+      # hooks to existing ensure hooks.
+      #
+      # hooks - Zero or more Symbol method names representing instance methods
+      #         to be called after the hooks invocations.
+      # block - An optional block to be executed as a hook. If given, the block
+      #         is executed before methods corresponding to any given Symbols.
+      #
+      # Examples
+      #
+      #   class MyInteractor
+      #     include Interactor
+      #
+      #     ensure_do :set_finish_time
+      #
+      #     ensure_do do
+      #       puts "finished"
+      #     end
+      #
+      #     def call
+      #       puts "called"
+      #     end
+      #
+      #     private
+      #
+      #     def set_finish_time
+      #       context.finish_time = Time.now
+      #     end
+      #   end
+      #
+      # Returns nothing.
+      def ensure_do(*hooks, &block)
+        hooks << block if block
+        hooks.each { |hook| ensure_hooks.unshift(hook) }
+      end
+
       # Internal: An Array of declared hooks to run around Interactor
       # invocation. The hooks appear in the order in which they will be run.
       #
@@ -165,7 +202,7 @@ module Interactor
         @before_hooks ||= []
       end
 
-      # Internal: An Array of declared hooks to run before Interactor
+      # Internal: An Array of declared hooks to run after Interactor
       # invocation. The hooks appear in the order in which they will be run.
       #
       # Examples
@@ -182,6 +219,25 @@ module Interactor
       # Returns an Array of Symbols and Procs.
       def after_hooks
         @after_hooks ||= []
+      end
+
+      # Internal: An Array of declared hooks to run after the hooks 
+      # invocation. The hooks appear in the order in which they will be run.
+      #
+      # Examples
+      #
+      #   class MyInteractor
+      #     include Interactor
+      #
+      #     ensure_do :set_finish_time, :say_goodbye
+      #   end
+      #
+      #   MyInteractor.ensure_hooks
+      #   # => [:say_goodbye, :set_finish_time]
+      #
+      # Returns an Array of Symbols and Procs.
+      def ensure_hooks
+        @ensure_hooks ||= []
       end
     end
 
@@ -208,10 +264,14 @@ module Interactor
     #
     # Returns nothing.
     def with_hooks
-      run_around_hooks do
-        run_before_hooks
-        yield
-        run_after_hooks
+      begin
+        run_around_hooks do
+          run_before_hooks
+          yield
+          run_after_hooks
+        end
+      ensure
+        run_ensure_hooks
       end
     end
 
@@ -238,7 +298,14 @@ module Interactor
       run_hooks(self.class.after_hooks)
     end
 
-    # Internal: Run a colection of hooks. The "run_hooks" method is the common
+    # Internal: Run ensure hooks.
+    #
+    # Returns nothing.
+    def run_ensure_hooks
+      run_hooks(self.class.ensure_hooks)
+    end
+
+    # Internal: Run a collection of hooks. The "run_hooks" method is the common
     # interface by which collections of either before or after hooks are run.
     #
     # hooks - An Array of Symbol and Proc hooks.

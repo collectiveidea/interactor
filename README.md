@@ -198,6 +198,27 @@ around after 2
 around after 1
 ```
 
+#### Ensure Hooks
+
+Sometimes an interactor needs to perform an action even if the context fails like the
+typical begin ensure block.
+
+```ruby
+ensure_do do
+  context.finish_time = Time.now
+end
+```
+
+A symbol argument can also be given, rather than a block.
+
+```ruby
+before :set_finish_time
+
+def zero_emails_sent
+  context.finish_time = Time.now
+end
+```
+
 #### Interactor Concerns
 
 An interactor can define multiple before/after hooks, allowing common hooks to
