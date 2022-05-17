@@ -212,9 +212,9 @@ end
 A symbol argument can also be given, rather than a block.
 
 ```ruby
-before :set_finish_time
+ensure_do :set_finish_time
 
-def zero_emails_sent
+def set_finish_time
   context.finish_time = Time.now
 end
 ```
