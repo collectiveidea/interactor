@@ -1,10 +1,6 @@
 name: Run Tests
 
-on:
-  push:
-    branches:
-      - "master"
-      - "v3"
+on: [push, pull_request]
 
 jobs:
   spec:
