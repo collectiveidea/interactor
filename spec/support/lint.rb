@@ -1,6 +1,6 @@
 shared_examples :lint do
   let(:foo_params) do
-    { foo: 'bar' }
+    {foo: "bar"}
   end
   let(:interactor) { Class.new.send(:include, described_class) }
 

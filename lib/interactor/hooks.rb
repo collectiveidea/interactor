@@ -221,7 +221,7 @@ module Interactor
         @after_hooks ||= []
       end
 
-      # Internal: An Array of declared hooks to run after the hooks 
+      # Internal: An Array of declared hooks to run after the hooks
       # invocation. The hooks appear in the order in which they will be run.
       #
       # Examples
@@ -264,15 +264,13 @@ module Interactor
     #
     # Returns nothing.
     def with_hooks
-      begin
-        run_around_hooks do
-          run_before_hooks
-          yield
-          run_after_hooks
-        end
-      ensure
-        run_ensure_hooks
+      run_around_hooks do
+        run_before_hooks
+        yield
+        run_after_hooks
       end
+    ensure
+      run_ensure_hooks
     end
 
     # Internal: Run around hooks.

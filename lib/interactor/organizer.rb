@@ -125,15 +125,13 @@ module Interactor
       end
 
       def call!
-        begin
-          self.class.organized.each do |interactor|
-            context._current_interactor_class = interactor
-            interactor.call!(context)
-          end
-        ensure
-          self.class.ensured.each do |interactor|
-            interactor.call(context)
-          end
+        self.class.organized.each do |interactor|
+          context._current_interactor_class = interactor
+          interactor.call!(context)
+        end
+      ensure
+        self.class.ensured.each do |interactor|
+          interactor.call(context)
         end
       end
     end

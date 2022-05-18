@@ -313,7 +313,7 @@ module Interactor
       context "with an ensure hook method" do
         let(:hooked) {
           build_hooked do
-          ensure_do :add_ensure
+            ensure_do :add_ensure
 
             private
 
