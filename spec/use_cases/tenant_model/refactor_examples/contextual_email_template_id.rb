@@ -8,7 +8,7 @@ module Helpers
   end
 
   class ContextualEmailTemplateId < BaseHelper
-    VALID_TYPES = [Estimate, Order, Sale, Contact, Company, Inquiry]
+    VALID_TYPES = [] # Estimate, Order, Sale, Contact, Company, Inquiry]
 
     delegate :tenant, :type, to: :context
 

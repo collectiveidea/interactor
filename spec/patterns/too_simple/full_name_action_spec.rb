@@ -61,7 +61,7 @@ describe TooSimple::FullNameAction do
       puts "full_name: #{result.full_name}"
     end
 
-    fit 'bad data' do
+    it 'bad data' do
       result = TooSimple::FullNameAction.call()
 
       puts "first_name: #{result.first_name}"

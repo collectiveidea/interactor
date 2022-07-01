@@ -58,7 +58,7 @@ describe TooSimple::AddNumbers do
       puts "sum: #{result.sum}"
     end
 
-    fit 'bad data' do
+    it 'bad data' do
       result = TooSimple::AddNumbers.call(lhs: 20)
 
       puts "lhs: #{result.lhs}"

@@ -72,12 +72,20 @@ shared_examples :lint do
       instance.run
     end
 
-    it "rescues failure" do
-      expect(instance).to receive(:run!).and_raise(Interactor::Failure)
+    it "rescues failure with the same context" do
+      expect(instance).to receive(:run!).and_raise(Interactor::Failure.new(instance.context))
 
       expect do
         instance.run
       end.not_to raise_error
+    end
+
+    it "raises other failures" do
+      expect(instance).to receive(:run!).and_raise(Interactor::Failure.new(Interactor::Context.new))
+
+      expect {
+        instance.run
+      }.to raise_error(Interactor::Failure)
     end
 
     it "raises other errors" do

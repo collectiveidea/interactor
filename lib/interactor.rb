@@ -117,7 +117,10 @@ module Interactor
   # rubocop:disable Lint/SuppressedException
   def run
     run!
-  rescue Failure
+  rescue Failure => e
+    if context.object_id != e.context.object_id
+      raise
+    end
   end
   # rubocop:enable Lint/SuppressedException
 
