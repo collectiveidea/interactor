@@ -1,4 +1,5 @@
 require "interactor/context"
+require "interactor/context_validation"
 require "interactor/error"
 require "interactor/hooks"
 require "interactor/organizer"
