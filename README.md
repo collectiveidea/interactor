@@ -253,7 +253,7 @@ class SessionsController < ApplicationController
       redirect_to user
     else
       flash.now[:message] = "Please try again."
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -277,7 +277,7 @@ class SessionsController < ApplicationController
       redirect_to result.user
     else
       flash.now[:message] = t(result.message)
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
