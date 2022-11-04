@@ -148,6 +148,13 @@ module Interactor
       rescue Failure => error
         expect(error.context).to eq(context)
       end
+
+      it "passes context between interactors" do
+        sub_context = Context.build(bar: 'foo')
+        context.fail!(sub_context)
+      rescue Failure => error
+        expect(context.bar).to eq('foo')
+      end
     end
 
     describe "#called!" do

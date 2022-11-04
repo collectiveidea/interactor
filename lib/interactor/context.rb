@@ -121,7 +121,7 @@ module Interactor
     #
     # Raises Interactor::Failure initialized with the Interactor::Context.
     def fail!(context = {})
-      context.each { |key, value| self[key.to_sym] = value }
+      context.to_h.each_pair { |key, value| self[key.to_sym] = value }
       @failure = true
       raise Failure, self
     end
