@@ -6,7 +6,7 @@ describe Interactor do
     let(:instance) { double(:instance, context: context) }
 
     it 'calls an instance with the given context' do
-      expect(interactor).to receive(:new).once.with(foo: 'bar') { instance }
+      expect(interactor).to receive(:new).once.with({ foo: 'bar' }) { instance }
       expect(instance).to receive(:run).once.with(no_args)
 
       expect(interactor.call(foo: 'bar')).to eq(context)
@@ -25,7 +25,7 @@ describe Interactor do
     let(:instance) { double(:instance, context: context) }
 
     it 'calls an instance with the given context' do
-      expect(interactor).to receive(:new).once.with(foo: 'bar') { instance }
+      expect(interactor).to receive(:new).once.with({ foo: 'bar' }) { instance }
       expect(instance).to receive(:run!).once.with(no_args)
 
       expect(interactor.call!(foo: 'bar')).to eq(context)
@@ -43,7 +43,7 @@ describe Interactor do
     let(:context) { double(:context) }
 
     it 'initializes a context' do
-      expect(Interactor::Context).to receive(:build).once.with(foo: 'bar') { context }
+      expect(Interactor::Context).to receive(:build).once.with({ foo: 'bar' }) { context }
 
       instance = interactor.new(foo: 'bar')
 
