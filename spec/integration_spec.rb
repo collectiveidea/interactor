@@ -929,6 +929,30 @@ describe "Integration" do
     end
   end
 
+  context "when a nested call! fails in an interactor" do
+    let(:interactor3) {
+      build_interactor do
+        class NestedInteractor
+          include Interactor
+
+          def call
+            context.fail!(something: :went_wrong)
+          end
+        end
+
+        def call
+          NestedInteractor.call!
+        end
+      end
+    }
+
+    it 'sets the failure status on enclosing interactor' do
+      result = interactor3.call
+
+      expect(result.failure?).to eq(true)
+    end
+  end
+
   context "when a nested call errors" do
     let(:interactor3) {
       build_interactor do
