@@ -12,7 +12,7 @@ module Interactor
         context = Context.build
 
         expect(context).to be_a(Context)
-        expect(context.send(:table)).to eq({})
+        expect(context.instance_variables).to eq([])
       end
 
       it "doesn't affect the original hash" do

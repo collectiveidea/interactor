@@ -28,7 +28,14 @@ module Interactor
   #   # => "baz"
   #   context
   #   # => #<Interactor::Context foo="baz" hello="world">
-  class Context < OpenStruct
+  class Context
+    def initialize(context = {})
+      context.each do |(k, v)|
+        self.class.attr_accessor(k)
+        send("#{k}=", v)
+      end
+    end
+
     # Internal: Initialize an Interactor::Context or preserve an existing one.
     # If the argument given is an Interactor::Context, the argument is returned.
     # Otherwise, a new Interactor::Context is initialized from the provided
@@ -121,7 +128,7 @@ module Interactor
     #
     # Raises Interactor::Failure initialized with the Interactor::Context.
     def fail!(context = {})
-      context.each { |key, value| self[key.to_sym] = value }
+      context.each { |key, value| send("#{key.to_sym}=", value) }
       @failure = true
       raise Failure, self
     end
@@ -176,6 +183,17 @@ module Interactor
     # Returns an Array of Interactor instances or an empty Array.
     def _called
       @called ||= []
+    end
+
+    def method_missing(name, *args)
+      if name.to_s.end_with?("=")
+        self.class.attr_accessor(name.to_s.chomp("="))
+        send(name, args.first)
+      end
+    end
+
+    def respond_to_missing?(sym, include_priv)
+      true
     end
   end
 end
