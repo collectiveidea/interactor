@@ -129,9 +129,9 @@ will continue invocation of the interactor. For example, with a block:
 
 ```ruby
 around do |interactor|
-  context.start_time = Time.now
+  context.start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   interactor.call
-  context.finish_time = Time.now
+  context.finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 end
 ```
 
@@ -141,9 +141,9 @@ With a method:
 around :time_execution
 
 def time_execution(interactor)
-  context.start_time = Time.now
+  context.start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   interactor.call
-  context.finish_time = Time.now
+  context.finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 end
 ```
 
@@ -209,9 +209,9 @@ module InteractorTimer
 
   included do
     around do |interactor|
-      context.start_time = Time.now
+      context.start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       interactor.call
-      context.finish_time = Time.now
+      context.finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
 end

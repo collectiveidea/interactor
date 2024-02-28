@@ -41,9 +41,9 @@ module Interactor
       #     private
       #
       #     def time_execution(interactor)
-      #       context.start_time = Time.now
+      #       context.start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       #       interactor.call
-      #       context.finish_time = Time.now
+      #       context.finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       #     end
       #   end
       #
@@ -80,7 +80,7 @@ module Interactor
       #     private
       #
       #     def set_start_time
-      #       context.start_time = Time.now
+      #       context.start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       #     end
       #   end
       #
@@ -117,7 +117,7 @@ module Interactor
       #     private
       #
       #     def set_finish_time
-      #       context.finish_time = Time.now
+      #       context.finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       #     end
       #   end
       #
