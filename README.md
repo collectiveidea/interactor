@@ -198,6 +198,27 @@ around after 2
 around after 1
 ```
 
+#### Ensure Hooks
+
+Sometimes an interactor needs to perform an action even if the context fails like the
+typical begin ensure block.
+
+```ruby
+ensure_do do
+  context.finish_time = Time.now
+end
+```
+
+A symbol argument can also be given, rather than a block.
+
+```ruby
+ensure_do :set_finish_time
+
+def set_finish_time
+  context.finish_time = Time.now
+end
+```
+
 #### Interactor Concerns
 
 An interactor can define multiple before/after hooks, allowing common hooks to
@@ -405,7 +426,9 @@ purpose is to run *other* interactors.
 class PlaceOrder
   include Interactor::Organizer
 
-  organize CreateOrder, ChargeCard, SendThankYou
+  organize CreateOrder, ChargeCard
+
+  ensure_do SendThankYou
 end
 ```
 
