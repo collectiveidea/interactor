@@ -144,9 +144,11 @@ module Interactor
       end
 
       it "makes the context available from the failure" do
-        context.fail!
-      rescue Failure => error
-        expect(error.context).to eq(context)
+        begin
+          context.fail!
+        rescue Failure => error
+          expect(error.context).to eq(context)
+        end
       end
     end
 

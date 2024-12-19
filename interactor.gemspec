@@ -12,7 +12,6 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
 
   spec.files = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
-  spec.test_files = spec.files.grep(/^spec/)
 
   spec.add_dependency "ostruct"
   spec.add_development_dependency "bundler"
