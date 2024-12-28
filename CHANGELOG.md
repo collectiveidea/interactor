@@ -1,6 +1,7 @@
 ## 3.2.0 / Unreleased
 * [BUGFIX] Raise failures from nested contexts [#170]
 * [FEATURE] Add `ostruct` dependency to gemspec.
+* [FEATURE] Add support for Ruby 3 pattern matching on the Context [#200]
 
 ## 3.1.2 / 2019-12-29
 * [BUGFIX] Fix Context#fail! on Ruby 2.7
