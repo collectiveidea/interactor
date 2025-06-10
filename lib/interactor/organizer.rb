@@ -89,7 +89,7 @@ module Interactor
       def call
         self.class.organized.each do |interactor|
           if interactor.is_a?(Hash)
-            interactor[:class].call!(context) if !interactor[:if] || send(interactor[:if])
+            interactor[:class].call!(context) if interactor[:if].nil? || send(interactor[:if])
           else
             interactor.call!(context)
           end
