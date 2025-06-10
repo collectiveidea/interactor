@@ -40,14 +40,27 @@ module Interactor
 
       before do
         allow(instance).to receive(:context) { context }
+        allow_any_instance_of(organizer).to receive(:true_method) { true }
+        allow_any_instance_of(organizer).to receive(:false_method) { false }
+      end
+
+      it "calls each interactor in order with the context if no 'if' is passed" do
         allow(organizer).to receive(:organized) {
           [interactor2, interactor3, interactor4]
         }
-      end
-
-      it "calls each interactor in order with the context" do
         expect(interactor2).to receive(:call!).once.with(context).ordered
         expect(interactor3).to receive(:call!).once.with(context).ordered
+        expect(interactor4).to receive(:call!).once.with(context).ordered
+
+        instance.call
+      end
+
+      it "calls only interactors in order with if method that returns true, or without if method" do
+        allow(organizer).to receive(:organized) {
+          [{class: interactor2, if: :true_method}, {class: interactor3, if: :false_method}, interactor4]
+        }
+        expect(interactor2).to receive(:call!).once.with(context).ordered
+        expect(interactor3).not_to receive(:call!)
         expect(interactor4).to receive(:call!).once.with(context).ordered
 
         instance.call

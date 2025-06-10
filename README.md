@@ -437,6 +437,31 @@ The organizer passes its context to the interactors that it organizes, one at a
 time and in order. Each interactor may change that context before it's passed
 along to the next interactor.
 
+### Conditional Organizers
+
+
+A Conditional Organizer is a special kind of organizer that runs interactors only if a condition is true
+
+```ruby
+class PlaceOrder
+  include Interactor::Organizer
+  
+  def should_send_thank_you?
+    context.client.is_a_good_client?
+  end
+  
+  organize CreateOrder,
+           { class: ChargeCard }
+           { class: SendThankYou, if: :should_send_thank_you? }
+end
+```
+
+The key difference from the example above is that we have a conditional interactor call:
+
+- CreateOrder will always be called, because you passed only the class
+- ChargeCard will always be called, because there's no "if"
+- SendThankYou will be called *only* if the method should_send_thank_you?, with the passed context, returns true
+
 #### Rollback
 
 If any one of the organized interactors fails its context, the organizer stops.
