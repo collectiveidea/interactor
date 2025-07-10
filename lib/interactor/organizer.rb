@@ -61,6 +61,18 @@ module Interactor
       #   MyOrganizer.organized
       #   # => [InteractorOne, InteractorTwo]
       #
+      #   class MyConditionalOrganizer
+      #     include Interactor::Organizer
+      #
+      #     def true_method() { true }
+      #     def false_method() { false }
+      #
+      #     organize { class: InteractorOne, if: :true_method }, { class: InteractorTwo, if: :false_method }
+      #   end
+      #
+      #   MyConditionalOrganizer.organized
+      #   # => { class: InteractorOne, if: :true_method }, { class: InteractorTwo, if: :false_method }
+      #
       # Returns an Array of Interactor classes or an empty Array.
       def organized
         @organized ||= []
@@ -76,7 +88,11 @@ module Interactor
       # Returns nothing.
       def call
         self.class.organized.each do |interactor|
-          interactor.call!(context)
+          if interactor.is_a?(Hash)
+            interactor[:class].call!(context) if interactor[:if].nil? || send(interactor[:if])
+          else
+            interactor.call!(context)
+          end
         end
       end
     end

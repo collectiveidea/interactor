@@ -34,21 +34,41 @@ module Interactor
     describe "#call" do
       let(:instance) { organizer.new }
       let(:context) { double(:context) }
+      let(:interactor1) { double(:interactor1) }
       let(:interactor2) { double(:interactor2) }
       let(:interactor3) { double(:interactor3) }
       let(:interactor4) { double(:interactor4) }
 
       before do
         allow(instance).to receive(:context) { context }
-        allow(organizer).to receive(:organized) {
-          [interactor2, interactor3, interactor4]
-        }
+        allow_any_instance_of(organizer).to receive(:true_method) { true }
+        allow_any_instance_of(organizer).to receive(:false_method) { false }
       end
 
       it "calls each interactor in order with the context" do
+        allow(organizer).to receive(:organized) {
+          [interactor2, interactor3, interactor4]
+        }
         expect(interactor2).to receive(:call!).once.with(context).ordered
         expect(interactor3).to receive(:call!).once.with(context).ordered
         expect(interactor4).to receive(:call!).once.with(context).ordered
+
+        instance.call
+      end
+
+      it "calls only interactors in order with if method that returns true, or without if method" do
+        allow(organizer).to receive(:organized) {
+          [
+            interactor1,
+            {class: interactor2},
+            {class: interactor3, if: :true_method},
+            {class: interactor4, if: :false_method},
+          ]
+        }
+        expect(interactor1).to receive(:call!).once.with(context).ordered
+        expect(interactor2).to receive(:call!).once.with(context).ordered
+        expect(interactor3).to receive(:call!).once.with(context).ordered
+        expect(interactor4).not_to receive(:call!)
 
         instance.call
       end
