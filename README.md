@@ -29,6 +29,48 @@ interactor needs to do its work.
 
 When an interactor does its single purpose, it affects its given context.
 
+#### Declaring required keys in the context
+
+If you want to optionally declare what data an interactor requires to
+function correctly, you can add the `ContextValidation` module to
+your interactor and declare any required items.
+
+```ruby
+include ContextValidation
+
+needs_context :user, :new_password
+```
+
+If any of the items from the `needs_context` declaration are missing, an
+error is raised.
+
+```ruby
+class UpdateUser
+  include Interactor
+  include ContextValidation
+
+  needs_context :user, :new_password
+end
+```
+
+```ruby
+result = UpdateUser.call(user: user, new_password: 'newpasswordstring')
+result.success? #=> true
+```
+
+```ruby
+result = UpdateUser.call(user: user)
+#<RuntimeError: Missing context: new_password in #<UpdateUser>>
+```
+
+Passing `nil` or `''` for the value of a required context will not raise
+an error, to allow for setting items to those values.
+
+```ruby
+result = UpdateUser.call(user: user, new_password: nil)
+result.success? #=> true
+```
+
 #### Adding to the Context
 
 As an interactor runs it can add information to the context.
