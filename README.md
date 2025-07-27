@@ -74,13 +74,35 @@ context.fail!
 context.success? # => false
 ```
 
-#### Dealing with Failure
+#### Succeeding the Context
 
-`context.fail!` always throws an exception of type `Interactor::Failure`.
+When you want to complete an interactor successfully and exit early, you can
+succeed the context.
+
+```ruby
+context.success!
+```
+
+When given a hash argument, the `success!` method can also update the context. The
+following are equivalent:
+
+```ruby
+context.result = "Done!"
+context.success!
+```
+
+```ruby
+context.success!(result: "Done!")
+```
+
+#### Dealing with Failure and Success
+
+Both `context.fail!` and `context.success!` always throw exceptions of type
+`Interactor::Failure` and `Interactor::Success` respectively.
 
 Normally, however, these exceptions are not seen. In the recommended usage, the controller invokes the interactor using the class method `call`, then checks the `success?` method of the context.
 
-This works because the `call` class method swallows `Interactor::Failure` exceptions.  When unit testing an interactor, if calling custom business logic methods directly and bypassing `call`, be aware that `fail!` will generate such exceptions.
+This works because the `call` class method swallows both `Interactor::Failure` and `Interactor::Success` exceptions. When unit testing an interactor, if calling custom business logic methods directly and bypassing `call`, be aware that both `fail!` and `success!` will generate such exceptions.
 
 See *Interactors in the Controller*, below, for the recommended usage of `call` and `success?`.
 
@@ -239,6 +261,32 @@ end
 To define an interactor, simply create a class that includes the `Interactor`
 module and give it a `call` instance method. The interactor can access its
 `context` from within `call`.
+
+### An Example Interactor with Early Success
+
+Your application could use an interactor that completes early under certain conditions.
+
+```ruby
+class ProcessData
+  include Interactor
+
+  def call
+    if context.data.empty?
+      context.success!(result: "No data to process", message: "Early completion")
+    end
+
+    if context.data.length > 1000
+      context.success!(result: context.data.first(100), message: "Too much data, processing first 100 items")
+    end
+
+    # Process all data
+    context.result = context.data.map(&:process)
+    context.message = "All data processed"
+  end
+end
+```
+
+This interactor demonstrates how `success!` can be used to exit early when certain conditions are met, while still providing useful information in the context.
 
 ## Interactors in the Controller
 
