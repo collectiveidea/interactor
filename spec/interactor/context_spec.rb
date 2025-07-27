@@ -152,6 +152,24 @@ module Interactor
       end
     end
 
+    describe "#success!" do
+      let(:context) { Context.build(foo: "bar") }
+
+      it "raises success" do
+        expect {
+          context.success!
+        }.to raise_error(Success)
+      end
+
+      it "makes the context available from the success" do
+        begin
+          context.success!
+        rescue Success => error
+          expect(error.context).to eq(context)
+        end
+      end
+    end
+
     describe "#called!" do
       let(:context) { Context.build }
       let(:instance1) { double(:instance1) }
