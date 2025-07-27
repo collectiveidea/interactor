@@ -28,4 +28,34 @@ module Interactor
       super
     end
   end
+
+  # Internal: Error raised during Interactor::Context success. The error stores
+  # a copy of the successful context for debugging purposes.
+  class Success < StandardError
+    # Internal: Gets the Interactor::Context of the Interactor::Success
+    # instance.
+    attr_reader :context
+
+    # Internal: Initialize an Interactor::Success.
+    #
+    # context - An Interactor::Context to be stored within the
+    #           Interactor::Success instance. (default: nil)
+    #
+    # Examples
+    #
+    #   Interactor::Success.new
+    #   # => #<Interactor::Success: Interactor::Success>
+    #
+    #   context = Interactor::Context.new(foo: "bar")
+    #   # => #<Interactor::Context foo="bar">
+    #   Interactor::Success.new(context)
+    #   # => #<Interactor::Success: #<Interactor::Context foo="bar">>
+    #
+    #   raise Interactor::Success, context
+    #   # => Interactor::Success: #<Interactor::Context foo="bar">
+    def initialize(context = nil)
+      @context = context
+      super
+    end
+  end
 end
