@@ -24,6 +24,40 @@ module Interactor
         hooked
       end
 
+      context "with an ensure hook method" do
+        let(:hooked) {
+          build_hooked do
+            before :add_before
+            after :add_after_with_error
+            ensure_hook :add_ensure
+
+            def self.context
+              @context ||= OpenStruct.new
+            end
+
+            private
+
+            def add_before
+              self.class.context.resource = 1
+            end
+
+            def add_after_with_error
+              raise 'something wrong has happened'
+            end
+
+            def add_ensure
+              self.class.context.resource = 0
+            end
+          end
+        }
+
+        it "runs the ensure hook block" do
+          expect { hooked.process }.to raise_error('something wrong has happened')
+
+          expect(hooked.context.resource).to eq 0
+        end
+      end
+
       context "with an around hook method" do
         let(:hooked) {
           build_hooked do
