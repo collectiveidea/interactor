@@ -72,6 +72,7 @@ module Interactor
     # Returns the resulting Interactor::Context after manipulation by the
     #   interactor.
     # Raises Interactor::Failure if the context is failed.
+    # Raises Interactor::Success if the context is succeeded.
     def call!(context = {})
       new(context).tap(&:run!).context
     end
@@ -113,7 +114,7 @@ module Interactor
   # Returns nothing.
   def run
     run!
-  rescue Failure => e
+  rescue Failure, Success => e
     if context.object_id != e.context.object_id
       raise
     end
