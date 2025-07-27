@@ -130,6 +130,34 @@ module Interactor
       raise Failure, self
     end
 
+    # Public: Success the Interactor::Context. Succeeding a context raises an error
+    # that may be rescued by the calling interactor. The context is also flagged
+    # as having succeeded.
+    #
+    # Optionally the caller may provide a hash of key/value pairs to be merged
+    # into the context before success.
+    #
+    # context - A Hash whose key/value pairs are merged into the existing
+    #           Interactor::Context instance. (default: {})
+    #
+    # Examples
+    #
+    #   context = Interactor::Context.new
+    #   # => #<Interactor::Context>
+    #   context.success!
+    #   # => Interactor::Success: #<Interactor::Context>
+    #   context.success! rescue false
+    #   # => false
+    #   context.success!(foo: "baz")
+    #   # => Interactor::Success: #<Interactor::Context foo="baz">
+    #
+    # Raises Interactor::Success initialized with the Interactor::Context.
+    def success!(context = {})
+      context.each { |key, value| self[key.to_sym] = value }
+      @failure = false
+      raise Success, self
+    end
+
     # Internal: Track that an Interactor has been called. The "called!" method
     # is used by the interactor being invoked with this context. After an
     # interactor is successfully called, the interactor instance is tracked in
