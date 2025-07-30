@@ -470,6 +470,62 @@ end
 interactor should have a single purpose, there should be no need to clean up
 after any failed interactor.
 
+## Interactor Inheritance
+
+Interactors can inherit from other interactors. Subclasses will inherit hooks declared in ancestors:
+
+```ruby
+class ParentInteractor
+  around do |interactor|
+    puts "around before ancestor"
+    interactor.call
+    puts "around after ancestor"
+  end
+
+  before do
+    puts "before ancestor"
+  end
+
+  after do
+    puts "after ancestor"
+  end
+end
+
+class ChildInteractor < ParentInteractor
+  around do |interactor|
+    puts "around before child"
+    interactor.call
+    puts "around after child"
+  end
+
+  before do
+    puts "before child"
+  end
+
+  after do
+    puts "after child"
+  end
+
+  def call
+    puts "called"
+  end
+end
+```
+
+Calling the child interactor will output:
+
+```
+around before child
+around before parent
+before child
+before parent
+called
+after parent
+after child
+around after parent
+around after child
+```
+
 ## Testing Interactors
 
 When written correctly, an interactor is easy to test because it only *does* one

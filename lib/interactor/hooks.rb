@@ -50,7 +50,7 @@ module Interactor
       # Returns nothing.
       def around(*hooks, &block)
         hooks << block if block
-        hooks.each { |hook| around_hooks.push(hook) }
+        hooks.each { |hook| internal_around_hooks.push(hook) }
       end
 
       # Public: Declare hooks to run before Interactor invocation. The before
@@ -87,7 +87,7 @@ module Interactor
       # Returns nothing.
       def before(*hooks, &block)
         hooks << block if block
-        hooks.each { |hook| before_hooks.push(hook) }
+        hooks.each { |hook| internal_before_hooks.push(hook) }
       end
 
       # Public: Declare hooks to run after Interactor invocation. The after
@@ -124,11 +124,12 @@ module Interactor
       # Returns nothing.
       def after(*hooks, &block)
         hooks << block if block
-        hooks.each { |hook| after_hooks.unshift(hook) }
+        hooks.each { |hook| internal_after_hooks.unshift(hook) }
       end
 
       # Internal: An Array of declared hooks to run around Interactor
       # invocation. The hooks appear in the order in which they will be run.
+      # Includes hooks declared in ancestors.
       #
       # Examples
       #
@@ -143,11 +144,12 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def around_hooks
-        @around_hooks ||= []
+        internal_around_hooks + ancestor_hooks(:around_hooks)
       end
 
       # Internal: An Array of declared hooks to run before Interactor
       # invocation. The hooks appear in the order in which they will be run.
+      # Includes hooks declared in ancestors.
       #
       # Examples
       #
@@ -162,11 +164,12 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def before_hooks
-        @before_hooks ||= []
+        internal_before_hooks + ancestor_hooks(:before_hooks)
       end
 
-      # Internal: An Array of declared hooks to run before Interactor
+      # Internal: An Array of declared hooks to run after Interactor
       # invocation. The hooks appear in the order in which they will be run.
+      # Includes hooks declared in ancestors.
       #
       # Examples
       #
@@ -181,7 +184,75 @@ module Interactor
       #
       # Returns an Array of Symbols and Procs.
       def after_hooks
-        @after_hooks ||= []
+        ancestor_hooks(:after_hooks) + internal_after_hooks
+      end
+
+      private
+
+      # Internal: An Array of declared hooks to run around Interactor
+      # invocation. The hooks appear in the order in which they will be run.
+      #
+      # Examples
+      #
+      #   class MyInteractor
+      #     include Interactor
+      #
+      #     around :time_execution, :use_transaction
+      #   end
+      #
+      #   MyInteractor.internal_around_hooks
+      #   # => [:time_execution, :use_transaction]
+      #
+      # Returns an Array of Symbols and Procs.
+      def internal_around_hooks
+        @internal_around_hooks ||= []
+      end
+
+      # Internal: An Array of declared hooks to run before Interactor
+      # invocation. The hooks appear in the order in which they will be run.
+      #
+      # Examples
+      #
+      #   class MyInteractor
+      #     include Interactor
+      #
+      #     before :set_start_time, :say_hello
+      #   end
+      #
+      #   MyInteractor.internal_before_hooks
+      #   # => [:set_start_time, :say_hello]
+      #
+      # Returns an Array of Symbols and Procs.
+      def internal_before_hooks
+        @internal_before_hooks ||= []
+      end
+
+      # Internal: An Array of declared hooks to run after Interactor
+      # invocation. The hooks appear in the order in which they will be run.
+      #
+      # Examples
+      #
+      #   class MyInteractor
+      #     include Interactor
+      #
+      #     after :set_finish_time, :say_goodbye
+      #   end
+      #
+      #   MyInteractor.internal_after_hooks
+      #   # => [:say_goodbye, :set_finish_time]
+      #
+      # Returns an Array of Symbols and Procs.
+      def internal_after_hooks
+        @internal_after_hooks ||= []
+      end
+
+      # Internal: Fetches hooks declared in the ancestor.
+      #
+      # name - A Symbol corresponding to the hook method in the ancestor.
+      #
+      # Returns an Array of Symbols and Procs.
+      def ancestor_hooks(hook)
+        superclass&.respond_to?(hook) ? superclass.send(hook) : []
       end
     end
 
